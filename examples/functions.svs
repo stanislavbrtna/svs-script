@@ -1,0 +1,13 @@
+function main {
+  hello();
+  sys print("" + add(1, 1));
+}
+
+function hello {
+  sys print("Hello");
+  return;
+}
+
+function add {
+  return arg0 + arg1;
+}

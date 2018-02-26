@@ -1,0 +1,14 @@
+function main {
+  a = 5;
+  {
+    local a;
+    a = 8;
+    {
+      local a;
+      a = "Some text";
+      sys print("a = " + a);
+    }
+    sys print("a = " + a);
+  }
+  sys print("a = " + a);
+}

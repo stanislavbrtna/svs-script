@@ -1,0 +1,174 @@
+function main {
+  sys print("AUTOTEST\nSTART-####");
+  if (1==1){
+    sys print("1 - if:OK");
+  }else{
+    sys print("1 - else:ERR");
+  }
+  
+  if (1!=1){
+    sys print("2 - if:ERR");
+  }else{
+    sys print("2 - else:OK");
+  }
+  FAIL=0;
+  
+  a=5;
+  b=10;
+  {
+  local a;
+    a=15;
+    b=a;
+  }
+  
+  if((a==5)*(b==15)){
+    sys print("3 - local:OK");
+  }else{
+    sys print("3 - local:FAIL");
+    FAIL=1;
+  }
+  
+  i_flt=9.0;
+  i2_flt=2.0;
+  n_flt=i_flt/i2_flt;
+  
+  if(n_flt!=4.5){
+    opFAIL=1;
+  }
+  
+  if(((i_flt+i2_flt)!=11.0)+((i_flt-i2_flt)!=7.0)+((i_flt*i2_flt)!=18.0)){
+    opFAIL=1;
+  }
+  
+  if("alpha"+"beta"+8!="alphabeta8"){
+    opFAIL=1;
+  }
+  
+  if(((6+5)!=11)+((8-1)!=7)+((9*2)!=18)+(9/2!=4)+(9%2!=1)){
+    opFAIL=1;
+  }
+  
+  if(opFAIL==1){
+    FAIL=1;
+    sys print("4 - math op: FAIL");
+  }else{
+    sys print("4 - math op: OK");
+  }
+  
+  if (("str"==ret_str())*(5.5==ret_flt())*(8==ret_val())){
+    sys print("5 - call return:OK");
+  }else{
+    sys print("5 - call return:FAIL");
+    FAIL=1;
+  }
+  
+  a=0;
+  while(a<5){
+    a=a+1;
+  }
+  
+  if (a!=5){
+    sys print("6 - while:FAIL");
+    FAIL=1;
+  }else{
+    sys print("6 - while:OK");
+  }
+  
+  a=0;
+  b=0;
+  while(a<50){
+    a=a+1;
+    
+    if (a==25){
+      break;
+    }
+  }
+  
+  if (a!=25){
+    sys print("7 - while-break:FAIL");
+    FAIL=1;
+  }else{
+    sys print("7 - while-break:OK");
+  }
+  
+  b=0;
+  for(a=0;a<5;a=a+1;){
+    b=5;
+  }
+  
+  if ((a!=5)+(b!=5)){
+    sys print("8 - for:FAIL");
+    FAIL=1;
+  }else{
+    sys print("8 - for:OK");
+  }
+  
+  stnd=0;
+  standalone();
+  if(stnd){
+    sys print("9 - standalone call:OK");
+  }else{
+    sys print("9 - standalone call:FAIL");
+    FAIL=1;
+  }
+  
+  a=0;
+  argsfunc(1,2,3,4,5,6,"karel", 5.5);
+  if (a==55){
+    sys print("10 - standalone argumented call:OK");
+  }else{
+    sys print("10 - standalone argumented call:FAIL");
+    FAIL=1;
+  }
+  
+  if ((99==argsfunc(1,2,3,4,5,6,"karel", 5.5))*(1!=6)){
+    sys print("11 - argumented call:OK");
+  }else{
+    sys print("11 - argumented call:FAIL");
+    FAIL=1;
+  }
+  
+  if ((TEST_VAL==5)*(TEST_VAL2==8)){
+    sys print("12 - Constants :OK");
+  }else{
+    sys print("12 - Constants:FAIL");
+    FAIL=1;
+  }
+  
+  #comments hopefully works
+  if(FAIL){
+    sys print("Test FAILED");
+  }else{
+    sys print("Test PASSED");
+  }
+  
+  return FAIL;
+}
+
+function ret_str{
+  return "str";
+}
+
+function ret_flt{
+  return 5.5;
+}
+
+function ret_val{
+  return 8;
+}
+
+function standalone{
+  stnd=1;
+}
+
+function argsfunc{
+  if((arg0==1)*(arg1==2)*(arg2==3)*(arg3==4)*(arg4==5)*(arg5==6)*(arg6=="karel")*(arg7==5.5)){
+    a= 55;
+    return 99;
+  }else{
+    sys print ("ko: "+arg0+" "+arg1+" "+arg2+" "+arg3+" "+arg4+" "+arg5+" "+arg6+" "+arg7);
+    return 0;
+  }
+}
+
+

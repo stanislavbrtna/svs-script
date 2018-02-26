@@ -1,0 +1,12 @@
+function main {
+	if (1) {
+		sys print("true");
+	}
+
+	if ( b < 10) {
+		b = b + 1;
+	} else {
+		b = 0;
+	}
+
+}

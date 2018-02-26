@@ -1,0 +1,18 @@
+function main {
+
+	while(1) {
+		if (a == 5) {
+			break;
+		}
+		a = a + 1;
+		sys print("loop");
+	}
+
+	b = 5;
+	while(b) {
+		b = b - 1;
+		sys print("loop 2");
+	}
+
+}
+
