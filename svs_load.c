@@ -22,13 +22,13 @@ SOFTWARE.
 
 #include "svs_load.h"
 
-uint8_t filename[32];
+uint8_t filename[64];
 uint8_t ldinit;
 uint8_t ldmode;
 
 void setFName(uint8_t * name) {
   uint16_t x;
-  for(x = 0; x < 32; x++) {
+  for(x = 0; x < 64; x++) {
 	  filename[x] = name[x];
   }
 }
@@ -41,7 +41,7 @@ void tokenGetchSetup(uint8_t * fname, uint8_t mode) {
 
 
 uint8_t loadApp(uint8_t *fname, uint8_t *name, svsVM *s, uint8_t mode) {
-	static uint8_t fsloaded;
+	//static uint8_t fsloaded;
 	svsReset(s);
 	svsSetName(name,s);
 	setFName(fname);
@@ -70,30 +70,32 @@ uint8_t loadApp(uint8_t *fname, uint8_t *name, svsVM *s, uint8_t mode) {
 #ifndef PC
 uint8_t tokenGetch() {
 	static FIL fp;
-	static FRESULT fr;
 	uint8_t x = 0;
+	uint32_t br;
 	if(ldmode == 0) {
 		if (ldinit == 0) {
 			printf("Opening file: %s\n", filename);
-			fr = f_open(&fp, filename, FA_READ);
-			if (fr != FR_OK) {
+			if (f_open(&fp, filename, FA_READ) != FR_OK) {
 			  errMsgS("tokenGetch: Error while opening file!");
+			  return 0;
 			}
 			ldinit = 1;
 		}
-		f_read(&fp,&x,sizeof(x),&fr);
-		//printf("tokenGetch: %c\n",x  );
+
+		if (f_read(&fp,&x,sizeof(x),&br) != FR_OK) {
+		  errMsgS("tokenGetch: Error while reading from file!");
+		}
+
 		if (f_eof(&fp)) {
 			f_close(&fp);
+			//printf("tokenGetch: EOF\n");
 			return 0;
 		} else {
+			//printf("tokenGetch: %c\n", x);
 		  return x;
 		}
 	} else {
-		if (ldinit == 0) {
-			ldinit = 1;
-		}
-		return x;
+		return 0;
 	}
 }
 

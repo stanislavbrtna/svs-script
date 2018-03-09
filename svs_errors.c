@@ -78,25 +78,24 @@ void errSoftPrint(svsVM *s) {
 	}
 }
 
-#ifdef PC
-void errMsg(errStruct err) {
-	printf("\nToken: %u HARD ERR: %s\n", err.tokenId, err.errString);
-	getchar();
-}
 
-void errMsgS(uint8_t *str) {
-	printf("\nHARD ERR: %s\n",str);
-	getchar();
-}
-
-#else
 void errMsg(errStruct err) {
 	printf("\nToken: %u HARD ERR: %s\n", err.tokenId, err.errString );
-	while(1);
+	svs_hardErrHandler();
 }
 
 void errMsgS(uint8_t *str) {
 	printf("\nHARD ERR: %s\n", str);
+	svs_hardErrHandler();
+}
+
+#ifdef PC
+void hardErrHandler_default(){
+	getchar();
+}
+#else
+void hardErrHandler_default(){
 	while(1);
 }
 #endif
+void svs_hardErrHandler () __attribute__ ((weak, alias ("hardErrHandler_default")));

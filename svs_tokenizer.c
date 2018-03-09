@@ -147,7 +147,7 @@ uint8_t tokenGetchDbg(){
 		}
 	}
 
-	//printf("token getch dbg: %c\n", c);
+	//printf("token getch dbg: %c (%u)\n", c, c);
 	return c;
 
 }
@@ -235,10 +235,9 @@ uint8_t tokenInput(uint16_t index, uint8_t inc){
 /*
 uint8_t tokenInput(uint16_t index, uint8_t inc){
 	uint8_t c=0;
-	uint32_t testpole[100];
 	c = tokenInputX(index, inc);
 
-	printf("token input init:%u (index: %u, inc: %u): %c\n",tokenizerInit ,index, inc, c);
+	printf("token input init:%u (index: %u, inc: %u): %c (%u)\n",tokenizerInit ,index, inc, c, c);
 	return c;
 }
 */

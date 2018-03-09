@@ -34,6 +34,8 @@ void errSoftSetToken(uint16_t token, svsVM *s);
 void errSoftSetParam(uint8_t *str, VARTYPE val, svsVM *s);
 uint8_t errCheck(svsVM *s);
 
+void hardErrHandler_default();
+
 void errSoftPrint(svsVM *s);
 
 #endif
