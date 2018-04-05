@@ -64,6 +64,12 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
 		result->type = prac.type;
 		result->tokenId = prac.tokenId;
 		exprExecDMSG("ExprExecLvl5 SYS", result->value.val_s, result->tokenId);
+	}else	if (getTokenType(index, s) == 36) { // EMBED FUNC
+		processEmbedCall(index, &prac, s);
+		result->value.val_s = prac.value.val_s;
+		result->type = prac.type;
+		result->tokenId = prac.tokenId;
+		exprExecDMSG("ExprExecLvl5 EMBED FUNC", result->value.val_s, result->tokenId);
 	}else if (getTokenType(index, s) == 17) { //CALL
 		if ((getTokenType(index + 1, s) == 5)) {
 			index = commParseCall(index, s);

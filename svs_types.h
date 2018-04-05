@@ -42,7 +42,7 @@ typedef struct {
   uint8_t name[NAME_LENGTH];
   uint32_t maskId; // maskovací id lokální proměnné
   varType value; //num - hodnota, str-nultý charakter v tabulce, string je ukončen \0
-  uint8_t type; //0-num (int32) 1-string 2-float 3-reserved pro sys exec n/a
+  uint8_t type; //0-num (int32) 1-string 3-float
 } varTableType;
 
 typedef struct { //struktura kterou vrací funkce výsledek

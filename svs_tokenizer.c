@@ -1083,16 +1083,25 @@ uint8_t tokenParse(svsVM *s){
 						}
 						tokenDMSG("New variable found!", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
 						tokenDMSG("Token set, type VAR, name:", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-						tokenDMSG(pracName, posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
+						tokenDMSG(pracName, posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
 					}
-				}else{
-						//tokenType[posToken]=17; //nastavíme typ
-						setTokenType(posToken, 17,s);
-						//tokenData[posToken]=strNew(pracName, s); //vytvoříme string s názvem
-						s->stringConstMax=s->stringFieldLen;
-						setTokenData(posToken,(varType)strNew(pracName, s),s);
-						tokenDMSG("Token set, type CALL, function name:", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-						tokenDMSG(s->stringField+getTokenData(posToken,s).val_str, posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
+				} else {
+						//TODO: Parsing of internal functions will be done here.
+						// if it is embedded function call and function with that name is not registered
+						// we register it as a embedded call, otherwise it will be a normal call
+						if (getEmbedCallId(pracName) && !(functionExists(pracName, s))) {
+							setTokenType(posToken, 36, s);
+							setTokenData(posToken, (varType)getEmbedCallId(pracName), s);
+							tokenDMSG("Token set, type EMBED CALL, function name:", posToken, getTokenData(posToken,s), getTokenType(posToken,s), posText);
+							tokenDMSG(pracName, posToken, getTokenData(posToken,s), getTokenType(posToken,s), posText);
+						} else {
+							setTokenType(posToken, 17, s);
+							s->stringConstMax = s->stringFieldLen;
+							setTokenData(posToken, (varType)strNew(pracName, s), s);
+							tokenDMSG("Token set, type CALL, function name:", posToken, getTokenData(posToken,s), getTokenType(posToken,s), posText);
+							tokenDMSG(s->stringField+getTokenData(posToken, s).val_str, posToken, getTokenData(posToken,s), getTokenType(posToken,s), posText);
+						}
+
 				}
 			}
 			posToken++;

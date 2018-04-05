@@ -166,6 +166,17 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 			return currToken;
 		}
 
+		if ((getTokenType(currToken, s) == 36) && lock) { //embed function
+			lock = 0;
+			commExDMSG("commExecLoop: EMBED FUNCTION statement", currToken);
+			processEmbedCall(currToken, &varPrac, s);
+			if (errCheck(s)) {
+				return 0;
+			}
+			currToken = varPrac.tokenId;
+			return currToken;
+		}
+
 		// equals statement
 		if ((getTokenType(currToken, s) == 10) && lock) {
 			//pokud narazíme na typ VAR / if we found a variable
@@ -648,7 +659,7 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
 		return index;
 
 	} else {
-		errSoft("sysExec: Syntax error at the begin of function call. (missing \"(\")", s);
+		errSoft("commParseCall: Syntax error at the begin of function call. (missing \"(\")", s);
 		errSoftSetParam("TokenId", (varType)index, s);
 		errSoftSetToken(index, s);
 		return 0;

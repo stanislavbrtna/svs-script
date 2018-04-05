@@ -25,6 +25,7 @@ When embedding the SVS, you can write your own error printing functions to suit 
 
 #include "svs_errors.h"
 
+void svs_hardErrHandler () __attribute__ ((weak, alias ("hardErrHandler_default")));
 
 void errSoft(uint8_t *str, svsVM *s) {
 	if (errCheck(s)) {
@@ -98,4 +99,4 @@ void hardErrHandler_default(){
 	while(1);
 }
 #endif
-void svs_hardErrHandler () __attribute__ ((weak, alias ("hardErrHandler_default")));
+

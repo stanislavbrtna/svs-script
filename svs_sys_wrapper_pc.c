@@ -23,9 +23,9 @@ SOFTWARE.
 #include "svs_basics.h"
 
 svsConstType pcBasicWrapConsts[]={
-{"TEST_VAL",5},
-{"TEST_VAL2",8},
-{"end",0}
+	{"TEST_VAL", 5},
+	{"TEST_VAL2", 8},
+	{"end", 0}
 };
 
 
@@ -39,7 +39,7 @@ void pcBasicWrapInit(){
 uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 	uint16_t x;
 	uint8_t argType[11];
-	
+
 	//printf("basics wrap got: %s \n",s->syscallTable[argS->callId.val_u].sysCallName);
 
   // sys test(1,2,3,4,5);
@@ -57,19 +57,19 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 		result->value.val_s=8;
 		return 1;
 	}
-	
+
 	// sys real(str); ret val
 	if (sysFuncMatch(argS->callId,"real",s)){
 	  varType prac;
 	  uint16_t x=0;
-	  
+
 	  prac.val_s=0;
-	  
+
 	  argType[1]=1;
 	  if(sysExecTypeCheck(argS, argType, 1,s)){
 		  return 0;
 		}
-		
+
 	  prac.val_s=0;
 		if(s->stringField[argS->arg[1].val_str]=='-'){
 		  x=1;
@@ -83,7 +83,7 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 			prac.val_s*=-1;
 		}else{
 		  x=0;
-			while(s->stringField[argS->arg[1].val_str+x]!=0){ 
+			while(s->stringField[argS->arg[1].val_str+x]!=0){
 				if((s->stringField[argS->arg[1].val_str+x]>='0')&&(s->stringField[argS->arg[1].val_str+x]<='9')){
 					prac.val_s*=10;
 					prac.val_s+=s->stringField[(argS->arg[1].val_str)+x]-48;
@@ -95,16 +95,16 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 		result->type=0;
 		return 1;
 	}
-	
+
 	/*Pole*/
-	
+
 	// sys arrayNew(num len); - 0 pokud fail, jinak id
 	if (sysFuncMatch(argS->callId,"arrayNew",s)){ //test
 	  argType[1]=0;
 		if(sysExecTypeCheck(argS, argType, 1,s)){
 		  return 0;
 		}
-		
+
 		if (argS->arg[1].val_s>(SVS_ARRAY_LEN-s->varArrayLen)){
 		  //pole se nevejde
 		  result->value.val_s=0;
@@ -117,7 +117,7 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 		s->varArrayLen+=argS->arg[1].val_s;
 		return 1;
 	}
-	
+
 	// sys arrayGet(id, index); - ret val.
 	if (sysFuncMatch(argS->callId,"arrayGet",s)){
 	  argType[1]=0;
@@ -125,7 +125,7 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 		if(sysExecTypeCheck(argS, argType, 2,s)){
 		  return 0;
 		}
-		
+
 		if (argS->arg[1].val_s>SVS_ARRAY_LEN){
 		  errSoft("pcBasicsWrap: arrayGet: Out of range!",s);
 		  return 1;
@@ -137,7 +137,7 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 		//s->varArrayLen+=argS->arg[1].val_s;
 		return 1;
 	}
-	
+
 	// sys arraySet(id, index, val);
 	if (sysFuncMatch(argS->callId,"arraySet",s)){
 	  argType[1]=0;
@@ -146,7 +146,7 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 		if(sysExecTypeCheck(argS, argType, 3,s)){
 		  return 0;
 		}
-		
+
 		if (argS->arg[1].val_s>SVS_ARRAY_LEN){
 		  errSoft("pcBasicsWrap: arrayGet: Out of range!",s);
 		  return 1;
@@ -159,7 +159,7 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 		}
 		return 1;
 	}
-	
+
 	//sys dbg(num lvl);
 	//debug pro comm exec a expr exec
 	if (sysFuncMatch(argS->callId,"dbg",s)){
@@ -172,7 +172,7 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 		result->value.val_s=0;
 		return 1;
 	}
-	
+
 	//sys profiler(enable);
 	//GC profiler
 	if (sysFuncMatch(argS->callId,"profiler",s)){
@@ -185,20 +185,20 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 		result->value.val_s=0;
 		return 1;
 	}
-	
+
 	//sys GC(num to free);
 	if (sysFuncMatch(argS->callId,"GC",s)){
 	  argType[1]=0;
 		if (sysExecTypeCheck(argS, argType, 1,s)){
 		  return 0;
 		}
-		
+
 		garbageCollect(argS->arg[1].val_s,s);
 
 		result->value.val_s=0;
 		return 1;
 	}
-	
+
 	//sys dbgGc(num lvl);
 	//debug pro GC
 	if (sysFuncMatch(argS->callId,"dbgGc",s)){
@@ -210,7 +210,7 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 		result->value.val_s=0;
 		return 1;
 	}
-	
+
 	// dbgCache
 	if (sysFuncMatch(argS->callId,"dbgCache",s)){
 	  argType[1]=0;
@@ -221,17 +221,17 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 		result->value.val_s=0;
 		return 1;
 	}
-	
+
 	//sys info();
 	if (sysFuncMatch(argS->callId,"info",s)){
 		if (sysExecTypeCheck(argS, argType, 0,s)){
 		  return 0;
 		}
-		
+
 		svsInfo(s);
 		return 1;
 	}
-	
+
 	//sys print(str);
 	if (sysFuncMatch(argS->callId,"print",s)){
 	  argType[1]=1;
@@ -246,12 +246,12 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 				break;
 			}
 			x++;
-		} 
+		}
 		puts("");
 
 		return 1;
 	}
-	
+
 	return 0;
 }
 

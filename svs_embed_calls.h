@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2016 Stanislav Brtna
+Copyright (c) 2018 Stanislav Brtna
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,37 +18,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-This is the main include file.
 */
 
-#ifndef SVS_BASICS
-#define SVS_BASICS
+#ifndef SVS_EMBED_CALLS
+#define SVS_EMBED_CALLS
 
-#ifdef PC
- #include <stdio.h>
- #include <stdint.h>
-#else
- #include <stdint.h>
- #ifdef SVS_USE_PLATFORM_SPECIFIC
- #include "platform_specific.h"
- #endif
-#endif
+#include "svs_basics.h"
 
-#include "svs_limits.h"
-#include "svs_types.h"
-#include "svs_errors.h"
+typedef struct {
+  const char* name;
+  uint16_t id;
+} svsEmbedCallsTableType;
 
-
-#include "svs_token_cache.h"
-#include "svs_misc.h"
-#include "svs_misc_str.h"
-#include "svs_sys_exec.h"
-#include "svs_embed_calls.h"
-#include "svs_tokenizer.h"
-#include "svs_expr_exec2.h"
-#include "svs_comm_exec.h"
-#include "svs_garbage_collector.h"
-#include "svs_load.h"
+uint16_t getEmbedCallId(uint8_t * str);
+uint16_t processEmbedCall(uint16_t index, varRetVal *result, svsVM *s);
+uint16_t execEmbedCall(uint16_t callId, varType *args, uint8_t * argType, uint16_t count, varRetVal *result, svsVM *s);
 
 #endif
