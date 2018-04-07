@@ -44,7 +44,7 @@ This is the main include file.
 #include "svs_misc.h"
 #include "svs_misc_str.h"
 #include "svs_sys_exec.h"
-#include "svs_embed_calls.h"
+#include "svs_builtin_calls.h"
 #include "svs_tokenizer.h"
 #include "svs_expr_exec2.h"
 #include "svs_comm_exec.h"

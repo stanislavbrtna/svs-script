@@ -20,18 +20,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef SVS_EMBED_CALLS
-#define SVS_EMBED_CALLS
+#ifndef SVS_BUILTIN_CALLS
+#define SVS_BUILTIN_CALLS
 
 #include "svs_basics.h"
 
 typedef struct {
   const char* name;
   uint16_t id;
-} svsEmbedCallsTableType;
+} svsBuiltInCallsTableType;
 
-uint16_t getEmbedCallId(uint8_t * str);
-uint16_t processEmbedCall(uint16_t index, varRetVal *result, svsVM *s);
-uint16_t execEmbedCall(uint16_t callId, varType *args, uint8_t * argType, uint16_t count, varRetVal *result, svsVM *s);
+uint16_t getBuiltInCallId(uint8_t * str);
+uint16_t processBuiltInCall(uint16_t index, varRetVal *result, svsVM *s);
+uint16_t execBuiltInCall(uint16_t callId, varType *args, uint8_t * argType, uint16_t count, varRetVal *result, svsVM *s);
 
 #endif

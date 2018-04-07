@@ -1,6 +1,6 @@
 function main {
 	if (1) {
-		sys print("true");
+		print("true");
 	}
 
 	if ( b < 10) {

@@ -166,10 +166,10 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 			return currToken;
 		}
 
-		if ((getTokenType(currToken, s) == 36) && lock) { //embed function
+		if ((getTokenType(currToken, s) == 36) && lock) { // built-in function
 			lock = 0;
-			commExDMSG("commExecLoop: EMBED FUNCTION statement", currToken);
-			processEmbedCall(currToken, &varPrac, s);
+			commExDMSG("commExecLoop: BUILT-IN FUNCTION statement", currToken);
+			processBuiltInCall(currToken, &varPrac, s);
 			if (errCheck(s)) {
 				return 0;
 			}
@@ -182,14 +182,9 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 			//pokud narazíme na typ VAR / if we found a variable
 			lock = 0;
 			x = currToken; //uložíme token indexu promněnné / we store index of the variable
-			commExDMSG("commExecLoop: = statement", currToken);
 			currToken++;
-			if (getTokenType(currToken,s) != 24) { //očekáváme "=" / expecting "="
-				errSoft("commEx: Syntax error next to VAR (missing \"=\").", s);
-				errSoftSetParam("TokenId", (varType)currToken, s);
-				errSoftSetToken(currToken, s);
-				return 0;
-			}else{
+			if (getTokenType(currToken,s) == 24) { // =
+				commExDMSG("commExecLoop: = statement", currToken);
 				currToken++;
 				//printf("var set val id: %u, value: %u\n", tokenData[x], exprExec(currToken));
 				//printf("math exec id: %u\n", currToken);
@@ -210,14 +205,64 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 				currToken = varPrac.tokenId; //nastavíme token kde se má pokračovat / we set the token id we got from exprExec
 				commExDMSG("commExecLoop: = statement: continue on token:", currToken);
 
-				if (getTokenType(currToken,s) != 9) { //zkontrolujeme středník / semicolon check
+			} else if(getTokenType(currToken, s) == 1) { // ++
+				commExDMSG("commExecLoop: ++ statement", currToken);
+				currToken++;
+				if (getTokenType(currToken, s) == 1) {
+					if (varGetType(varPrac.value, s) != 0) {
+						errSoft("commEx: Syntax error in ++: only num type can be incremented.", s);
+						errSoftSetParam("TokenId", (varType)currToken, s);
+						errSoftSetToken(currToken, s);
+						return 0;
+					}
+					varType prac;
+					prac = varGetVal(getTokenData(x,s),s);
+					varSetVal(getTokenData(x,s), (varType)(prac.val_s + (int32_t)1), s);
+
+					currToken++;
+				}else{
+					errSoft("commEx: Syntax error next to ++ (missing \"+\").", s);
+					errSoftSetParam("TokenId", (varType)currToken, s);
+					errSoftSetToken(currToken, s);
+					return 0;
+				}
+
+			} else if(getTokenType(currToken, s) == 2) { // --
+				commExDMSG("commExecLoop: -- statement", currToken);
+				currToken++;
+				if (getTokenType(currToken, s) == 2) {
+					if (varGetType(varPrac.value, s) != 0) {
+						errSoft("commEx: Syntax error in --: only num type can be decremented.", s);
+						errSoftSetParam("TokenId", (varType)currToken, s);
+						errSoftSetToken(currToken, s);
+						return 0;
+					}
+					varType prac;
+					prac = varGetVal(getTokenData(x,s),s);
+					varSetVal(getTokenData(x,s), (varType)(prac.val_s - (int32_t)1), s);
+
+					currToken++;
+				}else{
+					errSoft("commEx: Syntax error next to -- (missing \"-\").", s);
+					errSoftSetParam("TokenId", (varType)currToken, s);
+					errSoftSetToken(currToken, s);
+					return 0;
+				}
+
+			} else { //očekáváme "=" / expecting "="
+				errSoft("commEx: Syntax error next to VAR (missing \"=\", \"++\" or \"--\").", s);
+				errSoftSetParam("TokenId", (varType)currToken, s);
+				errSoftSetToken(currToken, s);
+				return 0;
+			}
+
+			if (getTokenType(currToken,s) != 9) { //zkontrolujeme středník / semicolon check
 					errSoft("commEx: Syntax error, missing ; .", s);
 					errSoftSetParam("TokenId", (varType)currToken, s);
 					errSoftSetToken(currToken, s);
 					return 0;
 				}
-				return currToken;
-			}
+
 			return currToken;
 		}
 
@@ -593,12 +638,12 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
 	 uint8_t *callName;
 	 uint16_t x = 1;
 	 varRetVal pracVar;
-	 comExArgs pracArgs;
-	 callName = s->stringField + getTokenData(index, s).val_u;
+	 comExArgs pracArgs; // to store current arguments while new function is executed
+	 comExArgs pracArgs2; // to temporarily store new arguments
+	 uint16_t usedUp = 0;
+	 uint16_t usedUpOld = 0;
 
-	 //tady bude třeba uložit staré argumenty
-	 commArgCopy(&s->commArgs, &pracArgs);
-	 commArgNull(&s->commArgs);
+	 callName = s->stringField + getTokenData(index, s).val_u;
 
 	 index++;
 
@@ -607,8 +652,8 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
 		index++;
 		if (getTokenType(index, s) != 6) { //pokud nemáme prázdnou závorku
 			exprExec(index, &pracVar, s);
-			s->commArgs.arg[x] = pracVar.value;
-			s->commArgs.argType[x] = pracVar.type;
+			pracArgs2.arg[x] = pracVar.value;
+			pracArgs2.argType[x] = pracVar.type;
 			index = pracVar.tokenId;
 			x++;
 		}
@@ -622,8 +667,8 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
 			}
 			index++;
 			exprExec(index, &pracVar, s);
-			s->commArgs.arg[x] = pracVar.value;
-			s->commArgs.argType[x] = pracVar.type;
+			pracArgs2.arg[x] = pracVar.value;
+			pracArgs2.argType[x] = pracVar.type;
 			index = pracVar.tokenId;
 			x++;
 		}
@@ -635,7 +680,16 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
 			return 0;
 		}
 
-		s->commArgs.usedup = x - 1;
+		usedUp = x - 1;
+		usedUpOld = s->commArgs.usedup;
+
+		//tady bude třeba uložit staré argumenty
+		commArgCopy(&s->commArgs, &pracArgs);
+		commArgNull(&s->commArgs);
+
+		commArgCopy(&pracArgs2, &s->commArgs);
+
+		s->commArgs.usedup = usedUp;
 
 		index++;
 		varRetValZero(&pracVar);
@@ -646,7 +700,6 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
 		if (errCheck(s)) {
 			return 0;
 		}
-
 		// ret val:			 s->commRetVal;
 		// ret val type:	s->commRetType;
 
@@ -655,6 +708,7 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
 
 		//navrácení argumentů zpět
 		commArgCopy(&pracArgs, &s->commArgs);
+		s->commArgs.usedup = usedUpOld;
 
 		return index;
 

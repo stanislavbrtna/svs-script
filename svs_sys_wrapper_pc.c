@@ -25,6 +25,11 @@ SOFTWARE.
 svsConstType pcBasicWrapConsts[]={
 	{"TEST_VAL", 5},
 	{"TEST_VAL2", 8},
+	// type defines
+	{"TYPE_NUM", 0},
+	{"TYPE_STR", 1},
+	{"TYPE_FLOAT", 3},
+
 	{"end", 0}
 };
 
@@ -58,6 +63,7 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
 		return 1;
 	}
 
+	// TODO: To be removed (TBR)
 	// sys real(str); ret val
 	if (sysFuncMatch(argS->callId,"real",s)){
 	  varType prac;

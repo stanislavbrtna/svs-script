@@ -64,12 +64,12 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
 		result->type = prac.type;
 		result->tokenId = prac.tokenId;
 		exprExecDMSG("ExprExecLvl5 SYS", result->value.val_s, result->tokenId);
-	}else	if (getTokenType(index, s) == 36) { // EMBED FUNC
-		processEmbedCall(index, &prac, s);
+	}else	if (getTokenType(index, s) == 36) { // BuiltIn FUNC
+		processBuiltInCall(index, &prac, s);
 		result->value.val_s = prac.value.val_s;
 		result->type = prac.type;
 		result->tokenId = prac.tokenId;
-		exprExecDMSG("ExprExecLvl5 EMBED FUNC", result->value.val_s, result->tokenId);
+		exprExecDMSG("ExprExecLvl5 BUILTIN FUNC", result->value.val_s, result->tokenId);
 	}else if (getTokenType(index, s) == 17) { //CALL
 		if ((getTokenType(index + 1, s) == 5)) {
 			index = commParseCall(index, s);
@@ -107,6 +107,25 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
 		  errSoftSetToken(index, s);
 		  return;
 		}
+	}else if ((getTokenType(index, s) == 39)) {
+		exprExecDMSG("ExprExecLvl5 NOT statement", result->value.val_s, result->tokenId);
+		exprExecLvl5(index + 1, result, s); // get next statement
+		if (errCheck(s)) {
+      return;
+    }
+    if (result->type != 0) {
+    	errSoft("ExprExecLvl5 NOT: You can only apply NOT on num type!", s);
+		  errSoftSetParam("TokenId", (varType)index, s);
+		  errSoftSetToken(index, s);
+		  return;
+    }
+    if (result->value.val_s) { // perform negation
+    	result->value = (varType)((int32_t)0);
+    } else {
+    	result->value = (varType)((int32_t)1);
+    }
+    exprExecDMSG("ExprExecLvl5 NOT statement end", result->value.val_s, result->tokenId);
+		index = result->tokenId;
 	}else if (((getTokenType(index, s) == 5) || (getTokenType(index, s) == 6))) {
 		while ((getTokenType(index, s) == 5) || (getTokenType(index, s) == 6)) {
 			if (getTokenType(index, s) == 5) { // (
@@ -128,7 +147,6 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
 	}
 	exprExecDMSG("ExprExecLvl5 Exit", result->value.val_s, result->tokenId);
 }
-
 
 void exprExecLvl4(uint16_t index, varRetVal *result, svsVM *s) {
   //NUM * / % FLT * /
@@ -390,12 +408,13 @@ void exprExecLvl2(uint16_t index, varRetVal *result, svsVM *s){
 }
 
 
+
+
 //expressionExec
-void exprExec(uint16_t index, varRetVal *result, svsVM *s){
+void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s){
   //== != <= >= < > --hotovo
   errStruct err;
   uint16_t tokenId;
-  uint16_t strBeginVal;
   uint16_t x;
   varRetVal prac;
 
@@ -403,14 +422,13 @@ void exprExec(uint16_t index, varRetVal *result, svsVM *s){
   err.tokenId=0;
 
   varRetValZero(&prac);
-  varRetValZero(result);
+
   result->tokenId=index;
 
 
   tokenId=index;
 
   //printf("GC:EXPR: begin %u\n", s->stringFieldLen);
-  strBeginVal=s->stringFieldLen;
 
   exprExecDMSG("ExprExecLvl1 Begin",result->value.val_s,tokenId);
 
@@ -715,6 +733,107 @@ void exprExec(uint16_t index, varRetVal *result, svsVM *s){
 		}
 	}
 
+  exprExecDMSG("ExprExecLvl1 Exit",result->value.val_u,result->tokenId);
+
+  return;
+}
+
+void exprExecLvlLogic(uint16_t index, varRetVal *result, svsVM *s){
+  // AND OR
+  varRetVal prac;
+  uint16_t tokenId;
+
+  errStruct err;
+	err.errString = "";
+	err.tokenId = 0;
+
+  varRetValZero(&prac);
+
+  tokenId=index;
+  exprExecDMSG("ExprExecLvlLogic (0) Begin",result->value.val_s,tokenId);
+  exprExecLvl1(tokenId, result,s);
+  if (errCheck(s)){
+    return;
+  }
+  tokenId=result->tokenId;
+
+  while ((getTokenType(tokenId,s) == 37) || (getTokenType(tokenId,s) == 38)) {
+		if (getTokenType(tokenId,s) == 37) { // and
+			exprExecDMSG("ExprExecLvlLogic AND operator",result->value.val_s,tokenId);
+			exprExecLvl1(result->tokenId + 1, &prac,s); //získáme druhý operand
+			if (errCheck(s)){
+        return;
+      }
+			if ((result->type == 0) && (prac.type == 0)) { //ověříme typ a pokud je to num, tak
+			  if (result->value.val_s && prac.value.val_s) {
+			  	result->value.val_s = 1;
+			  } else {
+			  	result->value.val_s = 0;
+			  }
+			  tokenId = prac.tokenId;  //nastavíme token id co se vrátilo
+			  result->tokenId = prac.tokenId; //nastavíme znova
+			  exprExecDMSG("ExprExecLogic AND: ",result->value.val_s,tokenId);
+			} else {
+				errSoft("Can only use logic operators (AND) on num type!",s);
+  		  errSoftSetParam("TokenId",(varType)tokenId,s);
+  		  errSoftSetToken(tokenId,s);
+	  	  return;
+			}
+		}else	if (getTokenType(tokenId,s) == 38) { // or
+			exprExecDMSG("ExprExecLvlLogic OR operator",result->value.val_s,tokenId);
+			exprExecLvl1(result->tokenId + 1, &prac,s); //získáme druhý operand
+			if (errCheck(s)){
+        return;
+      }
+			if ((result->type == 0) && (prac.type == 0)) { //ověříme typ a pokud je to num, tak
+			  if (result->value.val_s || prac.value.val_s) {
+			  	result->value.val_s = 1;
+			  } else {
+			  	result->value.val_s = 0;
+			  }
+			  tokenId = prac.tokenId;  //nastavíme token id co se vrátilo
+			  result->tokenId = prac.tokenId; //nastavíme znova
+			  exprExecDMSG("ExprExecLogic OR: ",result->value.val_s,tokenId);
+			} else {
+				errSoft("Can only use logic operators (OR) on num type!",s);
+  		  errSoftSetParam("TokenId",(varType)tokenId,s);
+  		  errSoftSetToken(tokenId,s);
+	  	  return;
+			}
+		}
+	}
+
+  exprExecDMSG("ExprExecLvlLogic (0) Exit",result->value.val_s,result->tokenId);
+}
+
+void exprExec(uint16_t index, varRetVal *result, svsVM *s) {
+	errStruct err;
+  uint16_t tokenId;
+  uint16_t strBeginVal;
+  uint16_t x;
+  varRetVal prac;
+
+  err.errString="";
+  err.tokenId=0;
+
+  varRetValZero(&prac);
+  varRetValZero(result);
+  result->tokenId=index;
+
+
+  tokenId=index;
+
+  //printf("GC:EXPR: begin %u\n", s->stringFieldLen);
+  strBeginVal=s->stringFieldLen;
+
+  exprExecDMSG("ExprExec Begin",result->value.val_s,tokenId);
+
+	exprExecLvlLogic(tokenId, result,s);
+	if (errCheck(s)){
+    return;
+  }
+	tokenId=result->tokenId;
+
 	if ((strBeginVal< s->stringFieldLen)&&(result->type==1)){
 	  for(x=0; x<(s->stringFieldLen-strBeginVal);x++){
 	    if(s->stringField[result->value.val_str+x]!=0){
@@ -732,7 +851,7 @@ void exprExec(uint16_t index, varRetVal *result, svsVM *s){
 
 	//printf("GC:EXPR: end %u\n", s->stringFieldLen);
 
-  exprExecDMSG("ExprExecLvl1 Exit",result->value.val_u,result->tokenId);
+  exprExecDMSG("ExprExec Exit",result->value.val_u,result->tokenId);
 
   return;
 }

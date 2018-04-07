@@ -308,3 +308,12 @@ uint8_t * getRetValStr(svsVM *s){
 float getRetValFlt(svsVM *s){
   return s->commRetVal.val_f;
 }
+
+float exp_helper(uint16_t a, uint16_t ex) {
+	uint16_t x;
+	float val = (float)a;
+	for(x = 1; x < ex; x++) {
+		val *= (float)a;
+	}
+	return val;
+}

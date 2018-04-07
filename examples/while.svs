@@ -5,13 +5,13 @@ function main {
 			break;
 		}
 		a = a + 1;
-		sys print("loop");
+		print("loop");
 	}
 
 	b = 5;
 	while(b) {
 		b = b - 1;
-		sys print("loop 2");
+		print("loop 2");
 	}
 
 }

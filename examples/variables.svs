@@ -6,9 +6,9 @@ function main {
     {
       local a;
       a = "Some text";
-      sys print("a = " + a);
+      print("a = " + a);
     }
-    sys print("a = " + a);
+    print("a = " + a);
   }
-  sys print("a = " + a);
+  print("a = " + a);
 }

@@ -34,7 +34,8 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s);
 void exprExecLvl4(uint16_t index, varRetVal *result, svsVM *s);
 void exprExecLvl3(uint16_t index, varRetVal *result, svsVM *s);
 void exprExecLvl2(uint16_t index, varRetVal *result, svsVM *s);
-void exprExec(uint16_t index, varRetVal *result, svsVM *s);
+void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s);
+void exprExecLvlLogic(uint16_t index, varRetVal *result, svsVM *s);
 void setExprExecDebug(uint8_t level);
 
 #endif

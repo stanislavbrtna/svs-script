@@ -3,10 +3,10 @@ function main {
 	bottles = 99;
 
 	while(bottles > 0) {
-		sys print( bottles + " bottles of beer on the wall.");
-		sys print("Take one down and pass it around.");
+		print( bottles + " bottles of beer on the wall.");
+		print("Take one down and pass it around.");
 		bottles = bottles - 1;
-		sys print( bottles + " bottles of beer on the wall.");
+		print( bottles + " bottles of beer on the wall.");
 	}
 
 }

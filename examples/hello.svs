@@ -1,10 +1,10 @@
 function main {
 	# this is a comment
-  sys print("Hello world program:");
+  print("Hello world program:");
 
   variable = "hello";
 
   variable = variable + " world";
 
-  sys print(variable + "!");
+  print(variable + "!");
 }

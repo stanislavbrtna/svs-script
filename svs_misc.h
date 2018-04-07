@@ -54,6 +54,7 @@ void svsInfo(svsVM *s);
 int32_t getRetValInt(svsVM *s);
 uint8_t * getRetValStr(svsVM *s);
 float getRetValFlt(svsVM *s);
+float exp_helper(uint16_t a, uint16_t ex);
 
 #ifdef LOCAL_VARIABLES_ENABLED
 void varAddLocal(varType Id, svsVM *s);
