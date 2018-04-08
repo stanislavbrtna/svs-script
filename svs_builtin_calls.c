@@ -295,7 +295,8 @@ uint16_t execBuiltInCall(uint16_t callId, varType *args,  uint8_t * argType, uin
 				x++;
 			}
 
-			result->value = (varType)(isNum + (2*isFlt * isNum));
+			// when num return is 1, when float return is 2, otherwise zero
+			result->value = (varType)(isNum + (isFlt * isNum));
 			result->type = 0;
 			return 1;
 		}
@@ -307,7 +308,7 @@ uint16_t execBuiltInCall(uint16_t callId, varType *args,  uint8_t * argType, uin
 		}
 
 		if (argType[1] == 3){
-			result->value = (varType)3;
+			result->value = (varType)2;
 			result->type = 0;
 			return 1;
 		}

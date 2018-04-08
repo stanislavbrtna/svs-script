@@ -148,10 +148,57 @@ function main {
   }
   cnt = cnt + 1;
 
-  if (num("69") == 69){
+
+  LogicFail = 0;
+  if (not 1) {
+  	LogicFail = 1;
+  }
+
+  if (((1 and 1) != 1)+((1 and 0)!=0)) {
+  	LogicFail = 1;
+  }
+
+  if (((0 or 1) != 1)+((0 or 0)!=0)) {
+  	LogicFail = 1;
+  }
+  if (LogicFail == 0){
+  	sys print(cnt + " - Logic functions:OK");
+  }else{
+  	sys print(cnt + " - Logic functions:FAIL");
+    FAIL = 1;
+  }
+  cnt = cnt + 1;
+
+
+  if (typeof(1) == TYPE_NUM
+  		and typeof("") == TYPE_STR
+  		and typeof(3.3) == TYPE_FLOAT
+  		and num("69") == 69
+  		and num(55.96) == 55
+  		and float("3.3") == 3.3
+  		and float(99) == 99.0
+  		and isnum("da5sd") == 0
+  		and isnum("1") == 1
+  		and isnum("1.1") == 2
+  		and isnum(1) == 1
+  		and isnum(1.1) == 2
+  		and len("abcd") == 4
+  		and getcp("abcd", 2) == "b") {
+
     sys print(cnt + " - Integrated functions:OK");
   }else{
     sys print(cnt + " - Integrated functions:FAIL");
+    FAIL = 1;
+  }
+  cnt = cnt + 1;
+
+  for(x = 0; x < 10; x++;) {}
+  for(y = 10; y > 0; y--;) {}
+
+  if (x == 10 and y == 0){
+    sys print(cnt + " - Increment and decrement:OK");
+  }else{
+    sys print(cnt + " - Increment and decrement:FAIL");
     FAIL = 1;
   }
   cnt = cnt + 1;
