@@ -260,7 +260,7 @@ uint16_t execBuiltInCall(uint16_t callId, varType *args,  uint8_t * argType, uin
 
 		if (argType[1] == 1) {
 			printf("%s\n", (uint8_t *)(s->stringField+args[1].val_str));
-			result->value = (varType)0;
+			result->value = (varType)((int32_t)0);
 			result->type = 0;
 			return 1;
 		}
@@ -302,13 +302,13 @@ uint16_t execBuiltInCall(uint16_t callId, varType *args,  uint8_t * argType, uin
 		}
 
 		if (argType[1] == 0){
-			result->value = (varType)1;
+			result->value = (varType)((int32_t)1);
 			result->type = 0;
 			return 1;
 		}
 
 		if (argType[1] == 3){
-			result->value = (varType)2;
+			result->value = (varType)((int32_t)2);
 			result->type = 0;
 			return 1;
 		}
@@ -408,4 +408,7 @@ uint16_t execBuiltInCall(uint16_t callId, varType *args,  uint8_t * argType, uin
 		result->type = 0;
 		return 1;
 	}
+
+	simpleError("execBuiltInCall: Unknown builtin call!", s);
+	return 0;
 }
