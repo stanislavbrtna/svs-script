@@ -12,9 +12,9 @@ The current state of code is not great. It barely works. I put it here mainly to
 # Usage
 
 ## Compilation
-You can compile the SVS interpreter by running:
+You can compile the SVS interpreter by using GNU Make:
 
-     bash build.sh
+     make
 
 SVS for command line is simple application, you shouldn't need anything more than some build-essentials package. (Tested on linux mint and debian)
 
