@@ -463,7 +463,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 	 					if (errCheck(s)) {
 							return 0;
 						}
-	 					//brak out
+	 					//break out
 	 					break;
 	 				} else {
 	 					commExDMSG("commExecLoop: for: expression TRUE", currToken);
@@ -485,6 +485,10 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 	 				//tělo smyčky
 	 				currToken = commExecLoop(loopPrac, s);
 	 				if (errCheck(s)) {
+						return 0;
+					}
+
+					if (s->handbrake == 1) {
 						return 0;
 					}
 
@@ -530,6 +534,9 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 					currToken = prac;
 					exprExec(currToken, &varPrac, s);
 					if (errCheck(s)) {
+						return 0;
+					}
+					if (s->handbrake == 1) {
 						return 0;
 					}
 	 				x = varPrac.value.val_s; //výsledek podmínky

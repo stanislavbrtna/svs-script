@@ -53,6 +53,8 @@ void svsReset(svsVM *s){
   s->errDbgUsed = 0;
 
   s->profilerEnabled = 0;
+  setCommExDebug(0);
+	setExprExecDebug(0);
 
   for (x = 0; x < VAR_TABLE_L; x++) {
     s->varTable[x].value.val_u = 0;
