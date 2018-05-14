@@ -55,8 +55,8 @@ void addSysWrapper(uint8_t (*arg) (varRetVal *result, argStruct *argS, svsVM *s)
   }
 }
 
-uint8_t sysFuncMatch(varType id, uint8_t *t, svsVM *s) {
-  if (strCmp(t, s->syscallTable[id.val_u].sysCallName)) {
+uint8_t sysFuncMatch(varType id, char *t, svsVM *s) {
+  if (strCmp((uint8_t *)t, s->syscallTable[id.val_u].sysCallName)) {
     return 1;
   } else {
     return 0;

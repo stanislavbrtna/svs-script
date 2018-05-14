@@ -22,10 +22,6 @@ SOFTWARE.
 
 #include "svs_token_cache.h"
 
-#ifndef PC
-extern FATFS FatFs;
-#endif
-
 uint8_t cacheDebug = 0;
 
 
