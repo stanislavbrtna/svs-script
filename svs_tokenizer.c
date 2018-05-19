@@ -24,23 +24,17 @@ SOFTWARE.
 
 // enable tokenizer debug messages
 static uint8_t tokenizerDebug = 0;
-
 static uint8_t tokenizerInit;
-
 static uint8_t tokenizerFerrFlag;
 
 //exact debug helpers
 static uint8_t tokenizer_exact_debug;
-
 static uint16_t tokenizer_exact_token;
-
 static uint16_t tokenizer_exact_char;
-
 static uint16_t tokenizer_exact_line;
 
 uint8_t debug_buffer[101];
 uint8_t debug_buffer_pos;
-
 
 void setTokenizerDebug(uint8_t level) {
 	tokenizerDebug = level;
@@ -72,6 +66,7 @@ void token_line_print() {
 	}
 }
 
+// this will run tokenizer on svs file and print line with given token.
 void tokenzer_print_token_line(uint16_t token, svsVM *s) {
 	uint16_t x;
 
@@ -80,33 +75,32 @@ void tokenzer_print_token_line(uint16_t token, svsVM *s) {
 	}
 	tokenizer_exact_token = token;
 
-	tokenizer_exact_char=0;
-	tokenizer_exact_line=1;
-	debug_buffer_pos=0;
+	tokenizer_exact_char = 0;
+	tokenizer_exact_line = 1;
+	debug_buffer_pos = 0;
 
 	printf("File: %s\n", s->fName);
 
 	tokenGetchSetup(s->fName, 0);
 
- tokenizerReset();
- tokenizer_exact_debug=1;
+	tokenizerReset();
+	tokenizer_exact_debug = 1;
 
-	//resety nějakejch věcí, aby tokenizer nebyl zmatenej
-	s->	funcTableLen=0;
-	s->varTableLen=0;
-	s->stringFieldLen=0;
-	s->errToken=0;
-	s->err=0;
+	// reset some tokenizer variables
+	s->funcTableLen = 0;
+	s->varTableLen = 0;
+	s->stringFieldLen = 0;
+	s->errToken = 0;
+	s->err = 0;
 
 	tokenParse(s);
-	printf("Token %u, ",token);
+	printf("Token %u, ", token);
 	token_line_print();
-
 }
 
 void tokenizerErrorPrint(uint8_t *str) {
 	printf("Tokenizer Error: %s\n", str);
-	tokenizer_exact_line++; //záhadně to vybíralo o řádku
+	tokenizer_exact_line++;
 	token_line_print();
 	printf("\n");
 }
@@ -115,74 +109,72 @@ void tokenizerErrorPrintNL(uint8_t *str) {
 	printf("Tokenizer Error: %s\n", str);
 }
 
-void tokenDMSG(char *text, uint16_t tokenId, VARTYPE data, uint8_t type, uint16_t textPos){
+void tokenDMSG(char *text, uint16_t tokenId, VARTYPE data, uint8_t type, uint16_t textPos) {
 #ifndef DBG_DISABLED
 	if(tokenizerDebug == 1) {
 		printf("TokenDMSG: %s \ntokenId: %u\n", text, tokenId);
 	}
 	if(tokenizerDebug == 2) {
-		printf("%u:%u:%i:%u (id:type:data:tP)\n", tokenId,type, data.val_s, textPos);
+		printf("%u:%u:%i:%u (id:type:data:tP)\n", tokenId, type, data.val_s, textPos);
 	}
 #endif
 }
 
-uint8_t tokenGetchDbg(){
+uint8_t tokenGetchDbg() {
 	uint8_t x;
 	uint8_t c = 0;
 
 	c = tokenGetch();
 
-	if(c=='\n'){
+	if (c == '\n') {
 		tokenizer_exact_line++;
-		for(x=0;x<100;x++){
-			debug_buffer[x]=0;
+		for(x = 0; x < 100; x++) {
+			debug_buffer[x] = 0;
 		}
-		debug_buffer_pos=0;
-	}else{
-		if (debug_buffer_pos<99){
-			debug_buffer[debug_buffer_pos]=c;
+		debug_buffer_pos = 0;
+	} else {
+		if (debug_buffer_pos < 99) {
+			debug_buffer[debug_buffer_pos] = c;
 			debug_buffer_pos++;
-		}else{
-			debug_buffer_pos=0;
+		} else {
+			debug_buffer_pos = 0;
 		}
 	}
 
 	//printf("token getch dbg: %c (%u)\n", c, c);
 	return c;
-
 }
 
 
-uint8_t tokenPreprocessor(){
-	uint8_t c=0;
+uint8_t tokenPreprocessor() {
+	uint8_t c = 0;
 
-	c=tokenGetchDbg();
+	c = tokenGetchDbg();
 
-	if (c=='#'){
-		c=tokenGetchDbg();
-		if (c=='#'){
+	if (c == '#') {
+		c = tokenGetchDbg();
+		if (c == '#') {
 			return c;
-		}else if (c=='*') {
+		} else if (c == '*') {
 			// multiline comment
-			while (1){
-				c=tokenGetchDbg();
-
-				if (c == '*'){
-					c=tokenGetchDbg();
-					if (c == '#'){
+			while (1) {
+				c = tokenGetchDbg();
+				if (c == '*') {
+					c = tokenGetchDbg();
+					if (c == '#') {
 						return tokenGetchDbg();
 					}
 				}
 			}
-		}else{
+		} else {
 			// single line comment
-			while (c!='\n'){
-				c=tokenGetchDbg();
+			while (c != '\n') {
+				c = tokenGetchDbg();
 			}
 		}
 		//printf("token prep dbg: %c\n", c);
 		return c;
-	}else{
+	} else {
 		//printf("token prep dbg: %c\n", c);
 		return c;
 	}
@@ -191,13 +183,11 @@ uint8_t tokenPreprocessor(){
 
 
 
-uint8_t tokenInput(uint16_t index, uint8_t inc){
+uint8_t tokenInput(uint16_t index, uint8_t inc) {
 	static uint8_t peek;
 	static uint8_t strBuff[16];
 	static uint16_t vTextPos;
 	uint16_t x;
-
-	//printf("tokenInput: textPos: %u\n ", vTextPos);
 
 	if (tokenizerInit == 0) {
 		tokenizerFerrFlag = 0;
@@ -233,6 +223,7 @@ uint8_t tokenInput(uint16_t index, uint8_t inc){
 }
 
 /*
+// stub used occasionaly for debug, TODO: use compiler flags
 uint8_t tokenInput(uint16_t index, uint8_t inc){
 	uint8_t c=0;
 	c = tokenInputX(index, inc);
@@ -541,40 +532,32 @@ uint8_t tokenParse(svsVM *s) {
 		24 - = přiřazení
 		*/
 
-		if (tokenInput(posText,0)=='='){ //== a =
-			if (tokenInput(posText+1,0)=='='){
-				//puts("rovno");
-				tokenInput(0,1);
+		if (tokenInput(posText, 0) == '=') { //== a =
+			if (tokenInput(posText + 1,0) == '=') {
+				tokenInput(0, 1);
 				posText++;
-				//tokenType[posToken]=18;
-				setTokenType(posToken,18,s);
-				tokenDMSG("Token set, type ==", posToken,	getTokenData(posToken,s),getTokenType(posToken,s), posText);
-			}else{
-				//puts("přiřazení");
-				//tokenType[posToken]=24;
-				setTokenType(posToken,24,s);
-				tokenDMSG("Token set, type =", posToken,	getTokenData(posToken,s),getTokenType(posToken,s), posText);
+				setTokenType(posToken, 18, s);
+				tokenDMSG("Token set, type ==", posToken,	getTokenData(posToken, s), getTokenType(posToken, s), posText);
+			} else {
+				setTokenType(posToken, 24, s);
+				tokenDMSG("Token set, type =", posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
 			}
-			tokenInput(0,1);
+			tokenInput(0, 1);
 			posText++;
 			posToken++;
 		}
 
-		if (tokenInput(posText,0)=='<'){ //< a <=
-			if (tokenInput(posText+1,0)=='='){ //pouze přiřazení
-				//puts("menší nebo rovno");
-				tokenInput(0,1);
+		if (tokenInput(posText, 0) == '<') { //< a <=
+			if (tokenInput(posText + 1, 0) == '='){
+				tokenInput(0, 1);
 				posText++;
-				//tokenType[posToken]=22;
-				setTokenType(posToken,22,s);
-				tokenDMSG("Token set, type <=", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-			}else{
-				//puts("menší než");
-				//tokenType[posToken]=20;
-				setTokenType(posToken,20,s);
-				tokenDMSG("Token set, type <", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
+				setTokenType(posToken, 22, s);
+				tokenDMSG("Token set, type <=", posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
+			} else {
+				setTokenType(posToken, 20, s);
+				tokenDMSG("Token set, type <", posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
 			}
-			tokenInput(0,1);
+			tokenInput(0, 1);
 			posText++;
 			posToken++;
 		}
@@ -583,11 +566,9 @@ uint8_t tokenParse(svsVM *s) {
 			if (tokenInput(posText+1,0)=='='){ //pouze přiřazení
 				posText++;
 				tokenInput(0,1);
-				//tokenType[posToken]=23;
 				setTokenType(posToken,23,s);
 				tokenDMSG("Token set, type >=", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
 			}else{
-				//tokenType[posToken]=21;
 				setTokenType(posToken,21,s);
 				tokenDMSG("Token set, type >", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
 			}
@@ -601,7 +582,6 @@ uint8_t tokenParse(svsVM *s) {
 				tokenDMSG("Token set, type !=", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
 				posText++;
 				tokenInput(0,1);
-				//tokenType[posToken]=19;
 				setTokenType(posToken,19,s);
 			}else{
 				tokenizerErrorPrint("Tokenizer: unknown symbol after \"!\"");
@@ -616,9 +596,7 @@ uint8_t tokenParse(svsVM *s) {
 		if (tokenInput(posText,0)=='\"'){
 			posText++;
 			tokenInput(0,1);
-			//tokenType[posToken]=25;
 			setTokenType(posToken,25,s);
-			//tokenData[posToken]=stringFieldLen;
 			setTokenData(posToken,(varType)s->stringFieldLen,s);
 
 			//maximální velikost textových konstant, pro garbage collection
@@ -690,8 +668,6 @@ uint8_t tokenParse(svsVM *s) {
 			}
 			s->stringField[s->stringFieldLen] = 0;
 			s->stringFieldLen++; // always points on the next free
-			//posText++;
-			//tokenInput(0,1);
 			tokenDMSG(
 					"Token set, type STR, value:",
 					posToken,
@@ -934,7 +910,6 @@ uint8_t tokenParse(svsVM *s) {
 					y++;
 				}
 			}
-
 
 			//end of constants check
 			if (strCmp(pracName, "sys")){
