@@ -58,6 +58,7 @@ All keywords, variables and functions are case sensitive. Here is a table of all
 | * | multiply |
 | / | division |
 | % | modulus |
+| & | reference string operator |
 | == | equal |
 | != | not equal |
 | <= | lower or equal |
@@ -82,14 +83,14 @@ This does **NOT** work:
 ### Priority of operators
 | Priority <br /> (highest to lowest.) | Operator(s) |
 |--|--|
-| 1. | not |
+| 1. | not, & |
 | 2. | *, /, % |
 | 3. | +, - |
 | 4. | + (between strings or strings and numbers) |
 | 5. | ==, !=, <=, >=, <, > |
 | 6. | and, or |
 
-Operators of the same priority are executed from left to right. Operations inside brackets are executed first.
+Operators of the same priority are executed from left to right. Operations inside brackets are executed first. Text reference operator (&) is handled while script is parsed to tokens.
 
 ### Types of values
 | Type | Example | Description |

@@ -203,6 +203,14 @@ function main {
   }
   cnt = cnt + 1;
 
+  if ("megabox123" == &megabox123) {
+    sys print(cnt + " - identificator passing:OK");
+  }else{
+    sys print(cnt + " - identificator passing:FAIL");
+    FAIL = 1;
+  }
+  cnt = cnt + 1;
+
   #comments hopefully works
   if(FAIL) {
     sys print("Test FAILED");

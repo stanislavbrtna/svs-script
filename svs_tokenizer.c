@@ -665,6 +665,49 @@ uint8_t tokenParse(svsVM *s) {
 			posToken++;
 		}
 
+		// & - creates string constant of a following symbol
+		if (tokenInput(posText,0) == '&') {
+			posText++;
+			tokenInput(0, 1);
+
+			setTokenType(posToken,25,s);
+
+			setTokenData(posToken, (varType)s->stringFieldLen, s);
+
+			//maximální velikost textových konstant, pro garbage collection
+			s->stringConstMax = s->stringFieldLen;
+
+			while((isRegChar(tokenInput(posText,0)) || isNumber(tokenInput(posText,0))) && (tokenInput(posText,0)!=0)) {
+				if (s->stringFieldLen >= (STRING_FIELD_L-1)) {
+					tokenizerErrorPrint("Tokenizer: String field full!");
+					return 1;
+				}
+
+				s->stringField[s->stringFieldLen] = tokenInput(posText,0);
+				posText++;
+				tokenInput(0,1);
+				s->stringFieldLen++;
+			}
+			s->stringField[s->stringFieldLen] = 0;
+			s->stringFieldLen++; // always points on the next free
+			//posText++;
+			//tokenInput(0,1);
+			tokenDMSG(
+					"Token set, type STR, value:",
+					posToken,
+					getTokenData(posToken,s),
+					getTokenType(posToken,s),
+					posText
+			);
+			tokenDMSG(
+					s->stringField + getTokenData(posToken,s).val_str,
+					posToken,
+					getTokenData(posToken,s),
+					getTokenType(posToken,s),
+					posText
+			);
+			posToken++;
+		}
 
 		// analizace textu
 		if (isRegChar(tokenInput(posText,0))){
@@ -717,29 +760,21 @@ uint8_t tokenParse(svsVM *s) {
 					return 0;
 				}else{
 					if (brCount1<0){
-						//err.errString="Bracket chceck error! Missing \"(\"";
-						//errMsg(err);
 						tokenizerErrorPrintNL("Bracket chceck error! Missing \"(\"");
 						return 1;
 					}
 
 					if (brCount1>0){
-						//err.errString="Bracket chceck error! Missing \")\"";
-						//errMsg(err);
 						tokenizerErrorPrintNL("Bracket chceck error! Missing \")\"");
 						return 1;
 					}
 
 					if (brCount2<0){
-						//err.errString="Bracket chceck error! Missing \"{\"";
-						//errMsg(err);
 						tokenizerErrorPrintNL("Bracket chceck error! Missing \"{\"");
 						return 1;
 					}
 
 					if (brCount2>0){
-						//err.errString="Bracket chceck error! Missing \"}\"";
-						//errMsg(err);
 						tokenizerErrorPrintNL("Bracket chceck error! Missing \"}\"");
 						return 1;
 					}
