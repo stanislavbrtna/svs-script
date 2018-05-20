@@ -35,4 +35,7 @@ uint8_t cacheRead(svsVM *s);
 uint8_t tokenInCache(uint16_t tokenId, svsVM *s);
 void setCacheDebug(uint8_t level);
 
+void SVScloseCache(svsVM *s);
+void SVSopenCache(svsVM *s);
+
 #endif

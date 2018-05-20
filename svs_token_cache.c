@@ -37,7 +37,7 @@ void setCacheDebug(uint8_t level){
 }
 
 
-#if TOKEN_CACHE_DISABLED == 1 
+#if TOKEN_CACHE_DISABLED == 1
 uint8_t getTokenType(uint16_t tokenId, svsVM *s){
   if(tokenId<TOKEN_LENGTH){
     return s->tokenCache[tokenId].Type;
@@ -116,6 +116,31 @@ varType getTokenData(uint16_t tokenId, svsVM *s){
   }
 }
 
+
+
+#ifdef PC
+
+void SVScloseCache(svsVM *s) {
+	fclose(s->vmCache);
+}
+
+void SVSopenCache(svsVM *s) {
+	printf("restoringCache: %s\n", s->vmName);
+	s->vmCache = fopen(s->vmName, "r+");
+}
+
+#else
+
+void SVScloseCache(svsVM *s) {
+	f_close(&(s->vmCache));
+}
+
+void SVSopenCache(svsVM *s) {
+	f_open(&(s->vmCache), s->vmName, FA_CREATE_ALWAYS|FA_READ|FA_WRITE);
+}
+
+#endif
+
 #ifdef CACHE_SIMPLE
 //simple cache reloader
 uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
@@ -136,11 +161,11 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
 	  errMsgS("cacheReload: Error: File not valid!");
 	}
 #endif
-  
+
   //fseek(s->vmCache,sizeof(tokenCacheStruct)*TOKEN_LENGTH*(tokenId%TOKEN_LENGTH),SEEK_SET);
-  
+
   s->cacheStart=TOKEN_LENGTH*(tokenId/TOKEN_LENGTH);
-  
+
   for(x=0;x<TOKEN_LENGTH;x++){
     #ifdef PC
 	  fseek(s->vmCache,sizeof(tokenCacheStruct)*(TOKEN_LENGTH*(tokenId/TOKEN_LENGTH)+x),SEEK_SET);
@@ -150,11 +175,11 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
     f_read(&(s->vmCache),&(s->tokenCache[x]),sizeof(tokenCacheStruct), (UINT*) &ret );
     #endif
   }
-  
+
   //printf("cacheReload dbg: END: index: %u cache start: %u\n", tokenId,s->cacheStart );
-  
+
   return 1;
-  
+
 }
 
 #else
@@ -169,7 +194,7 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
   prac.Data.val_s=666;
   prac.Type=6;
   uint16_t chacheStartPrac;
-  
+
   if (cacheDebug==1){
 	  printf("cacheReload dbg: BEGIN: index: %u cache start: %u -> reloading cache\n(chache size: %u )\n", tokenId,s->cacheStart, TOKEN_LENGTH );
 	}
@@ -184,14 +209,14 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
 	}
 #endif
   //TOKEN_CACHE_STEP
-  
+
   chacheStartPrac = s->cacheStart;
-  
+
   if (tokenId < s->cacheStart) {
     //
-    
+
     s->cacheStart = tokenId;
-    
+
     // pokudjde něco znovupoužít
     //bacha, token lenght je sice x, ale indexuje se od 0 do x-1
     if (chacheStartPrac < (tokenId + TOKEN_LENGTH - 1)) {
@@ -207,7 +232,7 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
     	chacheStartPrac = tokenId + TOKEN_LENGTH;
     }
     fillCache(0, tokenId, chacheStartPrac, s);
-    
+
   } else {
 
     //pokud se něco z cache dá znovupoužít
@@ -226,16 +251,16 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
 			//printf("   debug: quick FWD\n");
 			s->cacheStart = tokenId;
 			fillCache(0, tokenId, tokenId + TOKEN_LENGTH, s);
-		} 
+		}
   }
   //printf("cacheReload dbg: END: index: %u cache start: %u\n", tokenId,s->cacheStart );
-  
+
   return 1;
 }
 
 void fillCache(uint16_t cache_pos, uint16_t load_start, uint16_t load_end, svsVM *s) {
 	uint32_t x, ret;
-	
+
 	//printf("debug: fill params: chache_pos:%u start:%u stop:%u\n", cache_pos, load_start, load_end);
 	for(x = 0; (load_start + x) < load_end; x++) {
     #ifdef PC
@@ -254,8 +279,8 @@ uint8_t cacheRead(svsVM *s){
   tokenCacheStruct prac;
   prac.Data=666;
   prac.Type=6;
-  uint16_t fsize; 
-  
+  uint16_t fsize;
+
   if (!(s->vmCache)){
 		  errMsgS("getTokenType: Error with pointer to cache file!");
 	  }
@@ -263,7 +288,7 @@ uint8_t cacheRead(svsVM *s){
   fseek (s->vmCache, 0 , SEEK_END);
   fsize=(uint16_t) ftell (s->vmCache);
   rewind (s->vmCache);
-  
+
 
   for(x=0;x<fsize/(uint16_t)sizeof(tokenCacheStruct);x++){
     //fseek(s->vmCache,sizeof(tokenCacheStruct)*(TOKEN_LENGTH*(tokenId/TOKEN_LENGTH)+x),SEEK_SET);
@@ -306,11 +331,11 @@ uint8_t setTokenType(uint16_t tokenId, uint8_t val,  svsVM *s){
 #endif
     s->vmCacheUsed=1;
   }
-  
+
   if (tokenInCache(tokenId,s)){
     s->tokenCache[tokenId - s->cacheStart].Type=val;
   }
-  
+
 #ifdef PC
   fseek(s->vmCache,sizeof(tokenCacheStruct)*tokenId,SEEK_SET);
   fread(&prac, sizeof(tokenCacheStruct), 1, s->vmCache);
@@ -326,7 +351,7 @@ uint8_t setTokenType(uint16_t tokenId, uint8_t val,  svsVM *s){
   f_lseek( &(s->vmCache),sizeof(tokenCacheStruct)*tokenId);
   f_write( &(s->vmCache),&prac,sizeof(tokenCacheStruct), (UINT*) &ret );
 #endif
-  
+
   return 0;
 }
 
@@ -354,7 +379,7 @@ uint8_t setTokenData(uint16_t tokenId, varType val, svsVM *s){
 #endif
     s->vmCacheUsed=1;
   }
-  
+
   if (tokenInCache(tokenId,s)){
     s->tokenCache[tokenId - s->cacheStart].Data=val;
   }
