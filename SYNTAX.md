@@ -20,12 +20,12 @@ Or simply:
 ### Keywords
 All keywords, variables and functions are case sensitive. Here is a table of all keywords (in alphabetical order).
 | Keyword | Meaning |
-|--|--|
+| --- | --- |
 | arg0, arg1 ... arg9 | Function arguments. |
-| and| Logical and. |
-| break| Breaks the for or while loop. |
-| end| Specifies the end of file. Not mandatory if EOF is present. |
-| for| For loop. |
+| and | Logical and. |
+| break | Breaks the for or while loop. |
+| end | Specifies the end of file. Not mandatory if EOF is present. |
+| for | For loop. |
 | function | Defines new function. |
 | if, else | If and else, standard conditional branching. |
 | local |Specifies local variable. |
