@@ -28,7 +28,7 @@ All keywords, variables and functions are case sensitive. Here is a table of all
 | for | For loop. |
 | function | Defines new function. |
 | if, else | If and else, standard conditional branching. |
-| local |Specifies local variable. |
+| local | Specifies local variable. |
 | not | Logical negation. |
 | or | Logical or. |
 | return | Return from function. |
