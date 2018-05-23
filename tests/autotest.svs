@@ -192,7 +192,9 @@ function main {
   }
   cnt = cnt + 1;
 
-  for(x = 0; x < 10; x++;) {}
+  for(x = 0; x < 10; x++;) {
+  	b = 1 + b;
+  }
   for(y = 10; y > 0; y--;) {}
 
   if (x == 10 and y == 0){

@@ -209,7 +209,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 				commExDMSG("commExecLoop: ++ statement", currToken);
 				currToken++;
 				if (getTokenType(currToken, s) == 1) {
-					if (varGetType(varPrac.value, s) != 0) {
+					if (varGetType(getTokenData(x,s), s) != 0) {
 						errSoft("commEx: Syntax error in ++: only num type can be incremented.", s);
 						errSoftSetParam("TokenId", (varType)currToken, s);
 						errSoftSetToken(currToken, s);
@@ -231,7 +231,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 				commExDMSG("commExecLoop: -- statement", currToken);
 				currToken++;
 				if (getTokenType(currToken, s) == 2) {
-					if (varGetType(varPrac.value, s) != 0) {
+					if (varGetType(getTokenData(x, s), s) != 0) {
 						errSoft("commEx: Syntax error in --: only num type can be decremented.", s);
 						errSoftSetParam("TokenId", (varType)currToken, s);
 						errSoftSetToken(currToken, s);
@@ -239,7 +239,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 					}
 					varType prac;
 					prac = varGetVal(getTokenData(x,s),s);
-					varSetVal(getTokenData(x,s), (varType)(prac.val_s - (int32_t)1), s);
+					varSetVal(getTokenData(x, s), (varType)(prac.val_s - (int32_t)1), s);
 
 					currToken++;
 				}else{
