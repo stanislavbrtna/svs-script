@@ -19,6 +19,7 @@ Or simply:
 
 ### Keywords
 All keywords, variables and functions are case sensitive. Here is a table of all keywords (in alphabetical order).
+
 | Keyword | Meaning |
 | --- | --- |
 | arg0, arg1 ... arg9 | Function arguments. |
