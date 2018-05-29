@@ -125,7 +125,6 @@ void SVScloseCache(svsVM *s) {
 }
 
 void SVSopenCache(svsVM *s) {
-	printf("restoringCache: %s\n", s->vmName);
 	s->vmCache = fopen(s->vmName, "r+");
 }
 
@@ -136,20 +135,20 @@ void SVScloseCache(svsVM *s) {
 }
 
 void SVSopenCache(svsVM *s) {
-	f_open(&(s->vmCache), s->vmName, FA_CREATE_ALWAYS|FA_READ|FA_WRITE);
+	f_open(&(s->vmCache), s->vmName, FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
 }
 
 #endif
 
 #ifdef CACHE_SIMPLE
 //simple cache reloader
-uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
+uint8_t cacheReload(uint16_t tokenId,  svsVM *s) {
   uint32_t x, ret;
   tokenCacheStruct prac;
   prac.Data.val_s=666;
   prac.Type=6;
   if (cacheDebug==1){
-	  printf("cacheReload dbg: BEGIN: index: %u cache start: %u -> reloading cache\n", tokenId,s->cacheStart );
+	  printf("cacheReload dbg: BEGIN: index: %u cache start: %u -> reloading cache\n", tokenId, s->cacheStart);
 	}
   //
 #ifdef PC
@@ -273,37 +272,6 @@ void fillCache(uint16_t cache_pos, uint16_t load_start, uint16_t load_end, svsVM
   }
 }
 #endif
-/* tohle se pro umc celý zakomentuje, páč je to potřeba hodně porubat
-uint8_t cacheRead(svsVM *s){
-  uint16_t x, ret;
-  tokenCacheStruct prac;
-  prac.Data=666;
-  prac.Type=6;
-  uint16_t fsize;
-
-  if (!(s->vmCache)){
-		  errMsgS("getTokenType: Error with pointer to cache file!");
-	  }
-
-  fseek (s->vmCache, 0 , SEEK_END);
-  fsize=(uint16_t) ftell (s->vmCache);
-  rewind (s->vmCache);
-
-
-  for(x=0;x<fsize/(uint16_t)sizeof(tokenCacheStruct);x++){
-    //fseek(s->vmCache,sizeof(tokenCacheStruct)*(TOKEN_LENGTH*(tokenId/TOKEN_LENGTH)+x),SEEK_SET);
-    prac.Data=0;
-    prac.Type=0;
-#ifdef PC
-    fread(&prac, sizeof(tokenCacheStruct), 1, s->vmCache);
-#else
-    f_read(s->vmCache,&prac,sizeof(tokenCacheStruct), (UINT*) &ret );
-#endif
-    printf ("id: %u type: %u data %d\n",x, prac.Type, prac.Data);
-  }
-  return 1;
-}*/
-
 
 uint8_t setTokenType(uint16_t tokenId, uint8_t val,  svsVM *s){
   uint16_t x;
