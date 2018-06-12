@@ -24,10 +24,13 @@ This is the garbage collector for strings.
 
 #include "svs_garbage_collector.h"
 
-uint8_t gcDebug=0;
+#ifndef CMDLINE
+void pscg_garbage_walkaround(uint8_t *strId, uint32_t str_len, uint8_t *max);
+uint8_t pscg_garbage_walkaround2(uint8_t *strId);
+#endif
 
+uint8_t gcDebug = 0;
 
-//cgDMSG("text");
 void cgDMSG(char *text) {
   if (gcDebug == 1) {
 	  printf("gcDMSG: %s \n", text);
@@ -38,32 +41,22 @@ void setGcDebug(uint8_t level) {
   gcDebug = level;
 }
 
-#ifndef CMDLINE
-void pscg_garbage_walkaround(uint8_t *strId, uint32_t str_len, uint8_t *max);
-uint8_t pscg_garbage_walkaround2(uint8_t *strId);
-#endif
-
-
 uint8_t gcGetValidString(uint16_t strId, svsVM *s) {
   uint16_t x = 0;
 
-  //textové konstanty tam háže tokenizer, tudíž jsou ze začátku textového pole
-  //a už se nemění, stačí tedy zjistit kde je poslední konstanta, menší id jsou pak
-  //automaticky validní
-
-  if (strId<=s->stringConstMax){
+  if (strId <= s->stringConstMax) { // if string is a constant, it is valid
     return 1;
   }
 
   #ifndef CMDLINE
-  if (pscg_garbage_walkaround2( (uint8_t*) ((uint32_t)strId + (uint32_t)(s->stringField)) ) ){
-    //printf("dbg: GC: valid: %s\n",strId+s->stringField);
+  if (pscg_garbage_walkaround2( (uint8_t*) ((uint32_t)strId + (uint32_t)(s->stringField)))) {
     return 1;
   }
   #endif
 
   for(x = 1; x <= s->varTableLen; x++) {
-		if (s->varTable[x].type == 1) { // We need to access the var array without varGetType, because of how local variables work
+  // We need to access the var array without varGetType, because of how local variables work
+		if (s->varTable[x].type == 1) {
 			if (s->varTable[x].value.val_str == strId) {
 			  return 1;
 			}
@@ -71,16 +64,15 @@ uint8_t gcGetValidString(uint16_t strId, svsVM *s) {
 	}
 
 	//array
-	for(x = 1;x <= s->varArrayLen; x++) {
-		if (s->varArrayType[x] == 1) { //pokud je promněnná string
+	for(x = 1; x <= s->varArrayLen; x++) {
+		if (s->varArrayType[x] == 1) {
 			if (s->varArray[x].val_str == strId) {
 			  return 1;
 			}
 		}
 	}
 
-	//pokud jsme došli až sem a nic se nenašlo, vracíme 0
-
+	// not valid, returning zero
 	return 0;
 }
 
@@ -88,9 +80,8 @@ uint8_t gcRemoveString(uint16_t strId, uint8_t type, svsVM *s) {
   uint16_t x = 0;
   uint16_t str_len = 0;
 
-  //spočtu délku toho stringu
   x = strId;
-  while (s->stringField[x]!=0) {
+  while (s->stringField[x] != 0) {
     x++;
   }
 
@@ -104,17 +95,18 @@ uint8_t gcRemoveString(uint16_t strId, uint8_t type, svsVM *s) {
 
   x = 0;
 
-  for(x=1;x<=s->varTableLen;x++){
-		if (s->varTable[x].type == 1){ //pokud je promněnná string
-			if (s->varTable[x].value.val_str>strId){
-			  s->varTable[x].value.val_str = ((uint16_t)(varGetVal((varType)x, s).val_str - str_len)); //upravíme id
+  for(x = 1; x <= s->varTableLen; x++) {
+		if (s->varTable[x].type == 1) {
+			if (s->varTable[x].value.val_str > strId) {
+				// modify reference
+			  s->varTable[x].value.val_str = ((uint16_t)(varGetVal((varType)x, s).val_str - str_len));
 			}
 		}
 	}
 
 	//array
 	for(x = 1; x <= s->varArrayLen; x++) {
-		if (s->varArrayType[x] == 1) { //pokud je promněnná string
+		if (s->varArrayType[x] == 1) {
 			if (s->varArray[x].val_str > strId) {
 				s->varArray[x].val_str -= str_len;
 			}
@@ -122,67 +114,69 @@ uint8_t gcRemoveString(uint16_t strId, uint8_t type, svsVM *s) {
 	}
 
 	#ifndef CMDLINE
-    pscg_garbage_walkaround((uint32_t)((uint32_t)strId + (uint32_t)(s->stringField)), str_len, (uint32_t)((uint32_t)s->stringField + (uint32_t)s->stringFieldLen));
+    pscg_garbage_walkaround(
+                       (uint32_t)((uint32_t)strId + (uint32_t)(s->stringField)),
+                       str_len,
+                       (uint32_t)((uint32_t)s->stringField + (uint32_t)s->stringFieldLen)
+    );
   #endif
 
 	return 0;
 }
 
-void garbageCollect(uint16_t count, svsVM *s){
+void garbageCollect(uint16_t count, svsVM *s) {
   uint16_t x = 0;
   uint8_t valid = 0;
   uint16_t gc_start;
 
-  if ((STRING_FIELD_L*10)/(s->stringFieldLen+1)>11){
-    //pokud není volná už jen jedna desetina string fieldu, nebudeme provádět GC
-    //cgDMSG("Garbage Collection not needed.");
-    if (count==0){
+  if ((STRING_FIELD_L * 10) / (s->stringFieldLen + 1) > 11) {
+    // there is more than 1/10 of string memory free
+    // if we are not forced to collect, we do nothing
+    if (count == 0) {
       return;
     }
   }
 
-  if (s->profilerEnabled){
+  if (s->profilerEnabled) {
     printf("Profiler: collecting garbage! ");
   }
-  gc_start=s->stringFieldLen;
+  gc_start = s->stringFieldLen;
 
-  if (STRING_FIELD_L<s->stringFieldLen){
-    //tohle už je chybový stav
+  if (STRING_FIELD_L < s->stringFieldLen) {
     errMsgS("garbageCollect: String field invalid! (STRING_FIELD_L<stringFieldLen)");
   }
 
-  if (0==s->stringFieldLen){
+  if (0 == s->stringFieldLen) {
     cgDMSG("Nothing in string field.");
-    //v poli stringu nic není
     return;
   }
 
   //ověříme validitu nultého stringu, páč před ním není nula
-  valid=gcGetValidString(0,s);
-  if (valid==1){ //pokud byl validní, tak hledáme nějaký další invalidní
-    for(x=0;x<s->stringFieldLen-1;x++){
-      if (0==s->stringField[x]){ //ukončovací znak předchozího stringu
-        valid=gcGetValidString(x+1,s);
-        if (0==valid){
+  valid = gcGetValidString(0, s);
+  if (valid == 1) { //pokud byl validní, tak hledáme nějaký další invalidní
+    for(x = 0; x < s->stringFieldLen - 1; x++) {
+      if (0 == s->stringField[x]) { //ukončovací znak předchozího stringu
+        valid = gcGetValidString(x + 1, s);
+        if (0 == valid) {
           //cgDMSG("Non-valid string removed.");
           //printf("string: %s\n",stringField+x+1 );
-          gcRemoveString(x+1, valid,s);
+          gcRemoveString(x + 1, valid, s);
 
-          if (count!=0){
-            if (s->stringFieldLen<(gc_start-count)){
+          if (count != 0) {
+            if (s->stringFieldLen < (gc_start - count)) {
               break;
             }
           }
-          //printf("string field len:: %u\n",stringFieldLen );
+
         }
       }
     }
   }
-  if (s->profilerEnabled){
-    printf(" Collecting Done! %u/%u occupied %u freed.\n",s->stringFieldLen,  STRING_FIELD_L,gc_start-s->stringFieldLen );
+  if (s->profilerEnabled) {
+    printf(" Collecting Done! %u/%u occupied %u freed.\n", s->stringFieldLen, STRING_FIELD_L, gc_start-s->stringFieldLen);
   }
-  if (valid==1){
+  if (valid == 1) {
     cgDMSG("All strings valid.");
-    return; //všechny stringy jsou validní
+    return;
   }
 }
