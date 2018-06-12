@@ -62,10 +62,10 @@ uint8_t gcGetValidString(uint16_t strId, svsVM *s) {
   }
   #endif
 
-  for(x=1;x<=s->varTableLen;x++){
-		if (varGetType((varType)x,s)==1){ //pokud je promněnná string
-			if (varGetVal((varType)x,s).val_str==strId){
-			  return 1; // a má tu správnou hodnotu, vracíme 1
+  for(x = 1; x <= s->varTableLen; x++) {
+		if (s->varTable[x].type == 1) { // We need to access the var array without varGetType, because of how local variables work
+			if (s->varTable[x].value.val_str == strId) {
+			  return 1;
 			}
 		}
 	}
@@ -74,7 +74,7 @@ uint8_t gcGetValidString(uint16_t strId, svsVM *s) {
 	for(x = 1;x <= s->varArrayLen; x++) {
 		if (s->varArrayType[x] == 1) { //pokud je promněnná string
 			if (s->varArray[x].val_str == strId) {
-			  return 1; // a má tu správnou hodnotu, vracíme 1
+			  return 1;
 			}
 		}
 	}
@@ -105,9 +105,9 @@ uint8_t gcRemoveString(uint16_t strId, uint8_t type, svsVM *s) {
   x = 0;
 
   for(x=1;x<=s->varTableLen;x++){
-		if (varGetType((varType)x, s)==1){ //pokud je promněnná string
-			if (varGetVal((varType)x, s).val_str>strId){
-			  varSetVal((varType)x, (varType)((uint16_t)(varGetVal((varType)x, s).val_str - str_len)), s); //upravíme id
+		if (s->varTable[x].type == 1){ //pokud je promněnná string
+			if (s->varTable[x].value.val_str>strId){
+			  s->varTable[x].value.val_str = ((uint16_t)(varGetVal((varType)x, s).val_str - str_len)); //upravíme id
 			}
 		}
 	}
