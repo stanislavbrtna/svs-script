@@ -25,13 +25,14 @@ SOFTWARE.
 uint16_t callToken; // used to precisely locate errors
 
 svsBuiltInCallsTableType svsBuiltInCallsTable[] = {
-	{"num", 1},
-	{"float", 2},
-	{"print", 3},
-	{"isnum", 4},
-	{"typeof", 5},
-	{"getcp", 6},
-	{"len", 7},
+	{"num", NUM},
+	{"float", FLOAT},
+	{"print", PRINT},
+	{"isnum", ISNUM},
+	{"typeof", TYPEOF},
+	{"getcp", GETCP},
+	{"len", LEN},
+	{"substr", SUBSTR},
 	{"end", 0}
 };
 
@@ -124,9 +125,9 @@ static void simpleError(uint8_t * text, svsVM *s) {
 	errSoftSetToken(callToken, s);
 }
 
-uint16_t execBuiltInCall(uint16_t callId, varType *args,  uint8_t * argType, uint16_t count, varRetVal *result, svsVM *s) {
+uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argType, uint16_t count, varRetVal *result, svsVM *s) {
 	// real
-	if (callId == 1) {
+	if (callId == NUM) {
 		varType prac;
 		uint8_t negative = 0;
 	  uint16_t x = 0;
@@ -183,7 +184,7 @@ uint16_t execBuiltInCall(uint16_t callId, varType *args,  uint8_t * argType, uin
 	}
 
 	// flt(num) # takes num or str returns float
-	if (callId == 2) {
+	if (callId == FLOAT) {
 
 		if (count != 1) {
 	  	simpleError("flt(): wrong argument count!", s);
@@ -252,7 +253,7 @@ uint16_t execBuiltInCall(uint16_t callId, varType *args,  uint8_t * argType, uin
 	}
 
 	// print
-	if (callId == 3) {
+	if (callId == PRINT) {
 		if (count != 1) {
 	  	simpleError("print(): wrong argument count!", s);
 	  	return 0;
@@ -270,7 +271,7 @@ uint16_t execBuiltInCall(uint16_t callId, varType *args,  uint8_t * argType, uin
 	}
 
 	// isnum(str|num)
-	if (callId == 4) {
+	if (callId == ISNUM) {
 
 		if (count != 1) {
 	  	simpleError("isnum(): wrong argument count!", s);
@@ -318,7 +319,7 @@ uint16_t execBuiltInCall(uint16_t callId, varType *args,  uint8_t * argType, uin
 	}
 
 	// typeof(var)
-	if (callId == 5) {
+	if (callId == TYPEOF) {
 
 		if (count != 1) {
 	  	simpleError("typeof(): wrong argument count!", s);
@@ -331,7 +332,7 @@ uint16_t execBuiltInCall(uint16_t callId, varType *args,  uint8_t * argType, uin
 	}
 
 	// getcp
-	if (callId == 6) {
+	if (callId == GETCP) {
 		uint16_t len = 1; // we start indexing strings from 1
 		uint16_t x = 0;
 		uint8_t tmpChar[4];
@@ -381,7 +382,7 @@ uint16_t execBuiltInCall(uint16_t callId, varType *args,  uint8_t * argType, uin
 	}
 
 	// len
-	if (callId == 7) {
+	if (callId == LEN) {
 		uint16_t len = 0;
 		uint16_t x = 0;
 
@@ -390,7 +391,7 @@ uint16_t execBuiltInCall(uint16_t callId, varType *args,  uint8_t * argType, uin
 	  	return 0;
 	  }
 
-		if (argType[1] != 1){
+		if (argType[1] != SVS_TYPE_STR){
 			simpleError("len(): wrong type of argument!", s);
 			return 0;
 		}
@@ -406,6 +407,52 @@ uint16_t execBuiltInCall(uint16_t callId, varType *args,  uint8_t * argType, uin
 		// to get just the characters, without end of string
 		result->value = (varType)((int32_t)len);
 		result->type = 0;
+		return 1;
+	}
+
+	// str2 = substr(str, begin, end);
+	if (callId == SUBSTR) {
+		uint16_t len = 0;
+		uint16_t x = 0;
+
+		if (count != 3) {
+	  	simpleError("substr(): wrong argument count!", s);
+	  	return 0;
+	  }
+
+		if (argType[1] != SVS_TYPE_STR
+				|| argType[2] != SVS_TYPE_NUM
+				|| argType[3] != SVS_TYPE_NUM) {
+			simpleError("substr(): wrong type of argument!", s);
+			return 0;
+		}
+
+		if (args[2].val_s <= 0) {
+			args[2].val_s = 1;
+		}
+
+		if (args[3].val_s <= 0) {
+			args[3].val_s = 1;
+		}
+
+		strNewStreamInit(s);
+
+		while (s->stringField[args[1].val_str + x] != 0) {
+
+			if (len >= (args[2].val_u - 1) && (len <= args[3].val_s - 1)) {
+				strNewStreamPush(s->stringField[args[1].val_str + x], s);
+			}
+
+			if ((s->stringField[args[1].val_str + x] >= 0xC3) \
+					&& (s->stringField[args[1].val_str + x] <= 0xC5)) {
+				x++;
+			}
+			len++;
+			x++;
+		}
+		// to get just the characters, without end of string
+		result->value = (varType)(strNewStreamEnd(s));
+		result->type = SVS_TYPE_STR;
 		return 1;
 	}
 

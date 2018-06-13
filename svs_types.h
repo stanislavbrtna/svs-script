@@ -26,6 +26,10 @@ SOFTWARE.
 //#define VARTYPE int16_t
 #define VARTYPE varType
 
+#define SVS_TYPE_NUM 0
+#define SVS_TYPE_STR 1
+#define SVS_TYPE_FLT 3
+
 typedef struct {
   uint8_t fString[NAME_LENGTH];
   uint16_t tokenId;

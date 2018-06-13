@@ -25,13 +25,24 @@ SOFTWARE.
 
 #include "svs_basics.h"
 
+typedef enum {
+	NUM = 1,
+	FLOAT = 2,
+	PRINT = 3,
+	ISNUM = 4,
+	TYPEOF = 5,
+	GETCP = 6,
+	LEN = 7,
+	SUBSTR = 8,
+} builtinCallEnum;
+
 typedef struct {
   const char* name;
-  uint16_t id;
+  builtinCallEnum id;
 } svsBuiltInCallsTableType;
 
 uint16_t getBuiltInCallId(uint8_t * str);
 uint16_t processBuiltInCall(uint16_t index, varRetVal *result, svsVM *s);
-uint16_t execBuiltInCall(uint16_t callId, varType *args, uint8_t * argType, uint16_t count, varRetVal *result, svsVM *s);
+uint16_t execBuiltInCall(builtinCallEnum callId, varType *args, uint8_t * argType, uint16_t count, varRetVal *result, svsVM *s);
 
 #endif

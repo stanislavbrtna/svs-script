@@ -172,6 +172,9 @@ Result of this will be 4.
 #### Get char at posiotion (getcp)
 Function *getcp(string, position)* returns new string containing only one char that is at given position in a given string. If the position is invalid, then it returns empty string.
 
+#### Get substring (substr)
+Function *substr(string, [num]begin, [num]end)* returns new string containing portion of a given string begining at index *begin* and ending at index *end*, both included. If the position is invalid, then it returns empty string.
+
 #### Print
 Function *print* prints its parameter on standard output. (In SVS versions lower than 0.8 was used similar command *sys print(string)* that used sys wrapper. )
 ### Variables

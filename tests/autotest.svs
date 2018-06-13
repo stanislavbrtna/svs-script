@@ -183,7 +183,8 @@ function main {
   		and isnum(1) == 1
   		and isnum(1.1) == 2
   		and len("abcd") == 4
-  		and getcp("abcd", 2) == "b") {
+  		and getcp("abcd", 2) == "b"
+  		and substr("ABCDEF", 2, 5) == "BCDE") {
 
     sys print(cnt + " - Integrated functions:OK");
   }else{
