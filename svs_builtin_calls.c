@@ -203,7 +203,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
 	  	uint8_t negative = 0;
 	  	uint16_t x = 0;
 	  	prac.val_s = 0;
-	  	uint16_t float_dp = 0;
+	  	uint16_t float_dp = 1;
 
 			fltPrac = 0;
 

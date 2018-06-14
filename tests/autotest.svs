@@ -176,6 +176,9 @@ function main {
   		and num("69") == 69
   		and num(55.96) == 55
   		and float("3.3") == 3.3
+  		and float("123.456") == 123.456
+  		and float("456.789") == 456.789
+  		and float("3.3") == 3.3
   		and float(99) == 99.0
   		and isnum("da5sd") == 0
   		and isnum("1") == 1
