@@ -129,9 +129,7 @@ void garbageCollect(uint16_t count, svsVM *s) {
   uint8_t valid = 0;
   uint16_t gc_start;
 
-  if ((STRING_FIELD_L * 10) / (s->stringFieldLen + 1) > 11) {
-    // there is more than 1/10 of string memory free
-    // if we are not forced to collect, we do nothing
+  if (s->stringFieldLen + 1 < GC_THRESHOLD) {
     if (count == 0) {
       return;
     }
@@ -159,7 +157,7 @@ void garbageCollect(uint16_t count, svsVM *s) {
         valid = gcGetValidString(x + 1, s);
         if (0 == valid) {
           //cgDMSG("Non-valid string removed.");
-          //printf("string: %s\n",stringField+x+1 );
+          //printf("stringRM: %s\n",s->stringField+x+1 );
           gcRemoveString(x + 1, valid, s);
 
           if (count != 0) {

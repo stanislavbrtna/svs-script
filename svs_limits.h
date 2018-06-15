@@ -49,7 +49,8 @@ This file contains the main defines and limits of SVS.
 
 #define FUNCTION_TABLE_L 50 // počet funkcí v jednom souboru / max functions in one file
 #define VAR_TABLE_L 200 // počet promněnných / max number of variables
-#define STRING_FIELD_L 3000 // počet znaků stringové pamněti / max number of characters in string memory
+#define STRING_FIELD_L 6000 // počet znaků stringové pamněti / max number of characters in string memory
+#define GC_THRESHOLD 4500 // threshold for garbage collection of strings
 
 #define SYSCALL_TABLE_L 100  // kolik různých sys volání může obsahovat jeden vm / max number of different syscalls in one file
 
