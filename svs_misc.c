@@ -28,6 +28,7 @@ void svsReset(svsVM *s){
   s->varTableLen = 0;
   s->stringFieldLen = 0;
   s->stringConstMax = 0;
+  s->gcSafePoint = 0;
 
 #ifdef PC
   s->vmCache = 0;

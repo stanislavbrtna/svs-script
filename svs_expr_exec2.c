@@ -23,6 +23,8 @@ This is the second version of expression exec logic.
 */
 
 #include "svs_expr_exec2.h"
+
+uint8_t unsecureCommand;
 uint8_t exprExecDebug;
 
 void setExprExecDebug(uint8_t level) {
@@ -36,6 +38,7 @@ void exprExecDMSG(char *text, int16_t result, uint16_t tokenId) {
 }
 
 void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
+  uint16_t gcSafePointPrev;
   // ( ) NUM FLT STR VAR CALL
   varRetVal prac;
 
@@ -72,7 +75,11 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
 		exprExecDMSG("ExprExecLvl5 BUILTIN FUNC", result->value.val_s, result->tokenId);
 	}else if (getTokenType(index, s) == 17) { //CALL
 		if ((getTokenType(index + 1, s) == 5)) {
+			unsecureCommand = 1;
+			gcSafePointPrev = s->gcSafePoint;
+			s->gcSafePoint = s->stringFieldLen - 1;
 			index = commParseCall(index, s);
+			s->gcSafePoint = gcSafePointPrev;
 			if (errCheck(s)) {
         return;
       }
@@ -811,43 +818,53 @@ void exprExec(uint16_t index, varRetVal *result, svsVM *s) {
   uint16_t tokenId;
   uint16_t strBeginVal;
   uint16_t x;
+  uint16_t gcSafePointPrev;
+  uint8_t unsecureCommandFlag;
   varRetVal prac;
 
-  err.errString="";
-  err.tokenId=0;
+  err.errString = "";
+  err.tokenId = 0;
 
   varRetValZero(&prac);
   varRetValZero(result);
-  result->tokenId=index;
+  result->tokenId = index;
 
-
-  tokenId=index;
+  tokenId = index;
 
   //printf("GC:EXPR: begin %u\n", s->stringFieldLen);
-  strBeginVal=s->stringFieldLen;
+  strBeginVal = s->stringFieldLen;
+  gcSafePointPrev = s->gcSafePoint;
+  s->gcSafePoint = s->stringFieldLen - 1;
+  unsecureCommandFlag = unsecureCommand;
 
-  exprExecDMSG("ExprExec Begin",result->value.val_s,tokenId);
+  exprExecDMSG("ExprExec Begin", result->value.val_s,tokenId);
 
-	exprExecLvlLogic(tokenId, result,s);
-	if (errCheck(s)){
+	exprExecLvlLogic(tokenId, result, s);
+	if (errCheck(s)) {
     return;
   }
-	tokenId=result->tokenId;
+	tokenId = result->tokenId;
 
-	if ((strBeginVal< s->stringFieldLen)&&(result->type==1)){
-	  for(x=0; x<(s->stringFieldLen-strBeginVal);x++){
-	    if(s->stringField[result->value.val_str+x]!=0){
-	      s->stringField[strBeginVal+x]=s->stringField[result->value.val_str+x];
-	    }else{
-	      break;
-	    }
-	  }
-	  s->stringFieldLen=strBeginVal+x+1;
-	  s->stringField[strBeginVal+x]=0;
-	  result->value.val_s=strBeginVal;
-
+	if (unsecureCommand == 0) {
+		if ((strBeginVal < s->stringFieldLen) && (result->type == 1)) {
+			for(x = 0; x < (s->stringFieldLen - strBeginVal); x++) {
+			  if(s->stringField[result->value.val_str + x] != 0) {
+			    s->stringField[strBeginVal + x] = s->stringField[result->value.val_str + x];
+			  } else {
+			    break;
+			  }
+			}
+			s->stringFieldLen = strBeginVal + x + 1;
+			s->stringField[strBeginVal + x] = 0;
+			result->value.val_s = strBeginVal;
+		}
 	}
 
+	s->gcSafePoint = gcSafePointPrev;
+
+	if (unsecureCommandFlag == 0 && unsecureCommand == 1){
+		unsecureCommand = 0;
+	}
 
 	//printf("GC:EXPR: end %u\n", s->stringFieldLen);
 

@@ -152,7 +152,7 @@ void garbageCollect(uint16_t count, svsVM *s) {
   //ověříme validitu nultého stringu, páč před ním není nula
   valid = gcGetValidString(0, s);
   if (valid == 1) { //pokud byl validní, tak hledáme nějaký další invalidní
-    for(x = 0; x < s->stringFieldLen - 1; x++) {
+    for(x = s->gcSafePoint; x < s->stringFieldLen - 1; x++) {
       if (0 == s->stringField[x]) { //ukončovací znak předchozího stringu
         valid = gcGetValidString(x + 1, s);
         if (0 == valid) {

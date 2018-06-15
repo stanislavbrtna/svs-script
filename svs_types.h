@@ -105,6 +105,7 @@ typedef struct {
   // number of used chars, always points to the next free char
   uint16_t stringFieldLen;
   uint16_t stringConstMax;
+  uint16_t gcSafePoint;
 
   comExArgs commArgs;
 

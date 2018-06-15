@@ -1,0 +1,71 @@
+function main {
+	print("garbage collection test begin");
+
+	l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fringilla ullamcorper mi. Nunc eu sem facilisis lectus accumsan fermentum ut eu nulla. Donec erat ante, convallis ut lorem et, molestie dictum eros. Donec aliquam interdum erat et iaculis. In volutpat finibus lacus et feugiat. Duis euismod erat vitae erat accumsan dignissim.";
+
+	#sys profiler(1);
+	for (x = 0; x < 50; x++;) {
+
+		# set up generated test strings
+		testtext1 = "test " + "text " + x + 1;
+		testtext2 = "test " + "text " + x + 2;
+		testtext3 = "test " + "text " + x + 3;
+		testtext4 = "test " + "text " + x + 4;
+		testtext5 = "";
+
+		# crush the strings to grigger collection
+		for(i = 0; i < 300; i++;) {
+			b = 0;
+			if (x < 25) {
+				# to test unsafe commands in the expr exec
+				b = b + testF() + getcp(l, i % len(l));
+			} else {
+				b = b + getcp(l, i % len(l));
+				testF();
+			}
+		}
+
+		if (
+			testtext1 != "test " + "text " + x + 1 and
+			testtext2 != "test " + "text " + x + 2 and
+			testtext3 != "test " + "text " + x + 3 and
+			testtext4 != "test " + "text " + x + 4 and
+			testtext5 != "test " + "text " + x + 5
+		) {
+			FAIL = 1;
+			print(testtext1);
+			print(testtext2);
+			print(testtext3);
+			print(testtext4);
+			print(testtext5);
+			break;
+		}
+	}
+
+	test2 = "this " + "is " + test2F() + "2";
+
+	if (test2 != "this is test 2"){
+		FAIL = 1;
+	}
+
+	if(FAIL){
+		print("test FAILED!");
+	}else{
+		print("test PASSED");
+	}
+
+	return FAIL;
+}
+
+function testF {
+	testtext5 = "test " + "text " + x + 5;
+	return "";
+}
+
+function test2F {
+	i = 0;
+	for(i = 0; i < 1000; i = i + 1;) {
+		z = "testy test" + i;
+	}
+	return "test ";
+}

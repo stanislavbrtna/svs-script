@@ -14,3 +14,4 @@ svs:
 
 test: svs
 	./bin/svs tests/autotest.svs
+	./bin/svs tests/gctest.svs
