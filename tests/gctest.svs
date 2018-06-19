@@ -1,5 +1,5 @@
 function main {
-	print("garbage collection test begin");
+	print("Garbage collection test:");
 
 	l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fringilla ullamcorper mi. Nunc eu sem facilisis lectus accumsan fermentum ut eu nulla. Donec erat ante, convallis ut lorem et, molestie dictum eros. Donec aliquam interdum erat et iaculis. In volutpat finibus lacus et feugiat. Duis euismod erat vitae erat accumsan dignissim.";
 
@@ -49,9 +49,9 @@ function main {
 	}
 
 	if(FAIL){
-		print("test FAILED!");
+		print("FAILED!");
 	}else{
-		print("test PASSED");
+		print("PASSED");
 	}
 
 	return FAIL;

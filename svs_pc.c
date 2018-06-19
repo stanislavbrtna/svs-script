@@ -91,8 +91,8 @@ int main(int argc, char *argv[]){
 	if (argc==1){
 	printf("Usage:\n%s <fname> [-t] [-i]\n\
      fname - name of the script file\n\
-     -t    - optional tokenizer debug output\n\n(c) Standa\n\
-     -i    - optional debug output", argv[0]);
+     -t    - optional tokenizer debug output\n\
+     -i    - optional debug output\n\n(c) Standa\n", argv[0]);
   return 0;
 	}
 
