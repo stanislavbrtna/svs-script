@@ -128,7 +128,7 @@ int main(int argc, char *argv[]){
 	commExec("main", &s);
 	errSoftPrint(&s);
 
-
+	printf("\n");
 	if (s.commRetType==0){
 	  printf("Returned: %i\n",getRetValInt(&s));
 	  retval=(int)getRetValInt(&s);

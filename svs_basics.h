@@ -39,6 +39,9 @@ This is the main include file.
 #include "svs_types.h"
 #include "svs_errors.h"
 
+#if !defined(USE_FLOAT) && defined(SVS_USE_ADV_MATH)
+#error "USE_FLOAT required for SVS_USE_ADV_MATH"
+#endif
 
 #include "svs_token_cache.h"
 #include "svs_misc.h"

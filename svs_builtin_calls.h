@@ -34,6 +34,16 @@ typedef enum {
 	GETCP = 6,
 	LEN = 7,
 	SUBSTR = 8,
+	// advanced math
+	SIN = 9,
+	COS = 10,
+	TAN = 11,
+	ATAN = 12,
+	LOG = 13,
+	EXP = 14,
+	POW = 15,
+	PI = 16,
+	SQRT = 17
 } builtinCallEnum;
 
 typedef struct {

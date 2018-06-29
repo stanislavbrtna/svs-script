@@ -177,6 +177,37 @@ Function *substr(string, [num]begin, [num]end)* returns new string containing po
 
 #### Print
 Function *print* prints its parameter on standard output. (In SVS versions lower than 0.8 was used similar command *sys print(string)* that used sys wrapper. )
+
+### Built-in math functions
+Since version 0.8.6 SVS contains optional built-in math functions. These functions are enabled by default with SVS_USE_ADV_MATH define.
+
+#### Sin
+Function *[float]sin([float]angle_in_radians)* returns the sine of given angle.
+
+#### Cos
+Function *[float]cos([float]angle_in_radians)* returns the cosine of given angle.
+
+#### Tan
+Function *[float]tan([float]angle_in_radians)* returns the tangent of given angle.
+
+#### Atan
+Function *[float]atan([float]angle_in_radians)* returns the arc tangent of given angle.
+
+#### Log
+Function *[float]log([float]x)* returns the natural logarithm of x.
+
+#### Exp
+Function *[float]exp([float]x)* returns e^x.
+
+#### Pow
+Function *[float]pow([float]x, [float]y)* returns x^y.
+
+#### Pi
+Function *[float]pi()* returns the value of pi.
+
+#### Sqrt
+Function *[float]sqrt([float]x)* returns the square root of x.
+
 ### Variables
 Variables are by default all global (accessible across different functions), and value of uninitialised variable is (*num*) 0.
 Keyword *local* allows to add local variable to the current block of code. Local variables are destroyed at the end of block.

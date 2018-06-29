@@ -169,7 +169,6 @@ function main {
   }
   cnt = cnt + 1;
 
-
   if (typeof(1) == TYPE_NUM
   		and typeof("") == TYPE_STR
   		and typeof(3.3) == TYPE_FLOAT
@@ -213,6 +212,23 @@ function main {
     sys print(cnt + " - identificator passing:OK");
   }else{
     sys print(cnt + " - identificator passing:FAIL");
+    FAIL = 1;
+  }
+  cnt = cnt + 1;
+
+  if (sin(0.5) + "" == "0.47943" and
+      cos(0.5) + "" == "0.87758" and
+      tan(0.5) + "" == "0.5463" and
+      atan(0.8) + "" == "0.67474" and
+      log(5.0) + "" == "1.60944" and
+      exp(3.0) + "" == "20.08554" and
+      pow(5.0, 1.0/2.0) + "" == "2.23607" and
+      pi() + "" == "3.14159" and
+      sqrt(55.0) + "" == "7.4162"
+      ) {
+    sys print(cnt + " - advanced math:OK");
+  }else{
+    sys print(cnt + " - advanced math:FAIL");
     FAIL = 1;
   }
   cnt = cnt + 1;

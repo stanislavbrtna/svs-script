@@ -27,8 +27,8 @@ This file contains the main defines and limits of SVS.
 
 /*============================= Versions =====================================*/
 
-#define SVS_VERSION  "0.8.5"
-#define SVS_VERSION_NUM 850
+#define SVS_VERSION  "0.8.6"
+#define SVS_VERSION_NUM 860
 
 /*============================= Local Config =================================*/
 
@@ -60,6 +60,7 @@ This file contains the main defines and limits of SVS.
 
 #define LOCAL_VARIABLES_ENABLED // enable local statement
 #define USE_FLOAT // enable floating point math
+#define SVS_USE_ADV_MATH // enable sin, cos, tan, arctg, log, exp, pwr, pi, sqrt, float must be enabled
 //#define DBG_DISABLED // enable additional debug
 //#define CACHE_SIMPLE // disable advanced caching
 

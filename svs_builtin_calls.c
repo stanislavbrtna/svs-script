@@ -21,6 +21,9 @@ SOFTWARE.
 */
 
 #include "svs_builtin_calls.h"
+#ifdef SVS_USE_ADV_MATH
+#include <math.h>
+#endif
 
 uint16_t callToken; // used to precisely locate errors
 
@@ -33,6 +36,16 @@ svsBuiltInCallsTableType svsBuiltInCallsTable[] = {
 	{"getcp", GETCP},
 	{"len", LEN},
 	{"substr", SUBSTR},
+	// advanced math
+	{"sin", SIN},
+	{"cos", COS},
+	{"tan", TAN},
+	{"atan", ATAN},
+	{"log", LOG},
+	{"exp", EXP},
+	{"pow", POW},
+	{"pi", PI},
+	{"sqrt", SQRT},
 	{"end", 0}
 };
 
@@ -64,6 +77,9 @@ uint16_t processBuiltInCall(uint16_t index, varRetVal *result, svsVM *s) {
 		index++;
 		if (getTokenType(index, s) != 6) { //pokud nemáme prázdnou závorku
 			exprExec(index, &pracVar, s);
+			if (errCheck(s)) {
+				return 0;
+			}
 			args[x] = pracVar.value;
 			argType[x] = pracVar.type;
 			index = pracVar.tokenId;
@@ -455,6 +471,166 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
 		result->type = SVS_TYPE_STR;
 		return 1;
 	}
+
+#ifdef SVS_USE_ADV_MATH
+	// flt = sin([flt]rad)
+	if (callId == SIN) {
+		if (count != 1) {
+	  	simpleError("sin(): wrong argument count!", s);
+	  	return 0;
+	  }
+
+		if (argType[1] != SVS_TYPE_FLT) {
+			simpleError("sin(): wrong type of argument!", s);
+			return 0;
+		}
+
+		result->value = (varType)(sinf(args[1].val_f));
+		result->type = SVS_TYPE_FLT;
+		return 1;
+	}
+
+	// flt = cos([flt]rad)
+	if (callId == COS) {
+		if (count != 1) {
+	  	simpleError("cos(): wrong argument count!", s);
+	  	return 0;
+	  }
+
+		if (argType[1] != SVS_TYPE_FLT) {
+			simpleError("cos(): wrong type of argument!", s);
+			return 0;
+		}
+
+		result->value = (varType)(cosf(args[1].val_f));
+		result->type = SVS_TYPE_FLT;
+		return 1;
+	}
+
+	// flt = tan([flt]rad)
+	if (callId == TAN) {
+		if (count != 1) {
+	  	simpleError("tan(): wrong argument count!", s);
+	  	return 0;
+	  }
+
+		if (argType[1] != SVS_TYPE_FLT) {
+			simpleError("tan(): wrong type of argument!", s);
+			return 0;
+		}
+
+		result->value = (varType)(tanf(args[1].val_f));
+		result->type = SVS_TYPE_FLT;
+		return 1;
+	}
+
+	// flt = atan([flt]rad)
+	if (callId == ATAN) {
+		if (count != 1) {
+	  	simpleError("atan(): wrong argument count!", s);
+	  	return 0;
+	  }
+
+		if (argType[1] != SVS_TYPE_FLT) {
+			simpleError("atan(): wrong type of argument!", s);
+			return 0;
+		}
+
+		result->value = (varType)(atanf(args[1].val_f));
+		result->type = SVS_TYPE_FLT;
+		return 1;
+	}
+
+	// flt = log([flt])
+	if (callId == LOG) {
+		if (count != 1) {
+	  	simpleError("log(): wrong argument count!", s);
+	  	return 1;
+	  }
+
+		if (argType[1] != SVS_TYPE_FLT) {
+			simpleError("log(): wrong type of argument!", s);
+			return 1;
+		}
+
+		result->value = (varType)(logf(args[1].val_f));
+		result->type = SVS_TYPE_FLT;
+		return 1;
+	}
+
+	// flt = exp([flt])
+	if (callId == EXP) {
+		if (count != 1) {
+	  	simpleError("exp(): wrong argument count!", s);
+	  	return 0;
+	  }
+
+		if (argType[1] != SVS_TYPE_FLT) {
+			simpleError("exp(): wrong type of argument!", s);
+			return 0;
+		}
+
+		result->value = (varType)(expf(args[1].val_f));
+		result->type = SVS_TYPE_FLT;
+		return 1;
+	}
+
+	// flt = pow([flt]base, [flt]exp)
+	if (callId == POW) {
+		if (count != 2) {
+	  	simpleError("pow(): wrong argument count!", s);
+	  	return 0;
+	  }
+
+		if (argType[1] != SVS_TYPE_FLT || argType[2] != SVS_TYPE_FLT) {
+			simpleError("pow(): wrong type of argument!", s);
+			return 0;
+		}
+
+		result->value = (varType)(powf(args[1].val_f, args[2].val_f));
+		result->type = SVS_TYPE_FLT;
+		return 1;
+	}
+
+	// flt = pi()
+	if (callId == PI) {
+		if (count != 0) {
+	  	simpleError("pi(): wrong argument count!", s);
+	  	return 0;
+	  }
+
+		result->value = (varType)((float)3.14159265);
+		result->type = SVS_TYPE_FLT;
+		return 1;
+	}
+
+	// flt = sqrt([flt])
+	if (callId == SQRT) {
+		if (count != 1) {
+	  	simpleError("sqrt(): wrong argument count!", s);
+	  	return 0;
+	  }
+
+		if (argType[1] != SVS_TYPE_FLT) {
+			simpleError("sqrt(): wrong type of argument!", s);
+			return 0;
+		}
+
+		result->value = (varType)(sqrtf(args[1].val_f));
+		result->type = SVS_TYPE_FLT;
+		return 1;
+	}
+#else
+	if (callId == SIN || callId == COS ||
+			callId == TAN || callId == ATAN ||
+			callId == LOG || callId == EXP ||
+			callId == POW || callId == PI ||
+			callId == SQRT
+		) {
+		simpleError("execBuiltInCall(): SVS_USE_ADV_MATH is disabled in this build!", s);
+	  return 0;
+	}
+#endif
 
 	simpleError("execBuiltInCall: Unknown builtin call!", s);
 	return 0;

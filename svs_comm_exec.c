@@ -659,6 +659,9 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
 		index++;
 		if (getTokenType(index, s) != 6) { //pokud nemáme prázdnou závorku
 			exprExec(index, &pracVar, s);
+			if (errCheck(s)) {
+				return 0;
+			}
 			pracArgs2.arg[x] = pracVar.value;
 			pracArgs2.argType[x] = pracVar.type;
 			index = pracVar.tokenId;

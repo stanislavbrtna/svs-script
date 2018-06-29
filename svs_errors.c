@@ -30,6 +30,7 @@ void svs_hardErrHandler () __attribute__ ((weak, alias ("hardErrHandler_default"
 void errSoft(uint8_t *str, svsVM *s) {
 	if (errCheck(s)) {
 		errSoftPrint(s);
+		printf("Another error: %s\n", str);
 		errMsgS("errSoft:Double soft error occured!");
 	} else {
 		s->err = 1;

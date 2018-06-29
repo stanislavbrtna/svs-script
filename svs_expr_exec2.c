@@ -69,6 +69,9 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
 		exprExecDMSG("ExprExecLvl5 SYS", result->value.val_s, result->tokenId);
 	}else	if (getTokenType(index, s) == 36) { // BuiltIn FUNC
 		processBuiltInCall(index, &prac, s);
+		if (errCheck(s)) {
+			return;
+		}
 		result->value.val_s = prac.value.val_s;
 		result->type = prac.type;
 		result->tokenId = prac.tokenId;
@@ -841,8 +844,8 @@ void exprExec(uint16_t index, varRetVal *result, svsVM *s) {
 
 	exprExecLvlLogic(tokenId, result, s);
 	if (errCheck(s)) {
-    return;
-  }
+		return;
+	}
 	tokenId = result->tokenId;
 
 	if (unsecureCommand == 0) {

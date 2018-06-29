@@ -1060,7 +1060,7 @@ uint8_t tokenParse(svsVM *s) {
 			//filtrace bordelu
 				while(1){
 					if (isRegChar(tokenInput(posText,0))||(tokenInput(posText,0)==0)||(tokenInput(posText,0)=='(')||(tokenInput(posText,0)=='=')||(tokenInput(posText,0)=='<')||(tokenInput(posText,0)=='>')
-					||(tokenInput(posText,0)==';')||(tokenInput(posText,0)==',')||(tokenInput(posText,0)=='+')||(tokenInput(posText,0)=='-')||(tokenInput(posText,0)=='*')||(tokenInput(posText,0)=='/')||(tokenInput(posText,0)=='!')||(tokenInput(posText,0)==')')||(tokenInput(posText,0)=='%')){
+					||(tokenInput(posText,0)==';')||(tokenInput(posText,0)==',')||(tokenInput(posText,0)=='+')||(tokenInput(posText,0)=='-')||(tokenInput(posText,0)=='*')||(tokenInput(posText,0)=='/')||(tokenInput(posText,0)=='!')||(tokenInput(posText,0)==')')||(tokenInput(posText,0)=='%')||(tokenInput(posText,0)=='\n')){
 						break;
 					}else{
 						if (tokenInput(posText,0)!=' '){
