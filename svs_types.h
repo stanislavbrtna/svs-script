@@ -30,6 +30,16 @@ SOFTWARE.
 #define SVS_TYPE_STR 1
 #define SVS_TYPE_FLT 3
 
+#define SVS_TOKEN_FUNCTION 11
+#define SVS_TOKEN_IF 12
+#define SVS_TOKEN_ELSE 13
+#define SVS_TOKEN_WHILE 14
+#define SVS_TOKEN_BREAK 15
+#define SVS_TOKEN_RETURN 16
+#define SVS_TOKEN_CALL 17
+#define SVS_TOKEN_SYS 28
+#define SVS_TOKEN_FOR 34
+
 typedef struct {
   uint8_t fString[NAME_LENGTH];
   uint16_t tokenId;

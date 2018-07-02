@@ -233,13 +233,14 @@ Keyword *local* allows to add local variable to the current block of code. Local
     a = 5
 Maximum number of variables is also limited (VAR_TABLE_L define).
 
- ### Loops and branching
+### Loops and branching
 SVS supports simple branching with *if* and *else* and two types of loops.
 
 #### If and else
 Statement if must be followed by brackets containing an expression. If the expression is zero, the next command (or block of code) will be skipped, otherwise it will be executed. Else branch is optional.
 
-Do not use "else if" construction, it does not work in current version of SVS.
+*Note:*
+Do not use "else if" construction in SVS versions bellow 0.8.7.
 
 Example:
 

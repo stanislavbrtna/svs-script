@@ -36,6 +36,35 @@ void commExDMSG(char *text, uint16_t tokenId) {
 	}
 }
 
+uint16_t exprSkip(uint16_t index, svsVM *s) {
+	uint16_t x = 0;
+	uint16_t count = 0;
+
+	while(1) {
+		if (getTokenType(x,s) == 5) {
+			count += 1 ;
+		}
+
+		if (getTokenType(x,s) == 6) {
+			if (count > 0) {
+			count -= 1;
+			} else {
+				errSoft((uint8_t *)"commSkip: Bracket sanity error." ,s);
+				errSoftSetParam((uint8_t *)"TokenId", (varType)x ,s);
+				errSoftSetToken(x, s);
+				return 0;
+			}
+			if (count == 0) {
+				commExDMSG("commSkip expression skip end, (skipped)", x);
+				break;
+			}
+		}
+		x++;
+	}
+
+	return x; // ends on last bracket
+}
+
 
 // přeskakuje while smyčku, případně jednu z větví ifu
 // used for skipping code after if/else/while, if the equation say so
@@ -46,6 +75,31 @@ uint16_t commSkip(uint16_t index, svsVM *s) {
 	x = index;
 	commExDMSG("commSkip start", index);
 
+
+	// skip if/else
+	if (getTokenType(x, s) == SVS_TOKEN_IF) {
+		x = exprSkip(x, s);
+		x++;
+		x = commSkip(x, s);
+		if (getTokenType(x + 1, s) != SVS_TOKEN_ELSE) {
+			return x;
+		} else {
+			x++;
+			x = commSkip(x, s);
+			return x;
+		}
+	}
+
+	// skip for and while
+	if (getTokenType(x, s) == SVS_TOKEN_FOR ||
+	    getTokenType(x, s) == SVS_TOKEN_WHILE
+	    ) {
+		x = exprSkip(x, s); // skip expression
+		x++;
+		x = commSkip(x, s); // skip loop body
+		return x;
+	}
+
 	while(1) { //začátek bloku
 		if (getTokenType(x,s) == 7) {
 			count += 1 ;
@@ -55,7 +109,7 @@ uint16_t commSkip(uint16_t index, svsVM *s) {
 			if (count > 0) {
 				count -= 1;
 			} else {
-				errSoft((uint8_t *)"commSkip: Bracket sanity error. Maybe missing \";\"?" ,s);
+				errSoft((uint8_t *)"commSkip: Curly bracket sanity error. Maybe missing \";\"?" ,s);
 				errSoftSetParam((uint8_t *)"TokenId", (varType)x ,s);
 				errSoftSetToken(x, s);
 				return 0;
