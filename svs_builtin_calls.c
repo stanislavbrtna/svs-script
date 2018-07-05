@@ -46,6 +46,7 @@ svsBuiltInCallsTableType svsBuiltInCallsTable[] = {
 	{"pow", POW},
 	{"pi", PI},
 	{"sqrt", SQRT},
+	{"ver", VER},
 	{"end", 0}
 };
 
@@ -631,6 +632,20 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
 	  return 0;
 	}
 #endif
+
+	// [num] ver()
+	if (callId == VER) {
+		/* // kept here for future use
+		if (count != 0) {
+	  	simpleError("ver(): wrong argument count!", s);
+	  	return 0;
+	  }
+	  */
+
+		result->value = (varType)(SVS_VERSION_NUM);
+		result->type = SVS_TYPE_NUM;
+		return 1;
+	}
 
 	simpleError("execBuiltInCall: Unknown builtin call!", s);
 	return 0;

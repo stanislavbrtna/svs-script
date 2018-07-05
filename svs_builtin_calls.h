@@ -43,7 +43,8 @@ typedef enum {
 	EXP = 14,
 	POW = 15,
 	PI = 16,
-	SQRT = 17
+	SQRT = 17,
+	VER = 18
 } builtinCallEnum;
 
 typedef struct {

@@ -178,6 +178,9 @@ Function *substr(string, [num]begin, [num]end)* returns new string containing po
 #### Print
 Function *print* prints its parameter on standard output. (In SVS versions lower than 0.8 was used similar command *sys print(string)* that used sys wrapper. )
 
+#### Get SVS version
+Since SVS 0.8.8 you can use *[num]ver()* to get current version of SVS. Version is returned as number, for example version 0.8.8 will return 880, version 1.0 will be 1000.
+
 ### Built-in math functions
 Since version 0.8.6 SVS contains optional built-in math functions. These functions are enabled by default with SVS_USE_ADV_MATH define.
 

@@ -177,6 +177,11 @@ void exprExecLvl4(uint16_t index, varRetVal *result, svsVM *s) {
   }
   tokenId = result->tokenId;
 
+  if (result->type == SVS_TYPE_STR) {
+  	exprExecDMSG("ExprExecLvl4 Exit, token type STR, nothing to do",result->value.val_s,result->tokenId);
+  	return;
+  }
+
   while((getTokenType(tokenId, s) == 3) || (getTokenType(tokenId, s) == 4) || (getTokenType(tokenId, s) == 30)) {
 		if (getTokenType(tokenId, s) == 3) { // násobení
 			exprExecDMSG("ExprExecLvl4 * operator", result->value.val_s, tokenId);
@@ -284,6 +289,12 @@ void exprExecLvl3(uint16_t index, varRetVal *result, svsVM *s) {
     return;
   }
   tokenId = result->tokenId;
+
+  if (result->type == SVS_TYPE_STR) {
+  	exprExecDMSG("ExprExecLvl3 Exit, token type STR, nothing to do",result->value.val_s,result->tokenId);
+  	return;
+  }
+
   // TODO: pokračovat s revizí standardu kódu
   while ((getTokenType(tokenId,s)==1)||(getTokenType(tokenId,s)==2)){
 		if (getTokenType(tokenId,s)==1){ // sčítání
