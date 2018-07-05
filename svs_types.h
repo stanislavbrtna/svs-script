@@ -40,6 +40,9 @@ SOFTWARE.
 #define SVS_TOKEN_SYS 28
 #define SVS_TOKEN_FOR 34
 
+#define SVS_TOKEN_ADD 1
+#define SVS_TOKEN_SUBT 2
+
 typedef struct {
   uint8_t fString[NAME_LENGTH];
   uint16_t tokenId;

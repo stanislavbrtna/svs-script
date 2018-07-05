@@ -163,10 +163,6 @@ void exprExecLvl4(uint16_t index, varRetVal *result, svsVM *s) {
   varRetVal prac;
   uint16_t tokenId;
 
-  errStruct err;
-	err.errString = "";
-	err.tokenId = 0;
-
   varRetValZero(&prac);
 
   tokenId = index;
@@ -276,10 +272,6 @@ void exprExecLvl3(uint16_t index, varRetVal *result, svsVM *s) {
   varRetVal prac;
   uint16_t tokenId;
 
-  errStruct err;
-	err.errString = "";
-	err.tokenId = 0;
-
   varRetValZero(&prac);
 
   tokenId = index;
@@ -295,170 +287,152 @@ void exprExecLvl3(uint16_t index, varRetVal *result, svsVM *s) {
   	return;
   }
 
-  // TODO: pokračovat s revizí standardu kódu
-  while ((getTokenType(tokenId,s)==1)||(getTokenType(tokenId,s)==2)){
-		if (getTokenType(tokenId,s)==1){ // sčítání
-			exprExecDMSG("ExprExecLvl3 + (NUM) operator",result->value.val_s,tokenId);
-			exprExecLvl4(result->tokenId+1, &prac,s); //získáme druhý operand
-			if (errCheck(s)){
+  while ((getTokenType(tokenId, s) == SVS_TOKEN_ADD) || (getTokenType(tokenId, s) == SVS_TOKEN_SUBT)) {
+		if (getTokenType(tokenId,s) == SVS_TOKEN_ADD) {
+			exprExecDMSG("ExprExecLvl3 + (NUM) operator", result->value.val_s, tokenId);
+			exprExecLvl4(result->tokenId + 1, &prac, s); // get second operand
+			if (errCheck(s)) {
         return;
       }
-			if ((result->type==0)&&(prac.type==0)){ //ověříme typ a pokud je to číslo, tak
-			  result->value.val_s+=prac.value.val_s; //přičteme
-			  tokenId=prac.tokenId;  //nastavíme token id co se vrátilo
-			  result->tokenId=prac.tokenId; //nastavíme znova
-			}else if ((result->type==3)&&(prac.type==3)){ //ověříme typ a pokud je to float, tak
-			#ifdef USE_FLOAT
-			  result->value.val_f+=prac.value.val_f; //přičteme
-			  tokenId=prac.tokenId;  //nastavíme token id co se vrátilo
-			  result->tokenId=prac.tokenId; //nastavíme znova
-			  #endif
-			}else if((result->type==1)||(prac.type==1)){
-			  exprExecDMSG("ExprExecLvl3 + (NUM) operator: Exit",result->value.val_s,tokenId);
-			  result->tokenId=tokenId; //pokud se typy nerovnají, vrátíme to stringovému sčítání
+			if ((result->type == SVS_TYPE_NUM) && (prac.type == SVS_TYPE_NUM)) {
+			  result->value.val_s += prac.value.val_s;
+			  tokenId = prac.tokenId;
+			  result->tokenId = prac.tokenId;
+			} else if ((result->type == SVS_TYPE_FLT) && (prac.type == SVS_TYPE_FLT)) {
+#ifdef USE_FLOAT
+			  result->value.val_f += prac.value.val_f;
+			  tokenId = prac.tokenId;
+			  result->tokenId = prac.tokenId;
+#endif
+			} else if((result->type == SVS_TYPE_STR) || (prac.type == SVS_TYPE_STR)) {
+			  exprExecDMSG("ExprExecLvl3 + (NUM) operator: Exit", result->value.val_s, tokenId);
+			  result->tokenId = tokenId;
 			  return;
-			}else{
-			  errSoft("Can not add float and num!",s);
-  		  errSoftSetParam("TokenId",(varType)tokenId,s);
-  		  errSoftSetToken(tokenId,s);
+			} else {
+			  errSoft("Can not add float and num!", s);
+  		  errSoftSetParam("TokenId", (varType)tokenId, s);
+  		  errSoftSetToken(tokenId, s);
 	  	  return;
 			}
-		}else	if (getTokenType(tokenId,s)==2){ // odčítání
-			exprExecDMSG("ExprExecLvl3 - operator",result->value.val_s,tokenId);
-			exprExecLvl4(result->tokenId+1, &prac,s); //získáme druhý operand
-			if (errCheck(s)){
+		} else	if (getTokenType(tokenId,s) == SVS_TOKEN_SUBT) {
+			exprExecDMSG("ExprExecLvl3 - operator", result->value.val_s, tokenId);
+			exprExecLvl4(result->tokenId + 1, &prac, s);
+			if (errCheck(s)) {
         return;
       }
-			if ((result->type==0)&&(prac.type==0)){ //ověříme typ a pokud je to číslo, tak
-			  result->value.val_s-=prac.value.val_s; //odečteme
-			  tokenId=prac.tokenId;  //nastavíme token id co se vrátilo
-			  result->tokenId=prac.tokenId; //nastavíme znova
-			}else if ((result->type==3)&&(prac.type==3)){ //ověříme typ a pokud je to float, tak
+			if ((result->type == SVS_TYPE_NUM) && (prac.type == SVS_TYPE_NUM)) {
+			  result->value.val_s -= prac.value.val_s;
+			  tokenId = prac.tokenId;
+			  result->tokenId = prac.tokenId;
+			} else if ((result->type == SVS_TYPE_FLT) && (prac.type == SVS_TYPE_FLT)) {
 			#ifdef USE_FLOAT
-			  result->value.val_f-=prac.value.val_f; //odečteme
-			  tokenId=prac.tokenId;  //nastavíme token id co se vrátilo
-			  result->tokenId=prac.tokenId; //nastavíme znova
+			  result->value.val_f -= prac.value.val_f;
+			  tokenId = prac.tokenId;
+			  result->tokenId = prac.tokenId;
 			#endif
-			}else if ((result->type==0)&&(prac.type==3)&&(result->value.val_s==0)){ // řeší (-1.1)
+			}else if ( (result->type == SVS_TYPE_NUM)
+			           && (prac.type == SVS_TYPE_FLT) && (result->value.val_s == 0)) { // solves (-1.1)
 			#ifdef USE_FLOAT
-			  result->value.val_f=prac.value.val_f*-1; //nastavíme znaménko
-			  result->type=3;
-			  tokenId=prac.tokenId;  //nastavíme token id co se vrátilo
-			  result->tokenId=prac.tokenId; //nastavíme znova
+			  result->value.val_f = prac.value.val_f * -1;
+			  result->type = 3;
+			  tokenId = prac.tokenId;
+			  result->tokenId = prac.tokenId;
 			#endif
-			}else{
-        errSoft("Can only subtract num with num or float with float!",s);
-  		  errSoftSetParam("TokenId",(varType)tokenId,s);
-  		  errSoftSetToken(tokenId,s);
+			} else {
+        errSoft("Can only subtract num with num or float with float!", s);
+  		  errSoftSetParam("TokenId", (varType)tokenId, s);
+  		  errSoftSetToken(tokenId, s);
 	  	  return;
 			}
 		}
 	}
 
-  exprExecDMSG("ExprExecLvl3 Exit",result->value.val_s,result->tokenId);
+  exprExecDMSG("ExprExecLvl3 Exit", result->value.val_s, result->tokenId);
 }
 
 
-void exprExecLvl2(uint16_t index, varRetVal *result, svsVM *s){
+void exprExecLvl2(uint16_t index, varRetVal *result, svsVM *s) {
   //STR +
   varRetVal prac;
   uint16_t tokenId;
 
-  errStruct err;
-	err.errString="";
-	err.tokenId=0;
-
   varRetValZero(&prac);
 
-  tokenId=index;
-  exprExecDMSG("ExprExecLvl2 Begin",result->value.val_s,tokenId);
-  exprExecLvl3(tokenId, result,s);
-  if (errCheck(s)){
+  tokenId = index;
+  exprExecDMSG("ExprExecLvl2 Begin", result->value.val_s, tokenId);
+  exprExecLvl3(tokenId, result, s);
+  if (errCheck(s)) {
     return;
   }
-  tokenId=result->tokenId;
+  tokenId = result->tokenId;
 
-  while ((getTokenType(tokenId,s)==1)||(getTokenType(tokenId,s)==2)){
-		if (getTokenType(tokenId,s)==1){ // sčítání
+  while (getTokenType(tokenId, s) == SVS_TOKEN_ADD) {
+		if (getTokenType(tokenId, s) == SVS_TOKEN_ADD) {
 			exprExecDMSG("ExprExecLvl2 + (STR) operator",result->value.val_s,tokenId);
-			exprExecLvl3(result->tokenId+1, &prac,s); //získáme druhý operand
-			if (errCheck(s)){
+			exprExecLvl3(result->tokenId + 1, &prac, s);
+			if (errCheck(s)) {
         return;
       }
-			if ((result->type==1)&&(prac.type==1)){ //ověříme typ a pokud je to string, tak
-			  //printf("\nadvDBG: %s a %s, indexy: %i a %i \n", stringField+result->value, stringField+prac.value,result->value,prac.value);
-			  result->value.val_str= strAdd(result->value.val_str,prac.value.val_str,s); //sečtem stringy
-			  tokenId=prac.tokenId;  //nastavíme token id co se vrátilo
-			  result->tokenId=prac.tokenId; //nastavíme znova
-			  exprExecDMSG("ExprExecLvl2 STR: STR + STR",result->value.val_s,tokenId);
-			}else if ((result->type==0)&&(prac.type==1)){ //ověříme typ a pokud je to num a string
-			  //printf("\nadvDBG: %s a %s, indexy: %i a %i \n", stringField+i16toString(result->value), stringField+prac.value,i16toString(result->value),prac.value);
-			  result->value.val_str= strAdd(i16toString(result->value,s).val_str,prac.value.val_str,s); //převedem a sečtem
-			  result->type=1;
-			  tokenId=prac.tokenId;  //nastavíme token id co se vrátilo
-			  result->tokenId=prac.tokenId; //nastavíme znova
-			  exprExecDMSG("ExprExecLvl2 STR: NUM + STR",result->value.val_s,tokenId);
-			}else if ((result->type==1)&&(prac.type==0)){ //ověříme typ a pokud je to string a num
-			  //printf("\nadvDBG: %s a %s, indexy: %i a %i \n", stringField+result->value, stringField+i16toString(prac.value),result->value,i16toString(prac.value));
-			  result->value.val_str= strAdd(result->value.val_str,i16toString(prac.value,s).val_str,s); //převedem a sečtem
-			  result->type=1;
-			  tokenId=prac.tokenId;  //nastavíme token id co se vrátilo
-			  result->tokenId=prac.tokenId; //nastavíme znova
-			  exprExecDMSG("ExprExecLvl2 STR: STR + NUM",result->value.val_s,tokenId);
-			}else if((result->type==1)&&(prac.type==3)){
+			if ((result->type == SVS_TYPE_STR) && (prac.type == SVS_TYPE_STR)) {
+			  result->value.val_str = strAdd(result->value.val_str, prac.value.val_str, s);
+			  tokenId = prac.tokenId;
+			  result->tokenId = prac.tokenId;
+			  exprExecDMSG("ExprExecLvl2 STR: STR + STR", result->value.val_s, tokenId);
+			} else if ((result->type == SVS_TYPE_NUM) && (prac.type == SVS_TYPE_STR)) {
+			  result->value.val_str = strAdd(i16toString(result->value, s).val_str, prac.value.val_str, s);
+			  result->type = SVS_TYPE_STR;
+			  tokenId = prac.tokenId;
+			  result->tokenId = prac.tokenId;
+			  exprExecDMSG("ExprExecLvl2 STR: NUM + STR", result->value.val_s, tokenId);
+			} else if ((result->type == SVS_TYPE_STR) && (prac.type == SVS_TYPE_NUM)) {
+			  result->value.val_str = strAdd(result->value.val_str, i16toString(prac.value, s).val_str, s);
+			  result->type = SVS_TYPE_STR;
+			  tokenId = prac.tokenId;
+			  result->tokenId = prac.tokenId;
+			  exprExecDMSG("ExprExecLvl2 STR: STR + NUM", result->value.val_s, tokenId);
+			}else if ((result->type == SVS_TYPE_STR) && (prac.type == SVS_TYPE_FLT)) {
 			  #ifdef USE_FLOAT
-			  result->value.val_str= strAdd(result->value.val_str,floatToString(prac.value,s).val_str,s); //převedem a sečtem
-			  result->type=1;
-			  tokenId=prac.tokenId;  //nastavíme token id co se vrátilo
-			  result->tokenId=prac.tokenId; //nastavíme znova
-			  exprExecDMSG("ExprExecLvl2 STR: STR + NUM",result->value.val_s,tokenId);
+			  result->value.val_str = strAdd(result->value.val_str, floatToString(prac.value, s).val_str,s);
+			  result->type = SVS_TYPE_STR;
+			  tokenId = prac.tokenId;
+			  result->tokenId = prac.tokenId;
+			  exprExecDMSG("ExprExecLvl2 STR: STR + NUM", result->value.val_s, tokenId);
 			  #endif
-			}else if ((result->type==3)&&(prac.type==1)){ //ověříme typ a pokud je to num a string
+			}else if ((result->type == SVS_TYPE_FLT) && (prac.type == SVS_TYPE_STR)) {
 			#ifdef USE_FLOAT
-			  result->value.val_str= strAdd(floatToString(result->value,s).val_str,prac.value.val_str,s); //převedem a sečtem
-			  result->type=1;
-			  tokenId=prac.tokenId;  //nastavíme token id co se vrátilo
-			  result->tokenId=prac.tokenId; //nastavíme znova
-			  exprExecDMSG("ExprExecLvl2 STR: NUM + STR",result->value.val_s,tokenId);
+			  result->value.val_str = strAdd(floatToString(result->value, s).val_str, prac.value.val_str, s);
+			  result->type = SVS_TYPE_STR;
+			  tokenId = prac.tokenId;
+			  result->tokenId = prac.tokenId;
+			  exprExecDMSG("ExprExecLvl2 STR: NUM + STR", result->value.val_s, tokenId);
 			 #endif
 			}
 		}
 	}
 
-  exprExecDMSG("ExprExecLvl2 Exit",result->value.val_s,result->tokenId);
+  exprExecDMSG("ExprExecLvl2 Exit", result->value.val_s, result->tokenId);
 }
 
-
-
+// TODO: pokračovat s revizí standardu kódu
 
 //expressionExec
-void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s){
+void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
   //== != <= >= < > --hotovo
-  errStruct err;
   uint16_t tokenId;
   uint16_t x;
   varRetVal prac;
-
-  err.errString="";
-  err.tokenId=0;
-
   varRetValZero(&prac);
 
-  result->tokenId=index;
+  result->tokenId = index;
+  tokenId = index;
 
+  exprExecDMSG("ExprExecLvl1 Begin", result->value.val_s, tokenId);
 
-  tokenId=index;
-
-  //printf("GC:EXPR: begin %u\n", s->stringFieldLen);
-
-  exprExecDMSG("ExprExecLvl1 Begin",result->value.val_s,tokenId);
-
-	exprExecLvl2(tokenId, result,s);
-	if (errCheck(s)){
+	exprExecLvl2(tokenId, result, s);
+	if (errCheck(s)) {
     return;
   }
-	tokenId=result->tokenId;
-
+	tokenId = result->tokenId;
 
 	while ((getTokenType(tokenId,s)>=18)&&(getTokenType(tokenId,s)<=23)){
 		if (getTokenType(tokenId,s)==18){ //==
@@ -764,10 +738,6 @@ void exprExecLvlLogic(uint16_t index, varRetVal *result, svsVM *s){
   varRetVal prac;
   uint16_t tokenId;
 
-  errStruct err;
-	err.errString = "";
-	err.tokenId = 0;
-
   varRetValZero(&prac);
 
   tokenId=index;
@@ -828,16 +798,12 @@ void exprExecLvlLogic(uint16_t index, varRetVal *result, svsVM *s){
 }
 
 void exprExec(uint16_t index, varRetVal *result, svsVM *s) {
-	errStruct err;
   uint16_t tokenId;
   uint16_t strBeginVal;
   uint16_t x;
   uint16_t gcSafePointPrev;
   uint8_t unsecureCommandFlag;
   varRetVal prac;
-
-  err.errString = "";
-  err.tokenId = 0;
 
   varRetValZero(&prac);
   varRetValZero(result);
@@ -879,8 +845,6 @@ void exprExec(uint16_t index, varRetVal *result, svsVM *s) {
 	if (unsecureCommandFlag == 0 && unsecureCommand == 1){
 		unsecureCommand = 0;
 	}
-
-	//printf("GC:EXPR: end %u\n", s->stringFieldLen);
 
   exprExecDMSG("ExprExec Exit",result->value.val_u,result->tokenId);
 
