@@ -642,7 +642,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
 	  }
 	  */
 
-		result->value = (varType)(SVS_VERSION_NUM);
+		result->value = (varType)((uint16_t)SVS_VERSION_NUM);
 		result->type = SVS_TYPE_NUM;
 		return 1;
 	}
