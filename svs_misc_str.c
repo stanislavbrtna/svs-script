@@ -316,7 +316,7 @@ varType floatToString(varType num, svsVM *s) {
 
 	if (neg == 0) {
 	  while ((i[0] == '0') && (i[1] != '.')) {
-	    for (b = 0; b < 20; b++) {
+	    for (b = 0; b < 19; b++) {
 	      i[b] = i[b + 1];
 	    }
 	    a++;
@@ -324,7 +324,7 @@ varType floatToString(varType num, svsVM *s) {
 	} else {
 	  i[0] = '-';
 	  while((i[1] == '0') && (i[2] != '.')) {
-	    for (b = 1; b < 20; b++) {
+	    for (b = 1; b < 19; b++) {
 	      i[b] = i[b + 1];
 	    }
 	    a++;
