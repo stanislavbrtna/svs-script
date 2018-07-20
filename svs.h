@@ -27,8 +27,4 @@ This file just includes svs_basics, the main include file.
 
 #include "svs_basics.h"
 
-void tokenPrint();
-void varTablePrint();
-void strTablePrint();
-
 #endif
