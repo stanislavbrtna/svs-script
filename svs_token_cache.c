@@ -28,8 +28,8 @@ uint8_t cacheDebug = 0;
 //cgDMSG("text");
 void cacheDMSG(char *text){
   if (cacheDebug==1){
-	  printf("cacheDMSG: %s \n", text);
-	}
+    printf("cacheDMSG: %s \n", text);
+  }
 }
 
 void setCacheDebug(uint8_t level){
@@ -121,21 +121,21 @@ varType getTokenData(uint16_t tokenId, svsVM *s){
 #ifdef PC
 
 void SVScloseCache(svsVM *s) {
-	fclose(s->vmCache);
+  fclose(s->vmCache);
 }
 
 void SVSopenCache(svsVM *s) {
-	s->vmCache = fopen(s->vmName, "r+");
+  s->vmCache = fopen(s->vmName, "r+");
 }
 
 #else
 
 void SVScloseCache(svsVM *s) {
-	f_close(&(s->vmCache));
+  f_close(&(s->vmCache));
 }
 
 void SVSopenCache(svsVM *s) {
-	f_open(&(s->vmCache), s->vmName, FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
+  f_open(&(s->vmCache), s->vmName, FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
 }
 
 #endif
@@ -148,17 +148,17 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s) {
   prac.Data.val_s=666;
   prac.Type=6;
   if (cacheDebug==1){
-	  printf("cacheReload dbg: BEGIN: index: %u cache start: %u -> reloading cache\n", tokenId, s->cacheStart);
-	}
+    printf("cacheReload dbg: BEGIN: index: %u cache start: %u -> reloading cache\n", tokenId, s->cacheStart);
+  }
   //
 #ifdef PC
   if ((s->vmCache)==0){
-	  errMsgS("cacheReload: Error: File not valid!");
-	}
+    errMsgS("cacheReload: Error: File not valid!");
+  }
 #else
   if ((s->cacheFr)!=FR_OK){
-	  errMsgS("cacheReload: Error: File not valid!");
-	}
+    errMsgS("cacheReload: Error: File not valid!");
+  }
 #endif
 
   //fseek(s->vmCache,sizeof(tokenCacheStruct)*TOKEN_LENGTH*(tokenId%TOKEN_LENGTH),SEEK_SET);
@@ -167,7 +167,7 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s) {
 
   for(x=0;x<TOKEN_LENGTH;x++){
     #ifdef PC
-	  fseek(s->vmCache,sizeof(tokenCacheStruct)*(TOKEN_LENGTH*(tokenId/TOKEN_LENGTH)+x),SEEK_SET);
+    fseek(s->vmCache,sizeof(tokenCacheStruct)*(TOKEN_LENGTH*(tokenId/TOKEN_LENGTH)+x),SEEK_SET);
     ret= fread(&(s->tokenCache[x]), sizeof(tokenCacheStruct), 1, s->vmCache);
     #else
     f_lseek(&(s->vmCache),sizeof(tokenCacheStruct)*(TOKEN_LENGTH*(tokenId/TOKEN_LENGTH)+x));
@@ -195,17 +195,17 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
   uint16_t chacheStartPrac;
 
   if (cacheDebug==1){
-	  printf("cacheReload dbg: BEGIN: index: %u cache start: %u -> reloading cache\n(chache size: %u )\n", tokenId,s->cacheStart, TOKEN_LENGTH );
-	}
+    printf("cacheReload dbg: BEGIN: index: %u cache start: %u -> reloading cache\n(chache size: %u )\n", tokenId,s->cacheStart, TOKEN_LENGTH );
+  }
   //
 #ifdef PC
   if ((s->vmCache)==0){
-	  errMsgS("cacheReload: Error: File not valid!");
-	}
+    errMsgS("cacheReload: Error: File not valid!");
+  }
 #else
   if ((s->cacheFr)!=FR_OK){
-	  errMsgS("cacheReload: Error: File not valid!");
-	}
+    errMsgS("cacheReload: Error: File not valid!");
+  }
 #endif
   //TOKEN_CACHE_STEP
 
@@ -219,16 +219,16 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
     // pokudjde něco znovupoužít
     //bacha, token lenght je sice x, ale indexuje se od 0 do x-1
     if (chacheStartPrac < (tokenId + TOKEN_LENGTH - 1)) {
-    	//printf("  debug: REV from %u to %u\n", TOKEN_LENGTH, TOKEN_LENGTH - 1 - (chacheStartPrac - tokenId));
-		  for(x = 0; x < ((tokenId + TOKEN_LENGTH) - chacheStartPrac); x++) {
-		  	//s->tokenCache[x + TOKEN_LENGTH - chacheStartPrac - tokenId] = s->tokenCache[x];
-		  	s->tokenCache[TOKEN_LENGTH-1 - x] = s->tokenCache[TOKEN_LENGTH-1 - (chacheStartPrac - tokenId )-x];
-		  	//printf( "   %u = %u\n", TOKEN_LENGTH-1 - x, TOKEN_LENGTH - (chacheStartPrac - tokenId )-x);
-		  }
-		  //printf ("repeats %u\n", x-1);
+      //printf("  debug: REV from %u to %u\n", TOKEN_LENGTH, TOKEN_LENGTH - 1 - (chacheStartPrac - tokenId));
+      for(x = 0; x < ((tokenId + TOKEN_LENGTH) - chacheStartPrac); x++) {
+        //s->tokenCache[x + TOKEN_LENGTH - chacheStartPrac - tokenId] = s->tokenCache[x];
+        s->tokenCache[TOKEN_LENGTH-1 - x] = s->tokenCache[TOKEN_LENGTH-1 - (chacheStartPrac - tokenId )-x];
+        //printf( "   %u = %u\n", TOKEN_LENGTH-1 - x, TOKEN_LENGTH - (chacheStartPrac - tokenId )-x);
+      }
+      //printf ("repeats %u\n", x-1);
     } else {
-    	//printf("debug: quick REV\n");
-    	chacheStartPrac = tokenId + TOKEN_LENGTH;
+      //printf("debug: quick REV\n");
+      chacheStartPrac = tokenId + TOKEN_LENGTH;
     }
     fillCache(0, tokenId, chacheStartPrac, s);
 
@@ -237,20 +237,20 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
     //pokud se něco z cache dá znovupoužít
     //printf("  debug: FWD: %u < %u\n",((tokenId + TOKEN_CACHE_STEP) - TOKEN_LENGTH), (chacheStartPrac + TOKEN_LENGTH));
     if (((tokenId + TOKEN_CACHE_STEP) - TOKEN_LENGTH) < (chacheStartPrac + TOKEN_LENGTH)) {
-    	//printf("   debug: FWD from %u to %u\n", TOKEN_LENGTH - ((chacheStartPrac + TOKEN_LENGTH) - (tokenId + TOKEN_CACHE_STEP - TOKEN_LENGTH) ), 0);
-    	s->cacheStart = (tokenId + TOKEN_CACHE_STEP) - TOKEN_LENGTH;
-			for(x = 0; x < ( (chacheStartPrac + TOKEN_LENGTH) - (tokenId + TOKEN_CACHE_STEP - TOKEN_LENGTH)) ; x++) {
-				s->tokenCache[x] = s->tokenCache[x + TOKEN_LENGTH - ((chacheStartPrac + TOKEN_LENGTH) - (tokenId + TOKEN_CACHE_STEP - TOKEN_LENGTH))];
-				//printf( "   %u = %u\n", x, x + TOKEN_LENGTH - ((chacheStartPrac + TOKEN_LENGTH) - (tokenId + TOKEN_CACHE_STEP - TOKEN_LENGTH)));
-			}
-			//printf ("   repeatz %u, cache start:%u \n", x-1, s->cacheStart);
-			fillCache(x, chacheStartPrac + TOKEN_LENGTH, tokenId + TOKEN_CACHE_STEP, s);
-		} else {
-			// jump is out of reach for chache, reloading all
-			//printf("   debug: quick FWD\n");
-			s->cacheStart = tokenId;
-			fillCache(0, tokenId, tokenId + TOKEN_LENGTH, s);
-		}
+      //printf("   debug: FWD from %u to %u\n", TOKEN_LENGTH - ((chacheStartPrac + TOKEN_LENGTH) - (tokenId + TOKEN_CACHE_STEP - TOKEN_LENGTH) ), 0);
+      s->cacheStart = (tokenId + TOKEN_CACHE_STEP) - TOKEN_LENGTH;
+      for(x = 0; x < ( (chacheStartPrac + TOKEN_LENGTH) - (tokenId + TOKEN_CACHE_STEP - TOKEN_LENGTH)) ; x++) {
+        s->tokenCache[x] = s->tokenCache[x + TOKEN_LENGTH - ((chacheStartPrac + TOKEN_LENGTH) - (tokenId + TOKEN_CACHE_STEP - TOKEN_LENGTH))];
+        //printf( "   %u = %u\n", x, x + TOKEN_LENGTH - ((chacheStartPrac + TOKEN_LENGTH) - (tokenId + TOKEN_CACHE_STEP - TOKEN_LENGTH)));
+      }
+      //printf ("   repeatz %u, cache start:%u \n", x-1, s->cacheStart);
+      fillCache(x, chacheStartPrac + TOKEN_LENGTH, tokenId + TOKEN_CACHE_STEP, s);
+    } else {
+      // jump is out of reach for chache, reloading all
+      //printf("   debug: quick FWD\n");
+      s->cacheStart = tokenId;
+      fillCache(0, tokenId, tokenId + TOKEN_LENGTH, s);
+    }
   }
   //printf("cacheReload dbg: END: index: %u cache start: %u\n", tokenId,s->cacheStart );
 
@@ -258,12 +258,12 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
 }
 
 void fillCache(uint16_t cache_pos, uint16_t load_start, uint16_t load_end, svsVM *s) {
-	uint32_t x, ret;
+  uint32_t x, ret;
 
-	//printf("debug: fill params: chache_pos:%u start:%u stop:%u\n", cache_pos, load_start, load_end);
-	for(x = 0; (load_start + x) < load_end; x++) {
+  //printf("debug: fill params: chache_pos:%u start:%u stop:%u\n", cache_pos, load_start, load_end);
+  for(x = 0; (load_start + x) < load_end; x++) {
     #ifdef PC
-	  fseek(s->vmCache, sizeof(tokenCacheStruct) * (load_start + x), SEEK_SET);
+    fseek(s->vmCache, sizeof(tokenCacheStruct) * (load_start + x), SEEK_SET);
     fread(&(s->tokenCache[cache_pos+x]), sizeof(tokenCacheStruct), 1, s->vmCache);
     #else
     f_lseek(&(s->vmCache),sizeof(tokenCacheStruct) * (load_start + x));
@@ -292,10 +292,10 @@ uint8_t setTokenType(uint16_t tokenId, uint8_t val,  svsVM *s){
     s->cacheFr=f_open(&(s->vmCache),s->vmName, FA_CREATE_ALWAYS|FA_READ|FA_WRITE);
 
     if (s->cacheFr!=FR_OK){
-	  errMsgS("setTokenData: Error while opening cache file!");
-	}else{
+    errMsgS("setTokenData: Error while opening cache file!");
+  }else{
 
-	}
+  }
 #endif
     s->vmCacheUsed=1;
   }
@@ -342,8 +342,8 @@ uint8_t setTokenData(uint16_t tokenId, varType val, svsVM *s){
     s->cacheFr=f_open(&(s->vmCache),s->vmName, FA_CREATE_ALWAYS|FA_READ|FA_WRITE);
 
     if (s->cacheFr!=FR_OK){
-	  errMsgS("setTokenData: Error while opening cache file!");
-	}
+    errMsgS("setTokenData: Error while opening cache file!");
+  }
 #endif
     s->vmCacheUsed=1;
   }

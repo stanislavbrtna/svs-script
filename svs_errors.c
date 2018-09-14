@@ -28,76 +28,76 @@ When embedding the SVS, you can write your own error printing functions to suit 
 void svs_hardErrHandler () __attribute__ ((weak, alias ("hardErrHandler_default")));
 
 void errSoft(uint8_t *str, svsVM *s) {
-	if (errCheck(s)) {
-		errSoftPrint(s);
-		printf("Another error: %s\n", str);
-		errMsgS("errSoft:Double soft error occured!");
-	} else {
-		s->err = 1;
-		s->errString = str;
-	}
+  if (errCheck(s)) {
+    errSoftPrint(s);
+    printf("Another error: %s\n", str);
+    errMsgS("errSoft:Double soft error occured!");
+  } else {
+    s->err = 1;
+    s->errString = str;
+  }
 }
 
 void errSoftSetToken(uint16_t token, svsVM *s) {
-		s->errToken = token;
+    s->errToken = token;
 }
 
 void errSoftSetParam(uint8_t *str, varType val, svsVM *s) {
-	if (s->errDbgUsed < 5) {
-		s->errDbgVar[s->errDbgUsed] = val.val_s;
-		s->errDbgStr[s->errDbgUsed] = str;
-		s->errDbgUsed++;
-	} else {
-		errMsgS("errSoftSetParam: Too many parameters!");
-	}
+  if (s->errDbgUsed < 5) {
+    s->errDbgVar[s->errDbgUsed] = val.val_s;
+    s->errDbgStr[s->errDbgUsed] = str;
+    s->errDbgUsed++;
+  } else {
+    errMsgS("errSoftSetParam: Too many parameters!");
+  }
 }
 
 uint8_t errCheck(svsVM *s) {
-	return s->err;
+  return s->err;
 }
 
 
 void errHalt() {
-	puts("errHalt:Error!");
-	#ifdef PC
-	getchar();
-	#else
-	while(1);
-	#endif
+  puts("errHalt:Error!");
+  #ifdef PC
+  getchar();
+  #else
+  while(1);
+  #endif
 }
 
 void errSoftPrint(svsVM *s) {
-	uint8_t x;
-	if (errCheck(s)) {
-		printf("\nError occured: (soft)\n%s\n", s->errString);
-		for (x = 0; x < s->errDbgUsed; x++) {
-			printf("%s : %d\n", s->errDbgStr[x], s->errDbgVar[x]);
-		}
+  uint8_t x;
+  if (errCheck(s)) {
+    printf("\nError occured: (soft)\n%s\n", s->errString);
+    for (x = 0; x < s->errDbgUsed; x++) {
+      printf("%s : %d\n", s->errDbgStr[x], s->errDbgVar[x]);
+    }
 
-		if (s->errToken != 0) {
-			tokenzer_print_token_line(s->errToken, s);
-		}
-	}
+    if (s->errToken != 0) {
+      tokenzer_print_token_line(s->errToken, s);
+    }
+  }
 }
 
 
 void errMsg(errStruct err) {
-	printf("\nToken: %u HARD ERR: %s\n", err.tokenId, err.errString );
-	svs_hardErrHandler();
+  printf("\nToken: %u HARD ERR: %s\n", err.tokenId, err.errString );
+  svs_hardErrHandler();
 }
 
 void errMsgS(uint8_t *str) {
-	printf("\nHARD ERR: %s\n", str);
-	svs_hardErrHandler();
+  printf("\nHARD ERR: %s\n", str);
+  svs_hardErrHandler();
 }
 
 #ifdef PC
 void hardErrHandler_default(){
-	getchar();
+  getchar();
 }
 #else
 void hardErrHandler_default(){
-	while(1);
+  while(1);
 }
 #endif
 

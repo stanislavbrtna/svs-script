@@ -33,76 +33,76 @@ void pcBasicWrapInit();
 #ifdef CMDLINE
 int main(int argc, char *argv[]){
   svsVM s;
-	varRetVal result;
-	uint8_t dbginfo=0;
-	int retval=0;
-	puts("S! Script interpreter v."SVS_VERSION);
-	setTokenizerDebug(0);
-	setCommExDebug(0);
-	setExprExecDebug(0);
-	pcBasicWrapInit();
-	progname=argv[1];
-	if (argc==1){
-	printf("Usage:\n%s <fname> [-t] [-i]\n\
+  varRetVal result;
+  uint8_t dbginfo=0;
+  int retval=0;
+  puts("S! Script interpreter v."SVS_VERSION);
+  setTokenizerDebug(0);
+  setCommExDebug(0);
+  setExprExecDebug(0);
+  pcBasicWrapInit();
+  progname=argv[1];
+  if (argc==1){
+  printf("Usage:\n%s <fname> [-t] [-i]\n\
      fname - name of the script file\n\
      -t    - optional tokenizer debug output\n\
      -i    - optional debug output\n\n(c) Standa\n", argv[0]);
   return 0;
-	}
+  }
 
-	if (argc>2){
-	  if (strCmp(argv[2], "-t")){
-	    setTokenizerDebug(1);
-	  }
-	}
+  if (argc>2){
+    if (strCmp(argv[2], "-t")){
+      setTokenizerDebug(1);
+    }
+  }
 
-	if (argc>2){
-	  if (strCmp(argv[2], "-i")){
-	    dbginfo=1;
-	  }
-	}
+  if (argc>2){
+    if (strCmp(argv[2], "-i")){
+      dbginfo=1;
+    }
+  }
 
-	if (argc>3){
-	  if (strCmp(argv[3], "-i")){
-	    dbginfo=1;
-	  }
-	}
+  if (argc>3){
+    if (strCmp(argv[3], "-i")){
+      dbginfo=1;
+    }
+  }
 
-	if (loadApp(progname,"svs-cache", &s,0)){
-	  printf("Error while loading!\n");
-	  return 0;
-	}
+  if (loadApp(progname,"svs-cache", &s,0)){
+    printf("Error while loading!\n");
+    return 0;
+  }
 
 #ifdef TOK_CHECK
   //performing tokenizer check only
   tokenPrint(&s);
   return 0;
 #endif
-	puts("Script output begin:\n");
-	commExec("main", &s);
-	errSoftPrint(&s);
+  puts("Script output begin:\n");
+  commExec("main", &s);
+  errSoftPrint(&s);
 
-	printf("\n");
-	if (s.commRetType==0){
-	  printf("Returned: %i\n",getRetValInt(&s));
-	  retval=(int)getRetValInt(&s);
-	}else if(s.commRetType==1){
-	  printf("Returned: %s\n", getRetValStr(&s));
-	}else if(s.commRetType==2) {
-	  printf("Returned: %f\n",getRetValFlt(&s));
-	}
+  printf("\n");
+  if (s.commRetType==0){
+    printf("Returned: %i\n",getRetValInt(&s));
+    retval=(int)getRetValInt(&s);
+  }else if(s.commRetType==1){
+    printf("Returned: %s\n", getRetValStr(&s));
+  }else if(s.commRetType==2) {
+    printf("Returned: %f\n",getRetValFlt(&s));
+  }
 
-	if(dbginfo==1){
-	  printf("DBG Info:\n");
-	  tokenPrint(&s);
-	  puts("Variables:\n");
-	  varTablePrint(&s);
-	  strTablePrint(&s);
-	}
+  if(dbginfo==1){
+    printf("DBG Info:\n");
+    tokenPrint(&s);
+    puts("Variables:\n");
+    varTablePrint(&s);
+    strTablePrint(&s);
+  }
 #ifndef TOKEN_CACHE_DISABLED
-	unlink("svs-cache");
+  unlink("svs-cache");
 #endif
 
-	return retval;
+  return retval;
 }
 #endif

@@ -29,7 +29,7 @@ uint8_t ldmode;
 void setFName(uint8_t * name) {
   uint16_t x;
   for(x = 0; x < 64; x++) {
-	  filename[x] = name[x];
+    filename[x] = name[x];
   }
 }
 
@@ -41,95 +41,95 @@ void tokenGetchSetup(uint8_t * fname, uint8_t mode) {
 
 
 uint8_t loadApp(uint8_t *fname, uint8_t *name, svsVM *s, uint8_t mode) {
-	//static uint8_t fsloaded;
-	svsReset(s);
-	svsSetName(name,s);
-	setFName(fname);
-	svsSetFileName(fname, s);
+  //static uint8_t fsloaded;
+  svsReset(s);
+  svsSetName(name,s);
+  setFName(fname);
+  svsSetFileName(fname, s);
   printf("SVS loadApp: loading: %s\n", fname);
-	ldinit = 0;
-	ldmode = mode; //0=file 1=uart
+  ldinit = 0;
+  ldmode = mode; //0=file 1=uart
 
-	tokenizerReset();
+  tokenizerReset();
 
-	if(mode == 1) {
-		setTokenType(0, 0, s);
-		printf("Serial loading Ready!\n");
-	}
+  if(mode == 1) {
+    setTokenType(0, 0, s);
+    printf("Serial loading Ready!\n");
+  }
 
-	if (tokenParse(s) != 0) {
-		return 1;
-	}
-	#ifndef PC
-	f_sync(&(s->vmCache));
-	#endif
-	printf("Program loaded!\n");
-	return 0;
+  if (tokenParse(s) != 0) {
+    return 1;
+  }
+  #ifndef PC
+  f_sync(&(s->vmCache));
+  #endif
+  printf("Program loaded!\n");
+  return 0;
 }
 
 #ifndef PC
 uint8_t tokenGetch() {
-	static FIL fp;
-	uint8_t x = 0;
-	uint32_t br;
-	if(ldmode == 0) {
-		if (ldinit == 0) {
-			printf("Opening file: %s\n", filename);
-			if (f_open(&fp, filename, FA_READ) != FR_OK) {
-			  errMsgS("tokenGetch: Error while opening file!");
-			  return 0;
-			}
-			ldinit = 1;
-		}
+  static FIL fp;
+  uint8_t x = 0;
+  uint32_t br;
+  if(ldmode == 0) {
+    if (ldinit == 0) {
+      printf("Opening file: %s\n", filename);
+      if (f_open(&fp, filename, FA_READ) != FR_OK) {
+        errMsgS("tokenGetch: Error while opening file!");
+        return 0;
+      }
+      ldinit = 1;
+    }
 
-		if (f_read(&fp,&x,sizeof(x),&br) != FR_OK) {
-		  errMsgS("tokenGetch: Error while reading from file!");
-		}
+    if (f_read(&fp,&x,sizeof(x),&br) != FR_OK) {
+      errMsgS("tokenGetch: Error while reading from file!");
+    }
 
-		if (f_eof(&fp)) {
-			f_close(&fp);
-			//printf("tokenGetch: EOF\n");
-			return 0;
-		} else {
-			//printf("tokenGetch: %c\n", x);
-		  return x;
-		}
-	} else {
-		return 0;
-	}
+    if (f_eof(&fp)) {
+      f_close(&fp);
+      //printf("tokenGetch: EOF\n");
+      return 0;
+    } else {
+      //printf("tokenGetch: %c\n", x);
+      return x;
+    }
+  } else {
+    return 0;
+  }
 }
 
 #else
 
 uint8_t tokenGetch() {
-	static FILE *fp;
-	uint8_t x;
+  static FILE *fp;
+  uint8_t x;
 
-	if (ldinit == 0) {
-		if(ldmode == 0) {
-		  printf("tokenGetch: Opening file: %s\n", filename);
-		  fp = fopen(filename,"r");
-		  if(fp == NULL) {
-			  puts("tokenGetch: Error while opening file!");
-			  return(0);
-		  }
-		} else {
-		  puts("tokenGetch: Serial loading is not supported on PC");
-		  return(0);
-		}
-		ldinit = 1;
-	}
-	x = fgetc(fp);
+  if (ldinit == 0) {
+    if(ldmode == 0) {
+      printf("tokenGetch: Opening file: %s\n", filename);
+      fp = fopen(filename,"r");
+      if(fp == NULL) {
+        puts("tokenGetch: Error while opening file!");
+        return(0);
+      }
+    } else {
+      puts("tokenGetch: Serial loading is not supported on PC");
+      return(0);
+    }
+    ldinit = 1;
+  }
+  x = fgetc(fp);
 
-	if (feof(fp)) {
-		fclose(fp);
-		return 0;
-	} else {
+  if (feof(fp)) {
+    fclose(fp);
+    return 0;
+  } else {
 #ifdef TOK_CHECK
   printf("%c", x);
 #endif
-	  return x;
-	}
+    return x;
+  }
 }
 #endif
 

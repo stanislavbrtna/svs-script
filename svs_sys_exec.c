@@ -93,95 +93,95 @@ void sysExec(uint16_t index, varRetVal *result, svsVM *s) {
    * ona to vykoná a vrátí do resultu id
    *
   */
-  
+
   varRetVal pracVar;
   argStruct argS;
   uint16_t x;
   uint8_t retval = 0;
   errStruct err;
-  
+
   argS.callId = getTokenData(index, s);
-  
+
   index++;
-  
+
   x = 1;
 
   if ((getTokenType(index, s) == 5)) {
-	  index++;
-	  if (getTokenType(index, s) != 6) { // if the brackets are not empty
-	    exprExec(index, &pracVar, s); // execute expression
-	    if (errCheck(s)) {
-	    	return;
-	    }
-		  argS.arg[x] = pracVar.value; // set it's value as an argument
-		  argS.argType[x] = pracVar.type;
-		  index = pracVar.tokenId; // store token index
-		  x++;
-	  }	  
-	  
-	  // arguments are separated with coma or semicolon(legacy)
-	  while((getTokenType(index, s) == 9) || (getTokenType(index, s) == 33)) {
-		  if (x == FUNCTION_ARGS_MAX + 1) {
-		    errSoft("sysExec: too many arguments in sys call!", s);
-		    errSoftSetParam(s->syscallTable[argS.callId.val_u].sysCallName, (varType)((uint16_t)0), s);
-		    errSoftSetParam("TokenId", (varType)index, s);
-		    errSoftSetToken(index, s);
-		    return;
-		  }
-		  index++;
-		  exprExec(index, &pracVar, s);
-	    if (errCheck(s)) { // check for error inside expression
-	    	return;
-	    }
-		  argS.arg[x] = pracVar.value;
-		  argS.argType[x] = pracVar.type;
-		  index = pracVar.tokenId;
-		  x++;
-	  }
-	  
-	  if (getTokenType(index,s) != 6) {
-		  errSoft("sysExec: Syntax error at end of sys call. (missing \")\")", s);
-		  errSoftSetParam(s->syscallTable[argS.callId.val_u].sysCallName, (varType)((uint16_t)0), s);
-		  errSoftSetParam("TokenId", (varType)index, s);
-		  errSoftSetToken(index, s);
-		  return;
-	  }
-	  
-	  argS.usedup = x - 1;
-	  
-	  index++;
-	  varRetValZero(&pracVar);
-	  
-	  // run the sys wrappers
-	  for (x = 0; x < sysWrapperNum; x++) {
-	    retval = (*sysWrapper[x]) (&pracVar, &argS, s);
-	    if (retval == 1) {
-	      break;
-	    }
-	  }
-	  
-	  // if all wrappers failed
-	  if (retval == 0) {
-	    if (errCheck(s) == 0) {
-	      errSoft("sysExec: Unknown sys call!", s);
-	      errSoftSetParam(s->syscallTable[argS.callId.val_u].sysCallName, (varType)((uint16_t)0), s);
-		    errSoftSetParam("TokenId", (varType)index, s);
-		    errSoftSetToken(index, s);
-		    return;
-		  } else {
-		    // there was error inside wrapper (typecheck etc..)
-		    return;
-		  }
-	  } else {
-	    result->value = pracVar.value;
-	    result->type = pracVar.type;
-	    result->tokenId = index;
-	  }
+    index++;
+    if (getTokenType(index, s) != 6) { // if the brackets are not empty
+      exprExec(index, &pracVar, s); // execute expression
+      if (errCheck(s)) {
+        return;
+      }
+      argS.arg[x] = pracVar.value; // set it's value as an argument
+      argS.argType[x] = pracVar.type;
+      index = pracVar.tokenId; // store token index
+      x++;
+    }
+
+    // arguments are separated with coma or semicolon(legacy)
+    while((getTokenType(index, s) == 9) || (getTokenType(index, s) == 33)) {
+      if (x == FUNCTION_ARGS_MAX + 1) {
+        errSoft("sysExec: too many arguments in sys call!", s);
+        errSoftSetParam(s->syscallTable[argS.callId.val_u].sysCallName, (varType)((uint16_t)0), s);
+        errSoftSetParam("TokenId", (varType)index, s);
+        errSoftSetToken(index, s);
+        return;
+      }
+      index++;
+      exprExec(index, &pracVar, s);
+      if (errCheck(s)) { // check for error inside expression
+        return;
+      }
+      argS.arg[x] = pracVar.value;
+      argS.argType[x] = pracVar.type;
+      index = pracVar.tokenId;
+      x++;
+    }
+
+    if (getTokenType(index,s) != 6) {
+      errSoft("sysExec: Syntax error at end of sys call. (missing \")\")", s);
+      errSoftSetParam(s->syscallTable[argS.callId.val_u].sysCallName, (varType)((uint16_t)0), s);
+      errSoftSetParam("TokenId", (varType)index, s);
+      errSoftSetToken(index, s);
+      return;
+    }
+
+    argS.usedup = x - 1;
+
+    index++;
+    varRetValZero(&pracVar);
+
+    // run the sys wrappers
+    for (x = 0; x < sysWrapperNum; x++) {
+      retval = (*sysWrapper[x]) (&pracVar, &argS, s);
+      if (retval == 1) {
+        break;
+      }
+    }
+
+    // if all wrappers failed
+    if (retval == 0) {
+      if (errCheck(s) == 0) {
+        errSoft("sysExec: Unknown sys call!", s);
+        errSoftSetParam(s->syscallTable[argS.callId.val_u].sysCallName, (varType)((uint16_t)0), s);
+        errSoftSetParam("TokenId", (varType)index, s);
+        errSoftSetToken(index, s);
+        return;
+      } else {
+        // there was error inside wrapper (typecheck etc..)
+        return;
+      }
+    } else {
+      result->value = pracVar.value;
+      result->type = pracVar.type;
+      result->tokenId = index;
+    }
   } else {
     errSoft("sysExec: Syntax error at the begin of sys call. (missing \"(\")", s);
-	  errSoftSetParam(s->syscallTable[argS.callId.val_u].sysCallName, (varType)((uint16_t)0), s);
-		errSoftSetParam("TokenId", (varType)index, s);
-		errSoftSetToken(index, s);
-		return;
+    errSoftSetParam(s->syscallTable[argS.callId.val_u].sysCallName, (varType)((uint16_t)0), s);
+    errSoftSetParam("TokenId", (varType)index, s);
+    errSoftSetToken(index, s);
+    return;
   }
 }

@@ -55,7 +55,7 @@ void svsReset(svsVM *s){
 
   s->profilerEnabled = 0;
   setCommExDebug(0);
-	setExprExecDebug(0);
+  setExprExecDebug(0);
 
   for (x = 0; x < VAR_TABLE_L; x++) {
     s->varTable[x].value.val_u = 0;
@@ -77,13 +77,13 @@ void svsReset(svsVM *s){
 
 void svsInfo(svsVM *s) {
   printf("\nS! script v. %s\n", SVS_VERSION);
-	#ifdef PC
-	printf("Platform: PC\n");
-	#else
-	printf("Platform: uC\n");
-	#endif
-	printf("Limits:\n");
-	printf("TOKEN_LENGTH %u\n", TOKEN_LENGTH);
+  #ifdef PC
+  printf("Platform: PC\n");
+  #else
+  printf("Platform: uC\n");
+  #endif
+  printf("Limits:\n");
+  printf("TOKEN_LENGTH %u\n", TOKEN_LENGTH);
   printf("NAME_LENGTH  %u\n", NAME_LENGTH);
   printf("FUNCTION_TABLE_L %u\n", FUNCTION_TABLE_L);
   printf("VAR_TABLE_L %u\n", VAR_TABLE_L);
@@ -91,7 +91,7 @@ void svsInfo(svsVM *s) {
   printf("SYSCALL_TABLE_L %u\n", SYSCALL_TABLE_L);
   printf("SYSCALL_WRAPPERS %u\n", SYSCALL_WRAPPERS);
   printf("SVS_ARRAY_LEN %u\n", SVS_ARRAY_LEN);
-	printf("Compiled: %s %s\n(c) Standa\n\nEnjoy!\n", __DATE__, __TIME__);
+  printf("Compiled: %s %s\n(c) Standa\n\nEnjoy!\n", __DATE__, __TIME__);
 }
 
 void svsSetName(uint8_t * name, svsVM *s) {
@@ -115,90 +115,90 @@ void varRetValZero(varRetVal *x) {
 }
 
 uint8_t syscallExists(uint8_t *name, svsVM *s) {
-	uint16_t x = 0;
-	if (s->syscallTableLen != 0) {
-		for(x = 1; x <= s->syscallTableLen; x++) {
-			if (strCmp(name, s->syscallTable[x].sysCallName)) {
-				return 1;
-			}
-		}
-	}
-	return 0;
+  uint16_t x = 0;
+  if (s->syscallTableLen != 0) {
+    for(x = 1; x <= s->syscallTableLen; x++) {
+      if (strCmp(name, s->syscallTable[x].sysCallName)) {
+        return 1;
+      }
+    }
+  }
+  return 0;
 }
 
 uint8_t syscallGetId(uint8_t *name, svsVM *s) {
-	uint16_t x = 0;
-	if (s->syscallTableLen != 0) {
-		for (x = 1; x <= s->syscallTableLen; x++) {
-			if (strCmp(name, s->syscallTable[x].sysCallName)){
-				return x;
-			}
-		}
-	}
-	return 0;
+  uint16_t x = 0;
+  if (s->syscallTableLen != 0) {
+    for (x = 1; x <= s->syscallTableLen; x++) {
+      if (strCmp(name, s->syscallTable[x].sysCallName)){
+        return x;
+      }
+    }
+  }
+  return 0;
 }
 
 uint8_t functionExists(uint8_t *name, svsVM *s) {
-	uint16_t x = 0;
-	if (s->funcTableLen != 0) {
-		for (x = 1; x <= s->funcTableLen; x++) {
-			if (strCmp(name, s->funcTable[x].fString)) {
-				return 1;
-			}
-		}
-	}
-	return 0;
+  uint16_t x = 0;
+  if (s->funcTableLen != 0) {
+    for (x = 1; x <= s->funcTableLen; x++) {
+      if (strCmp(name, s->funcTable[x].fString)) {
+        return 1;
+      }
+    }
+  }
+  return 0;
 }
 
 uint8_t functionGetId(uint8_t *name, svsVM *s) {
-	uint16_t x = 0;
-	if (s->funcTableLen != 0) {
-		for (x = 1; x <= s->funcTableLen; x++) {
-			if (strCmp(name, s->funcTable[x].fString)) {
-				return x;
-			}
-		}
-	}
-	return 0;
+  uint16_t x = 0;
+  if (s->funcTableLen != 0) {
+    for (x = 1; x <= s->funcTableLen; x++) {
+      if (strCmp(name, s->funcTable[x].fString)) {
+        return x;
+      }
+    }
+  }
+  return 0;
 }
 
 uint8_t varExists(uint8_t *name, svsVM *s) {
-	uint16_t x = 0;
-	if (s->varTableLen != 0) {
-		for (x = 1; x <= s->varTableLen; x++) {
-			if (strCmp(name, s->varTable[x].name)) {
-				return 1;
-			}
-		}
-	}
-	return 0;
+  uint16_t x = 0;
+  if (s->varTableLen != 0) {
+    for (x = 1; x <= s->varTableLen; x++) {
+      if (strCmp(name, s->varTable[x].name)) {
+        return 1;
+      }
+    }
+  }
+  return 0;
 }
 
 #ifdef LOCAL_VARIABLES_ENABLED
 varType varGetIdFromMask(varType Id, svsVM *s) {
   uint16_t x = 0;
   if (s->varTableLen != 0) {
-		for (x = s->varTableLen; x >= 1; x--) { // projdem vartable pozpátku a hledáme maskId shodné s Id
-		  //printf("comparing %u and %u\n",s->varTable[x].maskId, Id.val_u);
-			if (s->varTable[x].maskId == Id.val_u) {
-			  //printf("Local variable found: id=%u\n",x);
-				return (varType)x;
-			}
-		}
-		//printf("Local variable NOT found: id=%u\n",Id.val_u);
-		return (varType)Id; //pokud nenajdeme, tak vrátíme id
-	} else {
-	  errMsgS("varGetIdFromMask: variable not found!");
-	  errHalt();
-	  return (varType)((uint16_t)0);
-	}
+    for (x = s->varTableLen; x >= 1; x--) { // projdem vartable pozpátku a hledáme maskId shodné s Id
+      //printf("comparing %u and %u\n",s->varTable[x].maskId, Id.val_u);
+      if (s->varTable[x].maskId == Id.val_u) {
+        //printf("Local variable found: id=%u\n",x);
+        return (varType)x;
+      }
+    }
+    //printf("Local variable NOT found: id=%u\n",Id.val_u);
+    return (varType)Id; //pokud nenajdeme, tak vrátíme id
+  } else {
+    errMsgS("varGetIdFromMask: variable not found!");
+    errHalt();
+    return (varType)((uint16_t)0);
+  }
 }
 
 void varAddLocal(varType Id, svsVM *s) {
   if (s->varTableLen == VAR_TABLE_L) {
-	  errSoft("varAddLocal: varTable full!", s);
-		errSoftSetParam("VarId", Id, s);
-		return;
+    errSoft("varAddLocal: varTable full!", s);
+    errSoftSetParam("VarId", Id, s);
+    return;
   }
 
   s->varTableLen++;
@@ -215,89 +215,89 @@ varType varGetIdFromMask(varType Id, svsVM *s) {
 
 void varAddLocal(varType Id, svsVM *s) {
   errSoft("varAddLocal: Local variables are disabled in this build!", s);
-	errSoftSetParam("VarId", Id, s);
-	return;
+  errSoftSetParam("VarId", Id, s);
+  return;
 }
 
 #endif
 
 VARTYPE varGetId(uint8_t *name, svsVM *s) {
-	uint16_t x = 0;
-	if (s->varTableLen != 0) {
-		for(x = 1; x <= s->varTableLen; x++) {
-			if (strCmp(name, s->varTable[x].name)) {
-				return (varType)x;
-			}
-		}
-	}
-	return (varType)((uint16_t)0);
+  uint16_t x = 0;
+  if (s->varTableLen != 0) {
+    for(x = 1; x <= s->varTableLen; x++) {
+      if (strCmp(name, s->varTable[x].name)) {
+        return (varType)x;
+      }
+    }
+  }
+  return (varType)((uint16_t)0);
 }
 
 uint8_t varGetType(VARTYPE id, svsVM *s) {
-	#ifdef LOCAL_VARIABLES_ENABLED
-	id = varGetIdFromMask(id, s);
-	#endif
-	if (id.val_u <= s->varTableLen) {
-		return s->varTable[id.val_u].type;
-	}
+  #ifdef LOCAL_VARIABLES_ENABLED
+  id = varGetIdFromMask(id, s);
+  #endif
+  if (id.val_u <= s->varTableLen) {
+    return s->varTable[id.val_u].type;
+  }
 
-	errMsgS("varGetType: variable not found!");
-	errHalt();
-	return 0;
+  errMsgS("varGetType: variable not found!");
+  errHalt();
+  return 0;
 }
 
 uint8_t varSetType(VARTYPE id, uint8_t type, svsVM *s) {
   #ifdef LOCAL_VARIABLES_ENABLED
-	id = varGetIdFromMask(id, s);
-	#endif
-	if (id.val_u <= s->varTableLen) {
-		s->varTable[id.val_u].type = type;
-		return 0;
-	}
-	errMsgS("varSetType: variable not found!");
-	errHalt();
-	return 1;
+  id = varGetIdFromMask(id, s);
+  #endif
+  if (id.val_u <= s->varTableLen) {
+    s->varTable[id.val_u].type = type;
+    return 0;
+  }
+  errMsgS("varSetType: variable not found!");
+  errHalt();
+  return 1;
 }
 
 VARTYPE varGetVal(VARTYPE id, svsVM *s) {
-	#ifdef LOCAL_VARIABLES_ENABLED
-	id = varGetIdFromMask(id, s);
-	#endif
-	if (id.val_u <= s->varTableLen) {
-		//printf("varGetVal id:%u value:%u \n",id,varTable[id].value);
-		return (varType)s->varTable[id.val_u].value;
-	}
-	errMsgS("varGetVal: variable not found!");
-	errHalt();
-	return (varType)((uint16_t) 0);
+  #ifdef LOCAL_VARIABLES_ENABLED
+  id = varGetIdFromMask(id, s);
+  #endif
+  if (id.val_u <= s->varTableLen) {
+    //printf("varGetVal id:%u value:%u \n",id,varTable[id].value);
+    return (varType)s->varTable[id.val_u].value;
+  }
+  errMsgS("varGetVal: variable not found!");
+  errHalt();
+  return (varType)((uint16_t) 0);
 }
 
 uint8_t varSetVal(VARTYPE id, VARTYPE val, svsVM *s) {
-	#ifdef LOCAL_VARIABLES_ENABLED
-	id = varGetIdFromMask(id, s);
-	#endif
-	if (id.val_u <= s->varTableLen) {
-		s->varTable[id.val_u].value.val_s = val.val_s;
-		return 1;
-	}
-	errMsgS("varSetVal: variable not found!");
-	return 0;
+  #ifdef LOCAL_VARIABLES_ENABLED
+  id = varGetIdFromMask(id, s);
+  #endif
+  if (id.val_u <= s->varTableLen) {
+    s->varTable[id.val_u].value.val_s = val.val_s;
+    return 1;
+  }
+  errMsgS("varSetVal: variable not found!");
+  return 0;
 }
 
 uint8_t isNumber(uint8_t x) {
-	if  ((x >= '0') && (x <= '9')) {
-		return 1;
-	} else {
-		return 0;
-	}
+  if  ((x >= '0') && (x <= '9')) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 uint8_t isRegChar(uint8_t x) {
-	if (((x >= 65) && (x <= 90)) || ((x >= 97) && (x <= 122)) || (x == '_')) {
-		return 1;
-	} else {
-		return 0;
-	}
+  if (((x >= 65) && (x <= 90)) || ((x >= 97) && (x <= 122)) || (x == '_')) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 int32_t getRetValInt(svsVM *s){
@@ -313,10 +313,10 @@ float getRetValFlt(svsVM *s){
 }
 
 float exp_helper(uint16_t a, uint16_t ex) {
-	uint16_t x;
-	float val = (float)a;
-	for(x = 1; x < ex; x++) {
-		val *= (float)a;
-	}
-	return val;
+  uint16_t x;
+  float val = (float)a;
+  for(x = 1; x < ex; x++) {
+    val *= (float)a;
+  }
+  return val;
 }

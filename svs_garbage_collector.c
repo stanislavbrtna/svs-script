@@ -33,8 +33,8 @@ uint8_t gcDebug = 0;
 
 void cgDMSG(char *text) {
   if (gcDebug == 1) {
-	  printf("gcDMSG: %s \n", text);
-	}
+    printf("gcDMSG: %s \n", text);
+  }
 }
 
 void setGcDebug(uint8_t level) {
@@ -56,24 +56,24 @@ uint8_t gcGetValidString(uint16_t strId, svsVM *s) {
 
   for(x = 1; x <= s->varTableLen; x++) {
   // We need to access the var array without varGetType, because of how local variables work
-		if (s->varTable[x].type == 1) {
-			if (s->varTable[x].value.val_str == strId) {
-			  return 1;
-			}
-		}
-	}
+    if (s->varTable[x].type == 1) {
+      if (s->varTable[x].value.val_str == strId) {
+        return 1;
+      }
+    }
+  }
 
-	//array
-	for(x = 1; x <= s->varArrayLen; x++) {
-		if (s->varArrayType[x] == 1) {
-			if (s->varArray[x].val_str == strId) {
-			  return 1;
-			}
-		}
-	}
+  //array
+  for(x = 1; x <= s->varArrayLen; x++) {
+    if (s->varArrayType[x] == 1) {
+      if (s->varArray[x].val_str == strId) {
+        return 1;
+      }
+    }
+  }
 
-	// not valid, returning zero
-	return 0;
+  // not valid, returning zero
+  return 0;
 }
 
 uint8_t gcRemoveString(uint16_t strId, uint8_t type, svsVM *s) {
@@ -96,24 +96,24 @@ uint8_t gcRemoveString(uint16_t strId, uint8_t type, svsVM *s) {
   x = 0;
 
   for(x = 1; x <= s->varTableLen; x++) {
-		if (s->varTable[x].type == 1) {
-			if (s->varTable[x].value.val_str > strId) {
-				// modify reference
-			  s->varTable[x].value.val_str = ((uint16_t)(varGetVal((varType)x, s).val_str - str_len));
-			}
-		}
-	}
+    if (s->varTable[x].type == 1) {
+      if (s->varTable[x].value.val_str > strId) {
+        // modify reference
+        s->varTable[x].value.val_str = ((uint16_t)(varGetVal((varType)x, s).val_str - str_len));
+      }
+    }
+  }
 
-	//array
-	for(x = 1; x <= s->varArrayLen; x++) {
-		if (s->varArrayType[x] == 1) {
-			if (s->varArray[x].val_str > strId) {
-				s->varArray[x].val_str -= str_len;
-			}
-		}
-	}
+  //array
+  for(x = 1; x <= s->varArrayLen; x++) {
+    if (s->varArrayType[x] == 1) {
+      if (s->varArray[x].val_str > strId) {
+        s->varArray[x].val_str -= str_len;
+      }
+    }
+  }
 
-	#ifndef CMDLINE
+  #ifndef CMDLINE
     pscg_garbage_walkaround(
                        (uint32_t)((uint32_t)strId + (uint32_t)(s->stringField)),
                        str_len,
@@ -121,7 +121,7 @@ uint8_t gcRemoveString(uint16_t strId, uint8_t type, svsVM *s) {
     );
   #endif
 
-	return 0;
+  return 0;
 }
 
 void garbageCollect(uint16_t count, svsVM *s) {
