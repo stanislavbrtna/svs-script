@@ -180,9 +180,6 @@ uint8_t tokenPreprocessor() {
   }
 }
 
-
-
-
 uint8_t tokenInput(uint16_t index, uint8_t inc) {
   static uint8_t peek;
   static uint8_t strBuff[16];
@@ -290,8 +287,6 @@ uint8_t tokenParse(svsVM *s) {
       numPracF.val_s=0;
       floatFound=0;
       setTokenType(posToken,0,s);
-      //tokenType[posToken]=0;
-      //tokenData[posToken]=tokenInput(posText,0)-48;
       numPrac.val_s=tokenInput(posText,0)-48;
       posText++;
       tokenInput(0,1);
@@ -308,7 +303,7 @@ uint8_t tokenParse(svsVM *s) {
 
       #endif
       }
-
+      // hex number input
       if(tokenInput(posText,0)=='x'){
         numPrac.val_s=0;
         tokenInput(0,1);
@@ -373,11 +368,6 @@ uint8_t tokenParse(svsVM *s) {
         if (floatFound==1){
           #ifdef USE_FLOAT
           setTokenType(posToken,31,s);
-
-          // nefunguje na např 2.05
-          //while(numPracF.val_f>1){
-          //  numPracF.val_f=numPracF.val_f/10;
-          //}
           numPrac.val_f+=numPracF.val_f;
           setTokenData(posToken, numPrac, s);
           tokenDMSG("Token set, type FLT", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
@@ -415,107 +405,148 @@ uint8_t tokenParse(svsVM *s) {
 
     // +
     if (tokenInput(posText,0) == '+') {
-      setTokenType(posToken, 1, s);
+      setTokenType(posToken, SVS_TOKEN_ADD, s);
       tokenInput(0, 1);
       posText++;
-      tokenDMSG("Token set, type +", posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
+      tokenDMSG("Token set, type +",
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken, s),
+                posText);
       posToken++;
     }
 
     // -
     if (tokenInput(posText, 0) == '-') {
-      setTokenType(posToken, 2, s);
+      setTokenType(posToken, SVS_TOKEN_SUBT, s);
       tokenInput(0, 1);
       posText++;
-      tokenDMSG("Token set, type -", posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
+      tokenDMSG("Token set, type -",
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken, s),
+                posText);
       posToken++;
     }
 
     // *
     if (tokenInput(posText, 0) == '*') {
-      setTokenType(posToken, 3, s);
+      setTokenType(posToken, SVS_TOKEN_MUL, s);
       tokenInput(0, 1);
       posText++;
-      tokenDMSG("Token set, type *", posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
+      tokenDMSG("Token set, type *",
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken, s),
+                posText);
       posToken++;
     }
 
     // /
     if (tokenInput(posText, 0) == '/') {
-      setTokenType(posToken, 4, s);
+      setTokenType(posToken, SVS_TOKEN_DIV, s);
       tokenInput(0, 1);
       posText++;
-      tokenDMSG("Token set, type /", posToken, getTokenData(posToken, s), getTokenType(posToken,s), posText);
+      tokenDMSG("Token set, type /",
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken,s),
+                posText);
       posToken++;
     }
 
     // %
     if (tokenInput(posText,0) == '%') {
-      setTokenType(posToken, 30, s);
+      setTokenType(posToken, SVS_TOKEN_MOD, s);
       tokenInput(0, 1);
       posText++;
-      tokenDMSG("Token set, type %", posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
+      tokenDMSG("Token set, type %",
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken, s),
+                posText);
       posToken++;
     }
 
     // (
     if (tokenInput(posText, 0) == '(') {
-      setTokenType(posToken, 5, s);
+      setTokenType(posToken, SVS_TOKEN_LBR, s);
       tokenInput(0, 1);
       posText++;
-      tokenDMSG("Token set, type (", posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
+      tokenDMSG("Token set, type (",
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken, s),
+                posText);
       posToken++;
       brCount1++; // variable used for bracket check
     }
 
     // )
     if (tokenInput(posText, 0) == ')') {
-      setTokenType(posToken, 6, s);
+      setTokenType(posToken, SVS_TOKEN_RBR, s);
       tokenInput(0, 1);
       posText++;
-      tokenDMSG("Token set, type )", posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
+      tokenDMSG("Token set, type )",
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken, s),
+                posText);
       posToken++;
       brCount1--; //kontrola počtu závorek
     }
 
     // {
-    if (tokenInput(posText,0)=='{'){
-      //tokenType[posToken]=7;
-      setTokenType(posToken,7,s);
-      tokenInput(0,1);
+    if (tokenInput(posText, 0) == '{') {
+      setTokenType(posToken, SVS_TOKEN_LCBR, s);
+      tokenInput(0, 1);
       posText++;
-      tokenDMSG("Token set, type {", posToken,  getTokenData(posToken,s),getTokenType(posToken,s), posText);
+      tokenDMSG("Token set, type {",
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken, s),
+                posText);
       posToken++;
       brCount2++;
     }
 
     // }
-    if (tokenInput(posText,0)=='}'){
-      //tokenType[posToken]=8;
-      setTokenType(posToken,8,s);
-      tokenInput(0,1);
+    if (tokenInput(posText, 0) == '}') {
+      setTokenType(posToken, SVS_TOKEN_RCBR, s);
+      tokenInput(0, 1);
       posText++;
-      tokenDMSG("Token set, type }", posToken,  getTokenData(posToken,s),getTokenType(posToken,s), posText);
+      tokenDMSG("Token set, type }",
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken, s),
+                posText);
       posToken++;
       brCount2--;
     }
 
     // ;
-    if (tokenInput(posText,0)==';'){
-      //tokenType[posToken]=9;
-      setTokenType(posToken,9,s);
-      tokenInput(0,1);
+    if (tokenInput(posText, 0) == ';') {
+      setTokenType(posToken, SVS_TOKEN_SCOL, s);
+      tokenInput(0, 1);
       posText++;
-      tokenDMSG("Token set, type ;", posToken,  getTokenData(posToken,s),getTokenType(posToken,s), posText);
+      tokenDMSG("Token set, type ;",
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken, s),
+                posText);
       posToken++;
     }
 
     // ;
-    if (tokenInput(posText,0)==','){
-      setTokenType(posToken,33,s);
-      tokenInput(0,1);
+    if (tokenInput(posText, 0) == ',') {
+      setTokenType(posToken, SVS_TOKEN_COL, s);
+      tokenInput(0, 1);
       posText++;
-      tokenDMSG("Token set, type ,", posToken,  getTokenData(posToken,s),getTokenType(posToken,s), posText);
+      tokenDMSG("Token set, type ,",
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken, s),
+                posText);
       posToken++;
     }
 

@@ -42,6 +42,15 @@ SOFTWARE.
 
 #define SVS_TOKEN_ADD 1
 #define SVS_TOKEN_SUBT 2
+#define SVS_TOKEN_MUL 3
+#define SVS_TOKEN_DIV 4
+#define SVS_TOKEN_MOD 30
+#define SVS_TOKEN_LBR 5
+#define SVS_TOKEN_RBR 6
+#define SVS_TOKEN_LCBR 7
+#define SVS_TOKEN_RCBR 8
+#define SVS_TOKEN_SCOL 9
+#define SVS_TOKEN_COL 33
 
 typedef struct {
   uint8_t fString[NAME_LENGTH];
