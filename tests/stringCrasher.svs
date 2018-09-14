@@ -1,0 +1,7 @@
+function main {
+  a = "";
+  while (1) {
+    # this will loop until crash
+    a = a + "abcdef";
+  }
+}
