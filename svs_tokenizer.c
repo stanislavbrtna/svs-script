@@ -1113,6 +1113,9 @@ uint8_t tokenParse(svsVM *s) {
 							setTokenType(posToken, 17, s);
 							s->stringConstMax = s->stringFieldLen;
 							setTokenData(posToken, (varType)strNew(pracName, s), s);
+							if (errCheck(s)) {
+							  return 1;
+							}
 							tokenDMSG("Token set, type CALL, function name:",
 													posToken, \
 													getTokenData(posToken,s), \

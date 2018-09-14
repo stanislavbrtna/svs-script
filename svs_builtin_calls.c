@@ -394,6 +394,12 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
 		}
 
 		result->value = (varType)(strNew(tmpChar, s));
+
+		if (errCheck(s)) {
+		  errSoftSetParam("TokenId", (varType)callToken, s);
+	    errSoftSetToken(callToken, s);
+		  return 0;
+		}
 		result->type = 1;
 		return 1;
 	}

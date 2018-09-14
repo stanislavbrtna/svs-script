@@ -31,8 +31,8 @@ uint16_t strNew(uint8_t *index, svsVM *s) {
 
 	while(index[x] != 0) {
 		if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
-			errMsgS("strNew: String field full!");
-			errHalt();
+			errSoft("strNew: String field full!", s);
+			return 0;
 		}
 		s->stringField[s->stringFieldLen] = index[x];
 		x++;
@@ -51,8 +51,8 @@ uint16_t strAdd(uint16_t index1, uint16_t index2, svsVM *s) {
 
 	while (s->stringField[index1+x] != 0) {
 		if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
-			errMsgS("strAdd: String field full!");
-			errHalt();
+			errSoft("strAdd: String field full!", s);
+			return 0;
 		}
 		s->stringField[s->stringFieldLen] = s->stringField[index1 + x];
 		x++;
@@ -63,8 +63,8 @@ uint16_t strAdd(uint16_t index1, uint16_t index2, svsVM *s) {
 
 	while (s->stringField[index2 + x] != 0) {
 		if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
-			errMsgS("strAdd: String field full!");
-			errHalt();
+			errSoft("strAdd: String field full!", s);
+			return 0;
 		}
 		s->stringField[s->stringFieldLen] = s->stringField[index2 + x];
 		x++;
@@ -85,8 +85,8 @@ uint16_t strInsert(uint16_t index1, uint16_t index2, uint16_t pos, svsVM *s) {
 	// fill buffer with source string upto pos
 	while ((s->stringField[index1 + x] != 0) && (x != pos)) {
 		if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
-			errMsgS("strAdd: String field full!");
-			errHalt();
+			errSoft("strInsert: String field full!", s);
+			return 0;
 		}
 		s->stringField[s->stringFieldLen] = s->stringField[index1 + x];
 		x++;
@@ -100,8 +100,8 @@ uint16_t strInsert(uint16_t index1, uint16_t index2, uint16_t pos, svsVM *s) {
 	// instert string index 2
 	while (s->stringField[index2 + x] != 0) {
 		if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
-			errMsgS("strAdd: String field full!");
-			errHalt();
+			errSoft("strInsert: String field full!", s);
+			return 0;
 		}
 		s->stringField[s->stringFieldLen] = s->stringField[index2 + x];
 		x++;
@@ -113,8 +113,8 @@ uint16_t strInsert(uint16_t index1, uint16_t index2, uint16_t pos, svsVM *s) {
 
 	while(s->stringField[index1 + x] != 0) {
 		if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
-			errMsgS("strAdd: String field full!");
-			errHalt();
+			errSoft("strInsert: String field full!", s);
+			return 0;
 		}
 		s->stringField[s->stringFieldLen] = s->stringField[index1 + x];
 		x++;
@@ -235,6 +235,10 @@ varType floatToString(varType num, svsVM *s) {
   uint8_t i[20] = "0000000000000.00000";
   //               -999999999999.99999
 
+  if (errCheck(s)) {
+    return retval;
+  }
+
 	if (num.val_f == 0) {
 	  retval.val_str = strNew("0", s);
 	  return retval;
@@ -330,6 +334,10 @@ varType floatToString(varType num, svsVM *s) {
 	    a++;
 	  }
 	}
+
+  if (errCheck(s)) {
+    return retval;
+  }
 
 	retval.val_str = strNew(i,s);
 	return retval;
