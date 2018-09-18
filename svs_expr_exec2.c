@@ -111,6 +111,35 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
       exprExecDMSG("ExprExecLvl5 VAR type STR", result->value.val_s, result->tokenId);
     }else if(result->type == 3) {
       exprExecDMSG("ExprExecLvl5 VAR type FLT", result->value.val_s, result->tokenId);
+    }else if(result->type == SVS_TYPE_ARR) {
+      exprExecDMSG("ExprExecLvl5 VAR type ARRAY", result->value.val_s, result->tokenId);
+      varType arrayIndex;
+      varType arrayBase;
+      arrayBase = result->value;
+      index++;
+      if (getTokenType(index, s) == SVS_TOKEN_LSQB) {
+        exprExec(index + 1, result, s); //odskočí a vrátí v resultu doufejme konec závorky
+        if (errCheck(s)) {
+          return;
+        }
+        index = result->tokenId;
+      } else {
+        errSoft("ExprExecLvl5 ARRAY: You can not evaluate whole array (missing \"[\")!", s);
+        errSoftSetParam("TokenId", (varType)index, s);
+        errSoftSetToken(index, s);
+        return;
+      }
+      arrayIndex = result->value;
+      result->value = s->varArray[arrayIndex.val_s + arrayBase.val_s];
+      result->type = s->varArrayType[arrayIndex.val_s + arrayBase.val_s];
+
+      if (getTokenType(index, s) != SVS_TOKEN_RSQB) {
+        errSoft("ExprExecLvl5 ARRAY: Missing \"]\")!", s);
+        errSoftSetParam("TokenId", (varType)index, s);
+        errSoftSetToken(index, s);
+        return;
+      }
+      result->tokenId = index + 1;
     }else{
       errSoft("ExprExecLvl5 VAR: Unknown variable type!", s);
       errSoftSetParam("TokenId", (varType)index, s);

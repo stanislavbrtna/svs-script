@@ -22,8 +22,9 @@ All keywords, variables and functions are case sensitive. Here is a table of all
 
 | Keyword | Meaning |
 | --- | --- |
-| arg0, arg1 ... arg9 | Function arguments. |
 | and | Logical and. |
+| arg0, arg1 ... arg9 | Function arguments. |
+| array | Initializes array. |
 | break | Breaks the for or while loop. |
 | end | Specifies the end of file. Not mandatory if EOF is present. |
 | for | For loop. |
@@ -179,7 +180,7 @@ Function *substr(string, [num]begin, [num]end)* returns new string containing po
 Function *print* prints its parameter on standard output. (In SVS versions lower than 0.8 was used similar command *sys print(string)* that used sys wrapper. )
 
 #### Get SVS version
-Since SVS 0.8.8 you can use *[num]ver()* to get current version of SVS. Version is returned as number, for example version 0.8.8 will return 880, version 1.0 will be 1000.
+Since SVS 0.8.8 you can use *[num]ver()* to get current version of SVS. Version is returned as number, for example version 1.0.0 will return 1000, version 1.5.3 will be 1530.
 
 ### Built-in math functions
 Since version 0.8.6 SVS contains optional built-in math functions. These functions are enabled by default with SVS_USE_ADV_MATH define.
@@ -235,6 +236,20 @@ Keyword *local* allows to add local variable to the current block of code. Local
     a = 8
     a = 5
 Maximum number of variables is also limited (VAR_TABLE_L define).
+
+### Arrays
+Since SVS version 1.0 implementation of arrays moved from sys warpper to the core language. There were no changes to the inner workings of SVS arrays, so they are still quite limited, but now the syntax is quite simple.
+Arrays can be defined by array keyword:
+
+    array a[50];
+This will create array named *a* with 50 cells. For now arrays can't be destroyed. When the array memory does not allow creation of new array an error is thrown.
+You can assign values to the cells of an array:
+
+    a[7] = 123;
+Or you can read value of cells in an expression:
+
+    print("value: " + a[7]);
+Multidimensional arrays are not supported. String functions does not work on arrays because strings in SVS are not internally stored as arrays.
 
 ### Loops and branching
 SVS supports simple branching with *if* and *else* and two types of loops.

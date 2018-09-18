@@ -29,6 +29,7 @@ SOFTWARE.
 #define SVS_TYPE_NUM 0
 #define SVS_TYPE_STR 1
 #define SVS_TYPE_FLT 3
+#define SVS_TYPE_ARR 4
 
 #define SVS_TOKEN_FUNCTION 11
 #define SVS_TOKEN_IF 12
@@ -37,6 +38,7 @@ SOFTWARE.
 #define SVS_TOKEN_BREAK 15
 #define SVS_TOKEN_RETURN 16
 #define SVS_TOKEN_CALL 17
+#define SVS_TOKEN_EQUALS 24
 #define SVS_TOKEN_SYS 28
 #define SVS_TOKEN_FOR 34
 
@@ -47,10 +49,15 @@ SOFTWARE.
 #define SVS_TOKEN_MOD 30
 #define SVS_TOKEN_LBR 5
 #define SVS_TOKEN_RBR 6
-#define SVS_TOKEN_LCBR 7
-#define SVS_TOKEN_RCBR 8
+#define SVS_TOKEN_LCBR 7 // {
+#define SVS_TOKEN_RCBR 8 // }
 #define SVS_TOKEN_SCOL 9
 #define SVS_TOKEN_COL 33
+
+#define SVS_TOKEN_ARRAY 40
+#define SVS_TOKEN_LSQB 41 // [
+#define SVS_TOKEN_RSQB 42 // ]
+
 
 typedef struct {
   uint8_t fString[NAME_LENGTH];

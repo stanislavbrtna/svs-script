@@ -550,6 +550,30 @@ uint8_t tokenParse(svsVM *s) {
       posToken++;
     }
 
+    if (tokenInput(posText, 0) == '[') {
+      setTokenType(posToken, SVS_TOKEN_LSQB, s);
+      tokenInput(0, 1);
+      posText++;
+      tokenDMSG("Token set, type [",
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken, s),
+                posText);
+      posToken++;
+    }
+
+    if (tokenInput(posText, 0) == ']') {
+      setTokenType(posToken, SVS_TOKEN_RSQB, s);
+      tokenInput(0, 1);
+      posText++;
+      tokenDMSG("Token set, type ]",
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken, s),
+                posText);
+      posToken++;
+    }
+
     //logic
     /*
     Logic:
@@ -924,8 +948,14 @@ uint8_t tokenParse(svsVM *s) {
       if (strCmp(pracName, "not")){
         tokenDMSG("Token set, type NOT", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
         setTokenType(posToken, 39,s);
-        setTokenData(posToken, (varType)((uint16_t)9),s);
-        Lock=0;
+        Lock = 0;
+      }
+
+
+      if (strCmp(pracName, "array")){
+        tokenDMSG("Token set, type ARRAY", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
+        setTokenType(posToken, SVS_TOKEN_ARRAY,s);
+        Lock = 0;
       }
 
       //check for constants
@@ -1091,7 +1121,8 @@ uint8_t tokenParse(svsVM *s) {
       //filtrace bordelu
         while(1){
           if (isRegChar(tokenInput(posText,0))||(tokenInput(posText,0)==0)||(tokenInput(posText,0)=='(')||(tokenInput(posText,0)=='=')||(tokenInput(posText,0)=='<')||(tokenInput(posText,0)=='>')
-          ||(tokenInput(posText,0)==';')||(tokenInput(posText,0)==',')||(tokenInput(posText,0)=='+')||(tokenInput(posText,0)=='-')||(tokenInput(posText,0)=='*')||(tokenInput(posText,0)=='/')||(tokenInput(posText,0)=='!')||(tokenInput(posText,0)==')')||(tokenInput(posText,0)=='%')||(tokenInput(posText,0)=='\n')){
+          ||(tokenInput(posText,0)==';')||(tokenInput(posText,0)==',')||(tokenInput(posText,0)=='+')||(tokenInput(posText,0)=='-')||(tokenInput(posText,0)=='*')||(tokenInput(posText,0)=='/')||(tokenInput(posText,0)=='!')||(tokenInput(posText,0)==')')||(tokenInput(posText,0)=='%')||(tokenInput(posText,0)=='\n')||(tokenInput(posText,0)=='[')
+          ||(tokenInput(posText,0)==']')){
             break;
           }else{
             if (tokenInput(posText,0)!=' '){

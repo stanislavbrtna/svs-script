@@ -221,6 +221,18 @@ void varAddLocal(varType Id, svsVM *s) {
 
 #endif
 
+varType newArray(varType Id, uint16_t len, svsVM *s) {
+  varType retval;
+  if (len > (SVS_ARRAY_LEN - s->varArrayLen)) {
+    errSoft("newArray: Array field full!", s);
+    return (varType)((uint16_t)0);
+  }
+  retval = (varType)s->varArrayLen;
+  s->varArrayLen += len;
+
+  return retval;
+}
+
 VARTYPE varGetId(uint8_t *name, svsVM *s) {
   uint16_t x = 0;
   if (s->varTableLen != 0) {

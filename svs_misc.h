@@ -39,6 +39,9 @@ uint8_t varSetType(VARTYPE id, uint8_t type, svsVM *s);
 VARTYPE varGetVal(VARTYPE id, svsVM *s);
 uint8_t varSetVal(VARTYPE id, VARTYPE val, svsVM *s);
 
+varType newArray(varType Id, uint16_t len, svsVM *s);
+
+
 uint8_t isNumber(uint8_t x);
 uint8_t isRegChar(uint8_t x);
 

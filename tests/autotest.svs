@@ -233,6 +233,29 @@ function main {
   }
   cnt = cnt + 1;
 
+  array A[100];
+  array B[100];
+  for(x = 0; x < 100; x++;) {
+    A[x] = "a"+x;
+  }
+
+  for(x = 0; x < 100; x++;) {
+    B[x] = "b"+x;
+  }
+
+  for(x = 0; x < 100; x++;) {
+    if(B[x] != "b"+x or A[x] != "a"+x){
+      arr_fail = 1;
+    }
+  }
+
+  if (not arr_fail) {
+    sys print(cnt + " - arrays:OK");
+  }else{
+    sys print(cnt + " - arrays:FAIL");
+    FAIL = 1;
+  }
+
   #comments hopefully works
   if(FAIL) {
     sys print("Test FAILED");
