@@ -1,0 +1,18 @@
+ # this file is all about werid things that will happen if you design
+ # a programming language on the fly
+
+function _ {
+  _ = "yeah, you can name both function and variable with just underscore";
+  print(_);
+}
+
+
+function main {
+  print("you can have comments #* seriously *# inside strings");
+  _();
+
+  if (0 and 0 and 0 and print("Lazy evaluation? We don't do that here.")){}
+
+  print("end of weirdness for now");
+}
+
