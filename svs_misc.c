@@ -71,8 +71,8 @@ void svsReset(svsVM *s){
     s->varArrayType[x] = 0;
   }
 
-  svsSetName("def.b", s);
-  svsSetFileName("def.svs", s);
+  svsSetName((uint8_t *)"def.b", s);
+  svsSetFileName((uint8_t *)"def.svs", s);
 }
 
 void svsInfo(svsVM *s) {
@@ -188,7 +188,7 @@ varType varGetIdFromMask(varType Id, svsVM *s) {
     //printf("Local variable NOT found: id=%u\n",Id.val_u);
     return (varType)Id; //pokud nenajdeme, tak vrátíme id
   } else {
-    errMsgS("varGetIdFromMask: variable not found!");
+    errMsgS((uint8_t *)"varGetIdFromMask: variable not found!");
     errHalt();
     return (varType)((uint16_t)0);
   }
@@ -196,8 +196,8 @@ varType varGetIdFromMask(varType Id, svsVM *s) {
 
 void varAddLocal(varType Id, svsVM *s) {
   if (s->varTableLen == VAR_TABLE_L) {
-    errSoft("varAddLocal: varTable full!", s);
-    errSoftSetParam("VarId", Id, s);
+    errSoft((uint8_t *)"varAddLocal: varTable full!", s);
+    errSoftSetParam((uint8_t *)"VarId", Id, s);
     return;
   }
 
@@ -205,7 +205,6 @@ void varAddLocal(varType Id, svsVM *s) {
   s->varTable[s->varTableLen].maskId = Id.val_u;
   s->varTable[s->varTableLen].value.val_s = (int32_t)0;
   s->varTable[s->varTableLen].type = 0;
-  //printf("Local var added:\n");
 }
 
 #else
@@ -214,8 +213,8 @@ varType varGetIdFromMask(varType Id, svsVM *s) {
 }
 
 void varAddLocal(varType Id, svsVM *s) {
-  errSoft("varAddLocal: Local variables are disabled in this build!", s);
-  errSoftSetParam("VarId", Id, s);
+  errSoft((uint8_t *)"varAddLocal: Local variables are disabled in this build!", s);
+  errSoftSetParam((uint8_t *)"VarId", Id, s);
   return;
 }
 
@@ -223,8 +222,9 @@ void varAddLocal(varType Id, svsVM *s) {
 
 varType newArray(varType Id, uint16_t len, svsVM *s) {
   varType retval;
+  (void)(Id);
   if (len > (SVS_ARRAY_LEN - s->varArrayLen)) {
-    errSoft("newArray: Array field full!", s);
+    errSoft((uint8_t *)"newArray: Array field full!", s);
     return (varType)((uint16_t)0);
   }
   retval = (varType)s->varArrayLen;
@@ -253,7 +253,7 @@ uint8_t varGetType(VARTYPE id, svsVM *s) {
     return s->varTable[id.val_u].type;
   }
 
-  errMsgS("varGetType: variable not found!");
+  errMsgS((uint8_t *)"varGetType: variable not found!");
   errHalt();
   return 0;
 }
@@ -266,7 +266,7 @@ uint8_t varSetType(VARTYPE id, uint8_t type, svsVM *s) {
     s->varTable[id.val_u].type = type;
     return 0;
   }
-  errMsgS("varSetType: variable not found!");
+  errMsgS((uint8_t *)"varSetType: variable not found!");
   errHalt();
   return 1;
 }
@@ -279,7 +279,7 @@ VARTYPE varGetVal(VARTYPE id, svsVM *s) {
     //printf("varGetVal id:%u value:%u \n",id,varTable[id].value);
     return (varType)s->varTable[id.val_u].value;
   }
-  errMsgS("varGetVal: variable not found!");
+  errMsgS((uint8_t *)"varGetVal: variable not found!");
   errHalt();
   return (varType)((uint16_t) 0);
 }
@@ -292,7 +292,7 @@ uint8_t varSetVal(VARTYPE id, VARTYPE val, svsVM *s) {
     s->varTable[id.val_u].value.val_s = val.val_s;
     return 1;
   }
-  errMsgS("varSetVal: variable not found!");
+  errMsgS((uint8_t *)"varSetVal: variable not found!");
   return 0;
 }
 

@@ -75,15 +75,15 @@ uint8_t tokenGetch() {
   if(ldmode == 0) {
     if (ldinit == 0) {
       printf("Opening file: %s\n", filename);
-      if (f_open(&fp, filename, FA_READ) != FR_OK) {
-        errMsgS("tokenGetch: Error while opening file!");
+      if (f_open(&fp, (char *)filename, FA_READ) != FR_OK) {
+        errMsgS((uint8_t *)"tokenGetch: Error while opening file!");
         return 0;
       }
       ldinit = 1;
     }
 
-    if (f_read(&fp,&x,sizeof(x),&br) != FR_OK) {
-      errMsgS("tokenGetch: Error while reading from file!");
+    if (f_read(&fp,&x,sizeof(x), &br) != FR_OK) {
+      errMsgS((uint8_t *)"tokenGetch: Error while reading from file!");
     }
 
     if (f_eof(&fp)) {

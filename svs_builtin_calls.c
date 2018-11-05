@@ -52,8 +52,8 @@ svsBuiltInCallsTableType svsBuiltInCallsTable[] = {
 
 uint16_t getBuiltInCallId(uint8_t * str) {
   uint16_t x = 0;
-  while (strCmp("end", (char*)(svsBuiltInCallsTable[x].name)) != 1) {
-    if (strCmp(str, (char*)(svsBuiltInCallsTable[x].name))) {
+  while (strCmp((uint8_t *)"end", (uint8_t *)svsBuiltInCallsTable[x].name) != 1) {
+    if (strCmp(str, (uint8_t *)(svsBuiltInCallsTable[x].name))) {
       return svsBuiltInCallsTable[x].id;
     }
     x++;
@@ -89,8 +89,8 @@ uint16_t processBuiltInCall(uint16_t index, varRetVal *result, svsVM *s) {
 
     while((getTokenType(index, s) == 33)) { //argumenty odděleny čárkou
       if (x == FUNCTION_ARGS_MAX + 1) {
-        errSoft("processBuiltInCall: too many arguments in function call!", s);
-        errSoftSetParam("TokenId", (varType)index, s);
+        errSoft((uint8_t *)"processBuiltInCall: too many arguments in function call!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
         errSoftSetToken(index, s);
         return 0;
       }
@@ -103,8 +103,8 @@ uint16_t processBuiltInCall(uint16_t index, varRetVal *result, svsVM *s) {
     }
 
     if (getTokenType(index, s) != 6) {
-      errSoft("processBuiltInCall: Syntax error at end of function call. (missing \")\")", s);
-      errSoftSetParam("TokenId", (varType)index, s);
+      errSoft((uint8_t *)"processBuiltInCall: Syntax error at end of function call. (missing \")\")", s);
+      errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
       errSoftSetToken(index, s);
       return 0;
     }
@@ -128,8 +128,8 @@ uint16_t processBuiltInCall(uint16_t index, varRetVal *result, svsVM *s) {
     return 1;
 
   } else {
-    errSoft("processBuiltInCall: Syntax error at the begin of function call. (missing \"(\")", s);
-    errSoftSetParam("TokenId", (varType)index, s);
+    errSoft((uint8_t *)"processBuiltInCall: Syntax error at the begin of function call. (missing \"(\")", s);
+    errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
     errSoftSetToken(index, s);
     return 0;
   }
@@ -138,7 +138,7 @@ uint16_t processBuiltInCall(uint16_t index, varRetVal *result, svsVM *s) {
 
 static void simpleError(uint8_t * text, svsVM *s) {
   errSoft(text, s);
-  errSoftSetParam("TokenId", (varType)callToken, s);
+  errSoftSetParam((uint8_t *)"TokenId", (varType)callToken, s);
   errSoftSetToken(callToken, s);
 }
 
@@ -151,7 +151,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     prac.val_s = 0;
 
     if (count != 1) {
-      simpleError("real(): wrong argument count!", s);
+      simpleError((uint8_t *)"real(): wrong argument count!", s);
       return 0;
     }
 
@@ -196,7 +196,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       return 1;
     }
 
-    simpleError("real(): wrong type of argument!", s);
+    simpleError((uint8_t *)"real(): wrong type of argument!", s);
     return 0;
   }
 
@@ -204,7 +204,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   if (callId == FLOAT) {
 
     if (count != 1) {
-      simpleError("flt(): wrong argument count!", s);
+      simpleError((uint8_t *)"flt(): wrong argument count!", s);
       return 0;
     }
 
@@ -215,11 +215,9 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     }
 
     if (argType[1] == 1) { // from str
-      varType prac;
       float fltPrac = 0;
       uint8_t negative = 0;
       uint16_t x = 0;
-      prac.val_s = 0;
       uint16_t float_dp = 1;
 
       fltPrac = 0;
@@ -265,14 +263,14 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       return 1;
     }
 
-    simpleError("flt(): wrong type of argument!", s);
+    simpleError((uint8_t *)"flt(): wrong type of argument!", s);
     return 0;
   }
 
   // print
   if (callId == PRINT) {
     if (count != 1) {
-      simpleError("print(): wrong argument count!", s);
+      simpleError((uint8_t *)"print(): wrong argument count!", s);
       return 0;
     }
 
@@ -283,7 +281,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       return 1;
     }
 
-    simpleError("print(): wrong type of argument!", s);
+    simpleError((uint8_t *)"print(): wrong type of argument!", s);
     return 0;
   }
 
@@ -291,7 +289,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   if (callId == ISNUM) {
 
     if (count != 1) {
-      simpleError("isnum(): wrong argument count!", s);
+      simpleError((uint8_t *)"isnum(): wrong argument count!", s);
       return 0;
     }
 
@@ -331,7 +329,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       return 1;
     }
 
-    simpleError("isnum(): wrong type of argument!", s);
+    simpleError((uint8_t *)"isnum(): wrong type of argument!", s);
     return 0;
   }
 
@@ -339,7 +337,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   if (callId == TYPEOF) {
 
     if (count != 1) {
-      simpleError("typeof(): wrong argument count!", s);
+      simpleError((uint8_t *)"typeof(): wrong argument count!", s);
       return 0;
     }
 
@@ -357,17 +355,17 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     tmpChar[0] = 0;
 
     if (count != 2) {
-      simpleError("getcp(): wrong argument count!", s);
+      simpleError((uint8_t *)"getcp(): wrong argument count!", s);
       return 0;
     }
 
     if (argType[1] != 1){
-      simpleError("getcp(): wrong type of argument 1!", s);
+      simpleError((uint8_t *)"getcp(): wrong type of argument 1!", s);
       return 0;
     }
 
     if (argType[2] != 0){
-      simpleError("getcp(): wrong type of argument 2!", s);
+      simpleError((uint8_t *)"getcp(): wrong type of argument 2!", s);
       return 0;
     }
 
@@ -396,7 +394,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     result->value = (varType)(strNew(tmpChar, s));
 
     if (errCheck(s)) {
-      errSoftSetParam("TokenId", (varType)callToken, s);
+      errSoftSetParam((uint8_t *)"TokenId", (varType)callToken, s);
       errSoftSetToken(callToken, s);
       return 0;
     }
@@ -410,12 +408,12 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     uint16_t x = 0;
 
     if (count != 1) {
-      simpleError("len(): wrong argument count!", s);
+      simpleError((uint8_t *)"len(): wrong argument count!", s);
       return 0;
     }
 
     if (argType[1] != SVS_TYPE_STR){
-      simpleError("len(): wrong type of argument!", s);
+      simpleError((uint8_t *)"len(): wrong type of argument!", s);
       return 0;
     }
 
@@ -439,14 +437,14 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     uint16_t x = 0;
 
     if (count != 3) {
-      simpleError("substr(): wrong argument count!", s);
+      simpleError((uint8_t *)"substr(): wrong argument count!", s);
       return 0;
     }
 
     if (argType[1] != SVS_TYPE_STR
         || argType[2] != SVS_TYPE_NUM
         || argType[3] != SVS_TYPE_NUM) {
-      simpleError("substr(): wrong type of argument!", s);
+      simpleError((uint8_t *)"substr(): wrong type of argument!", s);
       return 0;
     }
 
@@ -483,12 +481,12 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   // flt = sin([flt]rad)
   if (callId == SIN) {
     if (count != 1) {
-      simpleError("sin(): wrong argument count!", s);
+      simpleError((uint8_t *)"sin(): wrong argument count!", s);
       return 0;
     }
 
     if (argType[1] != SVS_TYPE_FLT) {
-      simpleError("sin(): wrong type of argument!", s);
+      simpleError((uint8_t *)"sin(): wrong type of argument!", s);
       return 0;
     }
 
@@ -500,12 +498,12 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   // flt = cos([flt]rad)
   if (callId == COS) {
     if (count != 1) {
-      simpleError("cos(): wrong argument count!", s);
+      simpleError((uint8_t *)"cos(): wrong argument count!", s);
       return 0;
     }
 
     if (argType[1] != SVS_TYPE_FLT) {
-      simpleError("cos(): wrong type of argument!", s);
+      simpleError((uint8_t *)"cos(): wrong type of argument!", s);
       return 0;
     }
 
@@ -517,12 +515,12 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   // flt = tan([flt]rad)
   if (callId == TAN) {
     if (count != 1) {
-      simpleError("tan(): wrong argument count!", s);
+      simpleError((uint8_t *)"tan(): wrong argument count!", s);
       return 0;
     }
 
     if (argType[1] != SVS_TYPE_FLT) {
-      simpleError("tan(): wrong type of argument!", s);
+      simpleError((uint8_t *)"tan(): wrong type of argument!", s);
       return 0;
     }
 
@@ -534,12 +532,12 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   // flt = atan([flt]rad)
   if (callId == ATAN) {
     if (count != 1) {
-      simpleError("atan(): wrong argument count!", s);
+      simpleError((uint8_t *)"atan(): wrong argument count!", s);
       return 0;
     }
 
     if (argType[1] != SVS_TYPE_FLT) {
-      simpleError("atan(): wrong type of argument!", s);
+      simpleError((uint8_t *)"atan(): wrong type of argument!", s);
       return 0;
     }
 
@@ -551,12 +549,12 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   // flt = log([flt])
   if (callId == LOG) {
     if (count != 1) {
-      simpleError("log(): wrong argument count!", s);
+      simpleError((uint8_t *)"log(): wrong argument count!", s);
       return 1;
     }
 
     if (argType[1] != SVS_TYPE_FLT) {
-      simpleError("log(): wrong type of argument!", s);
+      simpleError((uint8_t *)"log(): wrong type of argument!", s);
       return 1;
     }
 
@@ -568,12 +566,12 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   // flt = exp([flt])
   if (callId == EXP) {
     if (count != 1) {
-      simpleError("exp(): wrong argument count!", s);
+      simpleError((uint8_t *)"exp(): wrong argument count!", s);
       return 0;
     }
 
     if (argType[1] != SVS_TYPE_FLT) {
-      simpleError("exp(): wrong type of argument!", s);
+      simpleError((uint8_t *)"exp(): wrong type of argument!", s);
       return 0;
     }
 
@@ -585,12 +583,12 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   // flt = pow([flt]base, [flt]exp)
   if (callId == POW) {
     if (count != 2) {
-      simpleError("pow(): wrong argument count!", s);
+      simpleError((uint8_t *)"pow(): wrong argument count!", s);
       return 0;
     }
 
     if (argType[1] != SVS_TYPE_FLT || argType[2] != SVS_TYPE_FLT) {
-      simpleError("pow(): wrong type of argument!", s);
+      simpleError((uint8_t *)"pow(): wrong type of argument!", s);
       return 0;
     }
 
@@ -602,7 +600,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   // flt = pi()
   if (callId == PI) {
     if (count != 0) {
-      simpleError("pi(): wrong argument count!", s);
+      simpleError((uint8_t *)"pi(): wrong argument count!", s);
       return 0;
     }
 
@@ -614,12 +612,12 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   // flt = sqrt([flt])
   if (callId == SQRT) {
     if (count != 1) {
-      simpleError("sqrt(): wrong argument count!", s);
+      simpleError((uint8_t *)"sqrt(): wrong argument count!", s);
       return 0;
     }
 
     if (argType[1] != SVS_TYPE_FLT) {
-      simpleError("sqrt(): wrong type of argument!", s);
+      simpleError((uint8_t *)"sqrt(): wrong type of argument!", s);
       return 0;
     }
 
@@ -634,7 +632,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       callId == POW || callId == PI ||
       callId == SQRT
     ) {
-    simpleError("execBuiltInCall(): SVS_USE_ADV_MATH is disabled in this build!", s);
+    simpleError((uint8_t *)"execBuiltInCall(): SVS_USE_ADV_MATH is disabled in this build!", s);
     return 0;
   }
 #endif
@@ -653,6 +651,6 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     return 1;
   }
 
-  simpleError("execBuiltInCall: Unknown builtin call!", s);
+  simpleError((uint8_t *)"execBuiltInCall: Unknown builtin call!", s);
   return 0;
 }

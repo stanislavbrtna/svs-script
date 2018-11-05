@@ -76,7 +76,7 @@ uint8_t gcGetValidString(uint16_t strId, svsVM *s) {
   return 0;
 }
 
-uint8_t gcRemoveString(uint16_t strId, uint8_t type, svsVM *s) {
+uint8_t gcRemoveString(uint16_t strId, svsVM *s) {
   uint16_t x = 0;
   uint16_t str_len = 0;
 
@@ -141,7 +141,7 @@ void garbageCollect(uint16_t count, svsVM *s) {
   gc_start = s->stringFieldLen;
 
   if (STRING_FIELD_L < s->stringFieldLen) {
-    errMsgS("garbageCollect: String field invalid! (STRING_FIELD_L<stringFieldLen)");
+    errMsgS((uint8_t *)"garbageCollect: String field invalid! (STRING_FIELD_L<stringFieldLen)");
   }
 
   if (0 == s->stringFieldLen) {
@@ -158,7 +158,7 @@ void garbageCollect(uint16_t count, svsVM *s) {
         if (0 == valid) {
           //cgDMSG("Non-valid string removed.");
           //printf("stringRM: %s\n",s->stringField+x+1 );
-          gcRemoveString(x + 1, valid, s);
+          gcRemoveString(x + 1, s);
 
           if (count != 0) {
             if (s->stringFieldLen < (gc_start - count)) {

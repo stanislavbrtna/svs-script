@@ -87,8 +87,8 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
         return;
       }
     } else {
-      errSoft("ExprExecLvl5 CALL: Missing \"(\" at start of function! ", s);
-      errSoftSetParam("TokenId", (varType)index, s);
+      errSoft((uint8_t *)"ExprExecLvl5 CALL: Missing \"(\" at start of function! ", s);
+      errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
       errSoftSetToken(index, s);
       return;
     }
@@ -124,8 +124,8 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
         }
         index = result->tokenId;
       } else {
-        errSoft("ExprExecLvl5 ARRAY: You can not evaluate whole array (missing \"[\")!", s);
-        errSoftSetParam("TokenId", (varType)index, s);
+        errSoft((uint8_t *)"ExprExecLvl5 ARRAY: You can not evaluate whole array (missing \"[\")!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
         errSoftSetToken(index, s);
         return;
       }
@@ -134,15 +134,15 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
       result->type = s->varArrayType[arrayIndex.val_s + arrayBase.val_s];
 
       if (getTokenType(index, s) != SVS_TOKEN_RSQB) {
-        errSoft("ExprExecLvl5 ARRAY: Missing \"]\")!", s);
-        errSoftSetParam("TokenId", (varType)index, s);
+        errSoft((uint8_t *)"ExprExecLvl5 ARRAY: Missing \"]\")!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
         errSoftSetToken(index, s);
         return;
       }
       result->tokenId = index + 1;
     }else{
-      errSoft("ExprExecLvl5 VAR: Unknown variable type!", s);
-      errSoftSetParam("TokenId", (varType)index, s);
+      errSoft((uint8_t *)"ExprExecLvl5 VAR: Unknown variable type!", s);
+      errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
       errSoftSetToken(index, s);
       return;
     }
@@ -153,8 +153,8 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
       return;
     }
     if (result->type != 0) {
-      errSoft("ExprExecLvl5 NOT: You can only apply NOT on num type!", s);
-      errSoftSetParam("TokenId", (varType)index, s);
+      errSoft((uint8_t *)"ExprExecLvl5 NOT: You can only apply NOT on num type!", s);
+      errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
       errSoftSetToken(index, s);
       return;
     }
@@ -225,8 +225,8 @@ void exprExecLvl4(uint16_t index, varRetVal *result, svsVM *s) {
         result->tokenId = prac.tokenId; //nastavíme znova
         #endif
       } else {
-        errSoft("Can only multiply num and num or float and float!",s);
-        errSoftSetParam("TokenId",(varType)tokenId,s);
+        errSoft((uint8_t *)"Can only multiply num and num or float and float!",s);
+        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
         errSoftSetToken(tokenId,s);
         return;
       }
@@ -240,8 +240,8 @@ void exprExecLvl4(uint16_t index, varRetVal *result, svsVM *s) {
         if (prac.value.val_s != 0) {
           result->value.val_s /= prac.value.val_s; //vydělíme
         } else {
-          errSoft("Division by zero!", s);
-          errSoftSetParam("TokenId", (varType)tokenId, s);
+          errSoft((uint8_t *)"Division by zero!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
           errSoftSetToken(tokenId, s);
           return;
         }
@@ -252,8 +252,8 @@ void exprExecLvl4(uint16_t index, varRetVal *result, svsVM *s) {
         if (prac.value.val_f != 0) {
           result->value.val_f /= prac.value.val_f; //vydělíme
         } else {
-          errSoft("Division by zero!", s);
-          errSoftSetParam("TokenId", (varType)tokenId, s);
+          errSoft((uint8_t *)"Division by zero!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
           errSoftSetToken(tokenId, s);
           return;
         }
@@ -261,8 +261,8 @@ void exprExecLvl4(uint16_t index, varRetVal *result, svsVM *s) {
         result->tokenId = prac.tokenId; //nastavíme znova
         #endif
       } else {
-        errSoft("Can not divide string and num or float and num!", s);
-        errSoftSetParam("TokenId", (varType)tokenId, s);
+        errSoft((uint8_t *)"Can not divide string and num or float and num!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
         errSoftSetToken(tokenId, s);
         return;
       }
@@ -276,16 +276,16 @@ void exprExecLvl4(uint16_t index, varRetVal *result, svsVM *s) {
         if (prac.value.val_s != 0) {
           result->value.val_s %= prac.value.val_s; //vydělíme
         } else {
-          errSoft("Division by zero!", s);
-          errSoftSetParam("TokenId", (varType)tokenId, s);
+          errSoft((uint8_t *)"Division by zero!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
           errSoftSetToken(tokenId, s);
           return;
         }
         tokenId = prac.tokenId;  //nastavíme token id co se vrátilo
         result->tokenId = prac.tokenId; //nastavíme znova
       } else {
-        errSoft("Can not divide string and num!", s);
-        errSoftSetParam("TokenId", (varType)tokenId, s);
+        errSoft((uint8_t *)"Can not divide string and num!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
         errSoftSetToken(tokenId, s);
         return;
       }
@@ -338,8 +338,8 @@ void exprExecLvl3(uint16_t index, varRetVal *result, svsVM *s) {
         result->tokenId = tokenId;
         return;
       } else {
-        errSoft("Can not add float and num!", s);
-        errSoftSetParam("TokenId", (varType)tokenId, s);
+        errSoft((uint8_t *)"Can not add float and num!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
         errSoftSetToken(tokenId, s);
         return;
       }
@@ -368,8 +368,8 @@ void exprExecLvl3(uint16_t index, varRetVal *result, svsVM *s) {
         result->tokenId = prac.tokenId;
       #endif
       } else {
-        errSoft("Can only subtract num with num or float with float!", s);
-        errSoftSetParam("TokenId", (varType)tokenId, s);
+        errSoft((uint8_t *)"Can only subtract num with num or float with float!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
         errSoftSetToken(tokenId, s);
         return;
       }
@@ -448,7 +448,7 @@ void exprExecLvl2(uint16_t index, varRetVal *result, svsVM *s) {
 void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
   //== != <= >= < > --hotovo
   uint16_t tokenId;
-  uint16_t x;
+  //uint16_t x;
   varRetVal prac;
   varRetValZero(&prac);
 
@@ -512,8 +512,8 @@ void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
         #endif
         }
       }else{
-        errSoft("Can only compare (==) same types!",s);
-        errSoftSetParam("TokenId",(varType)tokenId,s);
+        errSoft((uint8_t *)"Can only compare (==) same types!",s);
+        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
         errSoftSetToken(tokenId,s);
         return;
       }
@@ -565,8 +565,8 @@ void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
           }
         }
       }else{
-        errSoft("Can only compare (!=) same types",s);
-        errSoftSetParam("TokenId",(varType)tokenId,s);
+        errSoft((uint8_t *)"Can only compare (!=) same types",s);
+        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
         errSoftSetToken(tokenId,s);
         return;
       }
@@ -605,14 +605,14 @@ void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
           }
         #endif
         }else{
-          errSoft("Can not use < operator on strings!",s);
-          errSoftSetParam("TokenId",(varType)tokenId,s);
+          errSoft((uint8_t *)"Can not use < operator on strings!",s);
+          errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
           errSoftSetToken(tokenId,s);
           return;
         }
       }else{
-        errSoft("Can not compare (<) string and num!",s);
-        errSoftSetParam("TokenId",(varType)tokenId,s);
+        errSoft((uint8_t *)"Can not compare (<) string and num!",s);
+        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
         errSoftSetToken(tokenId,s);
         return;
       }
@@ -651,14 +651,14 @@ void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
           }
         #endif
         }else{
-          errSoft("Can not use > operator on strings!",s);
-          errSoftSetParam("TokenId",(varType)tokenId,s);
+          errSoft((uint8_t *)"Can not use > operator on strings!",s);
+          errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
           errSoftSetToken(tokenId,s);
           return;
         }
       }else{
-        errSoft("Can only compare (>) same types",s);
-        errSoftSetParam("TokenId",(varType)tokenId,s);
+        errSoft((uint8_t *)"Can only compare (>) same types",s);
+        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
         errSoftSetToken(tokenId,s);
         return;
       }
@@ -697,14 +697,14 @@ void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
           }
         #endif
         }else{
-          errSoft("Can not use <= operator on strings!",s);
-          errSoftSetParam("TokenId",(varType)tokenId,s);
+          errSoft((uint8_t *)"Can not use <= operator on strings!",s);
+          errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
           errSoftSetToken(tokenId,s);
           return;
         }
       }else{
-        errSoft("Can only compare (<=) same types",s);
-        errSoftSetParam("TokenId",(varType)tokenId,s);
+        errSoft((uint8_t *)"Can only compare (<=) same types",s);
+        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
         errSoftSetToken(tokenId,s);
         return;
       }
@@ -743,14 +743,14 @@ void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
           }
         #endif
         }else{
-          errSoft("Can not use >= operator on strings!",s);
-          errSoftSetParam("TokenId",(varType)tokenId,s);
+          errSoft((uint8_t *)"Can not use >= operator on strings!",s);
+          errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
           errSoftSetToken(tokenId,s);
           return;
         }
       }else{
-        errSoft("Can only compare (>=) same types",s);
-        errSoftSetParam("TokenId",(varType)tokenId,s);
+        errSoft((uint8_t *)"Can only compare (>=) same types",s);
+        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
         errSoftSetToken(tokenId,s);
         return;
       }
@@ -794,8 +794,8 @@ void exprExecLvlLogic(uint16_t index, varRetVal *result, svsVM *s){
         result->tokenId = prac.tokenId; //nastavíme znova
         exprExecDMSG("ExprExecLogic AND: ",result->value.val_s,tokenId);
       } else {
-        errSoft("Can only use logic operators (AND) on num type!",s);
-        errSoftSetParam("TokenId",(varType)tokenId,s);
+        errSoft((uint8_t *)"Can only use logic operators (AND) on num type!",s);
+        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
         errSoftSetToken(tokenId,s);
         return;
       }
@@ -815,8 +815,8 @@ void exprExecLvlLogic(uint16_t index, varRetVal *result, svsVM *s){
         result->tokenId = prac.tokenId; //nastavíme znova
         exprExecDMSG("ExprExecLogic OR: ",result->value.val_s,tokenId);
       } else {
-        errSoft("Can only use logic operators (OR) on num type!",s);
-        errSoftSetParam("TokenId",(varType)tokenId,s);
+        errSoft((uint8_t *)"Can only use logic operators (OR) on num type!",s);
+        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
         errSoftSetToken(tokenId,s);
         return;
       }

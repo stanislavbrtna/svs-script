@@ -31,7 +31,7 @@ void tokenPrint(svsVM *s) {
       break;
     }
     if (getTokenType(x, s) != 31) {
-      printf("index:%u type:%u data:%u \n", x, getTokenType(x, s), getTokenData(x, s).val_u);
+      printf("index:%u type:%u data:%u \n", x, getTokenType(x, s), (unsigned int)getTokenData(x, s).val_u);
     } else {
       printf("index:%u type:%u data:%f \n", x, getTokenType(x, s), getTokenData(x, s).val_f);
     }
@@ -43,7 +43,7 @@ void varTablePrint(svsVM *s) {
   puts("varTable:");
   while (x <= s->varTableLen) {
     if(varGetType((varType)x, s) == 0) {
-      printf("var id: %u name: %s type: num value: %i \n", x, s->varTable[x].name, s->varTable[x].value.val_s);
+      printf("var id: %u name: %s type: num value: %i \n", x, s->varTable[x].name, (unsigned int)s->varTable[x].value.val_s);
     } else if (varGetType((varType)x, s) == 1) {
       printf("var id: %u name: %s type: str value: %s\n", x, s->varTable[x].name, s->stringField + s->varTable[x].value.val_str);
     } else if(varGetType((varType)x, s) == 3) {

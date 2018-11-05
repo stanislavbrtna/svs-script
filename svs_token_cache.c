@@ -82,10 +82,6 @@ uint8_t closeTokenCache(svsVM *s){
 
 #else
 
-uint8_t closeTokenCache(svsVM *s){
-  return 0;
-}
-
 
 uint8_t tokenInCache(uint16_t tokenId, svsVM *s){
   if((tokenId < (TOKEN_LENGTH + s->cacheStart)) && (tokenId >= (s->cacheStart))) {
@@ -96,7 +92,6 @@ uint8_t tokenInCache(uint16_t tokenId, svsVM *s){
 }
 
 uint8_t getTokenType(uint16_t tokenId, svsVM *s){
-  uint16_t x;
   if(tokenInCache(tokenId,s)){
     return s->tokenCache[tokenId - s->cacheStart ].Type;
   }else{
@@ -107,7 +102,6 @@ uint8_t getTokenType(uint16_t tokenId, svsVM *s){
 
 
 varType getTokenData(uint16_t tokenId, svsVM *s){
-  uint16_t x;
   if(tokenInCache(tokenId,s)){
     return s->tokenCache[tokenId - s->cacheStart ].Data;
   }else{
@@ -135,7 +129,7 @@ void SVScloseCache(svsVM *s) {
 }
 
 void SVSopenCache(svsVM *s) {
-  f_open(&(s->vmCache), s->vmName, FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
+  f_open(&(s->vmCache), (char *)s->vmName, FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
 }
 
 #endif
@@ -187,11 +181,7 @@ void fillCache(uint16_t cache_pos, uint16_t load_start, uint16_t load_end, svsVM
 
 // advanced cache reloader
 uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
-  uint32_t x, ret;
-  int32_t token_step=0;
-  tokenCacheStruct prac;
-  prac.Data.val_s=666;
-  prac.Type=6;
+  uint16_t x;
   uint16_t chacheStartPrac;
 
   if (cacheDebug==1){
@@ -204,7 +194,7 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
   }
 #else
   if ((s->cacheFr)!=FR_OK){
-    errMsgS("cacheReload: Error: File not valid!");
+    errMsgS((uint8_t *)"cacheReload: Error: File not valid!");
   }
 #endif
   //TOKEN_CACHE_STEP
@@ -274,9 +264,7 @@ void fillCache(uint16_t cache_pos, uint16_t load_start, uint16_t load_end, svsVM
 #endif
 
 uint8_t setTokenType(uint16_t tokenId, uint8_t val,  svsVM *s){
-  uint16_t x;
 #ifndef PC
-  FRESULT fr;
   UINT ret;
 #endif
   tokenCacheStruct prac;
@@ -289,10 +277,10 @@ uint8_t setTokenType(uint16_t tokenId, uint8_t val,  svsVM *s){
       errMsgS("setTokenData: Error while opening cache file!");
     }
 #else
-    s->cacheFr=f_open(&(s->vmCache),s->vmName, FA_CREATE_ALWAYS|FA_READ|FA_WRITE);
+    s->cacheFr=f_open(&(s->vmCache),(char *)s->vmName, FA_CREATE_ALWAYS|FA_READ|FA_WRITE);
 
     if (s->cacheFr!=FR_OK){
-    errMsgS("setTokenData: Error while opening cache file!");
+    errMsgS((uint8_t *)"setTokenData: Error while opening cache file!");
   }else{
 
   }
@@ -324,7 +312,6 @@ uint8_t setTokenType(uint16_t tokenId, uint8_t val,  svsVM *s){
 }
 
 uint8_t setTokenData(uint16_t tokenId, varType val, svsVM *s){
-  uint16_t x;
 #ifndef PC
   UINT ret;
   //FRESULT fr;
@@ -339,11 +326,11 @@ uint8_t setTokenData(uint16_t tokenId, varType val, svsVM *s){
       errMsgS("setTokenData: Error while opening cache file!");
     }
 #else
-    s->cacheFr=f_open(&(s->vmCache),s->vmName, FA_CREATE_ALWAYS|FA_READ|FA_WRITE);
+    s->cacheFr=f_open(&(s->vmCache),(char*)s->vmName, FA_CREATE_ALWAYS|FA_READ|FA_WRITE);
 
-    if (s->cacheFr!=FR_OK){
-    errMsgS("setTokenData: Error while opening cache file!");
-  }
+    if (s->cacheFr!=FR_OK) {
+    	errMsgS((uint8_t *)"setTokenData: Error while opening cache file!");
+    }
 #endif
     s->vmCacheUsed=1;
   }
@@ -369,7 +356,8 @@ uint8_t setTokenData(uint16_t tokenId, varType val, svsVM *s){
   return 0;
 }
 
-uint16_t getTokenMax(svsVM *s){
+uint16_t getTokenMax(svsVM *s) {
+	(void) (s);
   return 65000;
 }
 

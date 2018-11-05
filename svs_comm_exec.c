@@ -37,7 +37,7 @@ void commExDMSG(char *text, uint16_t tokenId) {
 }
 
 uint16_t exprSkip(uint16_t index, svsVM *s) {
-  uint16_t x = 0;
+  uint16_t x = index;
   uint16_t count = 0;
 
   while(1) {
@@ -133,8 +133,8 @@ uint16_t commSkip(uint16_t index, svsVM *s) {
   if ((x >= index) && (x <= s->tokenMax)) {
     return x;
   } else {
-    errSoft("commSkip: Skip sanity error.", s);
-    errSoftSetParam("after TokenId", (varType)index, s);
+    errSoft((uint8_t *)"commSkip: Skip sanity error.", s);
+    errSoftSetParam((uint8_t *)"after TokenId", (varType)index, s);
     errSoftSetToken(index, s);
     return 0;
   }
@@ -174,7 +174,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
     if ((getTokenType(currToken, s) == 17) && lock) {
       lock = 0;
       commExDMSG("commExecLoop: Function Call", currToken);
-      commExDMSG(s->stringField + getTokenData(currToken, s).val_u, currToken);
+      commExDMSG((char *)s->stringField + getTokenData(currToken, s).val_u, currToken);
 
       return commParseCall(currToken, s);
     }
@@ -186,8 +186,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
       currToken++;
 
       if (getTokenType(currToken, s) != 10) { // expecting VAR
-        errSoft("commEx: Syntax error next to LOCAL: Expected VAR after LOCAL.", s);
-        errSoftSetParam("TokenId", (varType)currToken, s);
+        errSoft((uint8_t *)"commEx: Syntax error next to LOCAL: Expected VAR after LOCAL.", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
         return 0;
       } else {
@@ -199,8 +199,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         currToken++;
 
         if (getTokenType(currToken, s) != 9) { //zkontrolujeme středník / semicolon check
-          errSoft("commEx: Syntax error, missing ; .", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Syntax error, missing ; .", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
@@ -219,8 +219,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
       currToken++;
 
       if (getTokenType(currToken, s) != 10) { // expecting VAR
-        errSoft("commEx: Syntax error next to ARRAY: Expected VAR after ARRAY.", s);
-        errSoftSetParam("TokenId", (varType)currToken, s);
+        errSoft((uint8_t *)"commEx: Syntax error next to ARRAY: Expected VAR after ARRAY.", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
         return 0;
       } else {
@@ -229,8 +229,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         currToken++;
 
         if (getTokenType(currToken, s) != SVS_TOKEN_LSQB) {
-          errSoft("commEx: Syntax error next to ARRAY: Missing [.", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Syntax error next to ARRAY: Missing [.", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
@@ -243,8 +243,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         }
 
         if (varPrac.type != SVS_TYPE_NUM || varPrac.value.val_s < 0) {
-          errSoft("commEx: Error next to ARRAY: Index can be positive num only.", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Error next to ARRAY: Index can be positive num only.", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
@@ -269,8 +269,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         }
 
         if (getTokenType(currToken, s) != SVS_TOKEN_RSQB) {
-          errSoft("commEx: Syntax error, missing ].", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Syntax error, missing ].", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
@@ -278,8 +278,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         currToken++;
 
         if (getTokenType(currToken, s) != 9) { //zkontrolujeme středník / semicolon check
-          errSoft("commEx: Syntax error, missing ; .", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Syntax error, missing ; .", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
@@ -319,8 +319,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
       if (getTokenType(currToken,s) == 24) { // =
         commExDMSG("commExecLoop: = statement", currToken);
         if (varGetType(getTokenData(x,s), s) == SVS_TYPE_ARR) {
-          errSoft("commEx: Equals on array is not supported.", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Equals on array is not supported.", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
@@ -350,8 +350,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         currToken++;
         if (getTokenType(currToken, s) == 1) {
           if (varGetType(getTokenData(x,s), s) != 0) {
-            errSoft("commEx: Syntax error in ++: only num type can be incremented.", s);
-            errSoftSetParam("TokenId", (varType)currToken, s);
+            errSoft((uint8_t *)"commEx: Syntax error in ++: only num type can be incremented.", s);
+            errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
             errSoftSetToken(currToken, s);
             return 0;
           }
@@ -361,8 +361,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 
           currToken++;
         }else{
-          errSoft("commEx: Syntax error next to ++ (missing \"+\").", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Syntax error next to ++ (missing \"+\").", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
@@ -372,8 +372,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         currToken++;
         if (getTokenType(currToken, s) == 2) {
           if (varGetType(getTokenData(x, s), s) != 0) {
-            errSoft("commEx: Syntax error in --: only num type can be decremented.", s);
-            errSoftSetParam("TokenId", (varType)currToken, s);
+            errSoft((uint8_t *)"commEx: Syntax error in --: only num type can be decremented.", s);
+            errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
             errSoftSetToken(currToken, s);
             return 0;
           }
@@ -383,8 +383,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 
           currToken++;
         } else {
-          errSoft("commEx: Syntax error next to -- (missing \"-\").", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Syntax error next to -- (missing \"-\").", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
@@ -392,8 +392,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         varType index;
 
         if (varGetType(getTokenData(x, s), s) != SVS_TYPE_ARR) {
-          errSoft("commEx: Only array type can be indexed.", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Only array type can be indexed.", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
@@ -406,8 +406,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         }
 
         if (varPrac.type != SVS_TYPE_NUM || varPrac.value.val_s < 0) {
-          errSoft("commEx: Error next to ARRAY: Index can be positive num only.", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Error next to ARRAY: Index can be positive num only.", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
@@ -415,8 +415,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         index = varPrac.value;
 
         if (getTokenType(currToken, s) != SVS_TOKEN_RSQB) {
-          errSoft("commEx: Syntax error, missing ].", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Syntax error, missing ].", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
@@ -424,8 +424,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         currToken++;
 
         if (getTokenType(currToken, s) != SVS_TOKEN_EQUALS) {
-          errSoft("commEx: Syntax error, missing =.", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Syntax error, missing =.", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
@@ -441,8 +441,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         currToken = varPrac.tokenId;
 
         if (index.val_s + varGetVal(getTokenData(x, s), s).val_s > SVS_ARRAY_LEN) {
-          errSoft("commEx: Array out of range!", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Array out of range!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         } else {
@@ -451,15 +451,15 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         }
 
       } else { //očekáváme "=" / expecting "="
-        errSoft("commEx: Syntax error next to VAR (missing \"=\", \"++\", \"--\" or \"[\").", s);
-        errSoftSetParam("TokenId", (varType)currToken, s);
+        errSoft((uint8_t *)"commEx: Syntax error next to VAR (missing \"=\", \"++\", \"--\" or \"[\").", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
         return 0;
       }
 
       if (getTokenType(currToken,s) != 9) { //zkontrolujeme středník / semicolon check
-          errSoft("commEx: Syntax error, missing ; .", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Syntax error, missing ; .", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
@@ -534,8 +534,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
       commExDMSG("commExecLoop: if statement", currToken);
       currToken++;
       if (getTokenType(currToken, s) != 5) { // detekce závorky
-        errSoft("commExecLoop: Unknown statement after if", s);
-        errSoftSetParam("TokenId", (varType)currToken, s);
+        errSoft((uint8_t *)"commExecLoop: Unknown statement after if", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
         return 0;
       } else {
@@ -547,8 +547,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         x = varPrac.value.val_s; //výsledek ifu
         currToken = varPrac.tokenId;
         if (getTokenType(currToken,s) != 6) {
-          errSoft("commEx: Syntax error in if statement, missing \")\"", s);
-          errSoftSetParam("TokenId", (varType)currToken, s);
+          errSoft((uint8_t *)"commEx: Syntax error in if statement, missing \")\"", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
@@ -674,8 +674,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
           }
 
           if (getTokenType(currToken, s) != 6) {
-            errSoft("commEx: Syntax error in for statement, missing \")\" or maybe \";\"", s);
-            errSoftSetParam("TokenId", (varType)exprPrac, s);
+            errSoft((uint8_t *)"commEx: Syntax error in for statement, missing \")\" or maybe \";\"", s);
+            errSoftSetParam((uint8_t *)"TokenId", (varType)exprPrac, s);
             //jako parametr stavíme exprPrac, kdyby current token mířil po skipu někam do háje
             errSoftSetToken(exprPrac, s);
             return 0;
@@ -724,8 +724,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
       commExDMSG("commExecLoop: while statement", currToken);
       currToken++;
       if (getTokenType(currToken, s) != 5) { // detekce závorky
-        errSoft("commEx: Unknown statement after while, missing \"(\"", s);
-        errSoftSetParam("TokenId", (varType)currToken, s);
+        errSoft((uint8_t *)"commEx: Unknown statement after while, missing \"(\"", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
         return 0;
       } else {
@@ -744,8 +744,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
           currToken = varPrac.tokenId;
           backBr = currToken;
           if (getTokenType(currToken, s) != 6) {
-            errSoft("commEx: Syntax error in while statement, missing \")\"", s);
-            errSoftSetParam("TokenId", (varType)currToken, s);
+            errSoft((uint8_t *)"commEx: Syntax error in while statement, missing \")\"", s);
+            errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
             errSoftSetToken(currToken, s);
             return 0;
           }
@@ -788,8 +788,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
     }
 
     if(lock == 1) {
-      errSoft("commEx: Unexpected command!", s);
-      errSoftSetParam("TokenType", (varType)(uint16_t)getTokenType(currToken, s), s);
+      errSoft((uint8_t *)"commEx: Unexpected command!", s);
+      errSoftSetParam((uint8_t *)"TokenType", (varType)(uint16_t)getTokenType(currToken, s), s);
       errSoftSetToken(currToken, s);
       return 0;
     }
@@ -815,7 +815,7 @@ uint16_t commExec(uint8_t * name, svsVM *s) {
   if (functionExists(name, s)) {
     return commExecById(functionGetId(name, s), s);
   } else {
-    errSoft("commExecById: Function does not exist.", s);
+    errSoft((uint8_t *)"commExecById: Function does not exist.", s);
     return 0;
   }
 }
@@ -871,8 +871,8 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
 
     while((getTokenType(index, s) == 33)) { //argumenty odděleny čárkou
       if (x == FUNCTION_ARGS_MAX + 1) {
-        errSoft("commParseCall: too many arguments in function call!", s);
-        errSoftSetParam("TokenId", (varType)index, s);
+        errSoft((uint8_t *)"commParseCall: too many arguments in function call!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
         errSoftSetToken(index, s);
         return 0;
       }
@@ -885,8 +885,8 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
     }
 
     if (getTokenType(index, s) != 6) {
-      errSoft("commParseCall: Syntax error at end of function call. (missing \")\")", s);
-      errSoftSetParam("TokenId", (varType)index, s);
+      errSoft((uint8_t *)"commParseCall: Syntax error at end of function call. (missing \")\")", s);
+      errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
       errSoftSetToken(index, s);
       return 0;
     }
@@ -924,8 +924,8 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
     return index;
 
   } else {
-    errSoft("commParseCall: Syntax error at the begin of function call. (missing \"(\")", s);
-    errSoftSetParam("TokenId", (varType)index, s);
+    errSoft((uint8_t *)"commParseCall: Syntax error at the begin of function call. (missing \"(\")", s);
+    errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
     errSoftSetToken(index, s);
     return 0;
   }

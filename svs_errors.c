@@ -31,10 +31,10 @@ void errSoft(uint8_t *str, svsVM *s) {
   if (errCheck(s)) {
     errSoftPrint(s);
     printf("Another error: %s\n", str);
-    errMsgS("errSoft:Double soft error occured!");
+    errMsgS((uint8_t *)"errSoft:Double soft error occured!");
   } else {
     s->err = 1;
-    s->errString = str;
+    s->errString = (char *) str;
   }
 }
 
@@ -48,7 +48,7 @@ void errSoftSetParam(uint8_t *str, varType val, svsVM *s) {
     s->errDbgStr[s->errDbgUsed] = str;
     s->errDbgUsed++;
   } else {
-    errMsgS("errSoftSetParam: Too many parameters!");
+    errMsgS((uint8_t *)"errSoftSetParam: Too many parameters!");
   }
 }
 

@@ -57,9 +57,13 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
     if(sysExecTypeCheck(argS, argType, 5,s)){
       return 0;
     }
-    printf("Voláná sys test funkce!  arg1=%i arg2=%i arg3=%i arg4=%i arg5=%i \n", argS->
-    arg[1].val_s, argS->arg[2].val_s, argS->arg[3].val_s, argS->arg[4].val_s, argS->arg[5].val_s);
-    result->value.val_s=8;
+    printf("Voláná sys test funkce!  arg1=%i arg2=%i arg3=%i arg4=%i arg5=%i \n",
+    		(int)argS->arg[1].val_s,
+				(int)argS->arg[2].val_s,
+				(int)argS->arg[3].val_s,
+				(int)argS->arg[4].val_s,
+				(int)argS->arg[5].val_s);
+    result->value.val_s = 8;
     return 1;
   }
 
@@ -133,7 +137,7 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
     }
 
     if (argS->arg[1].val_s>SVS_ARRAY_LEN){
-      errSoft("pcBasicsWrap: arrayGet: Out of range!",s);
+      errSoft((uint8_t *)"pcBasicsWrap: arrayGet: Out of range!",s);
       return 1;
     }else{
       result->value=s->varArray[argS->arg[1].val_u+argS->arg[2].val_u];
@@ -154,7 +158,7 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
     }
 
     if (argS->arg[1].val_s>SVS_ARRAY_LEN){
-      errSoft("pcBasicsWrap: arrayGet: Out of range!",s);
+      errSoft((uint8_t *)"pcBasicsWrap: arrayGet: Out of range!",s);
       return 1;
     }else{
       s->varArray[argS->arg[1].val_s+argS->arg[2].val_s]=argS->arg[3];

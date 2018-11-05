@@ -42,7 +42,7 @@ void addSysConsts(svsConstType *consts) {
     sysConsts[sysConstsNum] = consts;
     sysConstsNum++;
   } else {
-    errMsgS("addSysWrapper: Maximum number of syscall const arrays exceeded!");
+    errMsgS((uint8_t *)"addSysWrapper: Maximum number of syscall const arrays exceeded!");
   }
 }
 
@@ -51,7 +51,7 @@ void addSysWrapper(uint8_t (*arg) (varRetVal *result, argStruct *argS, svsVM *s)
     sysWrapper[sysWrapperNum] = arg;
     sysWrapperNum++;
   } else {
-    errMsgS("addSysWrapper: Maximum number of syscall wrappers exceeded!");
+    errMsgS((uint8_t *)"addSysWrapper: Maximum number of syscall wrappers exceeded!");
   }
 }
 
@@ -68,17 +68,17 @@ uint8_t sysExecTypeCheck(argStruct *argS, uint8_t *argType, uint8_t argCnt, svsV
   if (argS->usedup == argCnt) {
     for (x = 1; x <= argCnt; x++) {
       if ((argS->argType[x] != argType[x]) && (argType[x] != 3)) {
-        errSoft("sysExecTypeCheck: Wrong type of argument for SYS function!", s);
+        errSoft((uint8_t *)"sysExecTypeCheck: Wrong type of argument for SYS function!", s);
         errSoftSetParam(s->syscallTable[(uint16_t)(argS->callId.val_u)].sysCallName, (varType)((uint16_t)0), s);
-        errSoftSetParam("Argument number", (varType)((uint16_t)x), s);
+        errSoftSetParam((uint8_t *)"Argument number", (varType)((uint16_t)x), s);
         return 1;
       }
     }
   } else {
-    errSoft("sysExecTypeCheck: Wrong number of arguments for SYS function!", s);
+    errSoft((uint8_t *)"sysExecTypeCheck: Wrong number of arguments for SYS function!", s);
     errSoftSetParam(s->syscallTable[argS->callId.val_u].sysCallName, (varType)((uint16_t)0), s);
-    errSoftSetParam("Expected", (varType)((uint16_t)argCnt), s);
-    errSoftSetParam("Got", (varType)((uint16_t)argS->usedup), s);
+    errSoftSetParam((uint8_t *)"Expected", (varType)((uint16_t)argCnt), s);
+    errSoftSetParam((uint8_t *)"Got", (varType)((uint16_t)argS->usedup), s);
     return 1;
   }
   return 0;
@@ -98,7 +98,6 @@ void sysExec(uint16_t index, varRetVal *result, svsVM *s) {
   argStruct argS;
   uint16_t x;
   uint8_t retval = 0;
-  errStruct err;
 
   argS.callId = getTokenData(index, s);
 
@@ -122,9 +121,9 @@ void sysExec(uint16_t index, varRetVal *result, svsVM *s) {
     // arguments are separated with coma or semicolon(legacy)
     while((getTokenType(index, s) == 9) || (getTokenType(index, s) == 33)) {
       if (x == FUNCTION_ARGS_MAX + 1) {
-        errSoft("sysExec: too many arguments in sys call!", s);
+        errSoft((uint8_t *)"sysExec: too many arguments in sys call!", s);
         errSoftSetParam(s->syscallTable[argS.callId.val_u].sysCallName, (varType)((uint16_t)0), s);
-        errSoftSetParam("TokenId", (varType)index, s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
         errSoftSetToken(index, s);
         return;
       }
@@ -140,9 +139,9 @@ void sysExec(uint16_t index, varRetVal *result, svsVM *s) {
     }
 
     if (getTokenType(index,s) != 6) {
-      errSoft("sysExec: Syntax error at end of sys call. (missing \")\")", s);
+      errSoft((uint8_t *)"sysExec: Syntax error at end of sys call. (missing \")\")", s);
       errSoftSetParam(s->syscallTable[argS.callId.val_u].sysCallName, (varType)((uint16_t)0), s);
-      errSoftSetParam("TokenId", (varType)index, s);
+      errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
       errSoftSetToken(index, s);
       return;
     }
@@ -163,9 +162,9 @@ void sysExec(uint16_t index, varRetVal *result, svsVM *s) {
     // if all wrappers failed
     if (retval == 0) {
       if (errCheck(s) == 0) {
-        errSoft("sysExec: Unknown sys call!", s);
+        errSoft((uint8_t *)"sysExec: Unknown sys call!", s);
         errSoftSetParam(s->syscallTable[argS.callId.val_u].sysCallName, (varType)((uint16_t)0), s);
-        errSoftSetParam("TokenId", (varType)index, s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
         errSoftSetToken(index, s);
         return;
       } else {
@@ -178,9 +177,9 @@ void sysExec(uint16_t index, varRetVal *result, svsVM *s) {
       result->tokenId = index;
     }
   } else {
-    errSoft("sysExec: Syntax error at the begin of sys call. (missing \"(\")", s);
+    errSoft((uint8_t *)"sysExec: Syntax error at the begin of sys call. (missing \"(\")", s);
     errSoftSetParam(s->syscallTable[argS.callId.val_u].sysCallName, (varType)((uint16_t)0), s);
-    errSoftSetParam("TokenId", (varType)index, s);
+    errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
     errSoftSetToken(index, s);
     return;
   }
