@@ -1,0 +1,204 @@
+function main {
+  #This will test all the operators, it depends on num == and != to work
+  FAIL = 0;
+  print("OP Test:");
+  #num: and, or, not, ==, !=, >, <, <=, >=, +, -, *, /, %
+  if (1 == 1) { } else {
+    FAIL = 1;
+    print("== FAIL 1");
+  }
+
+  if (1 == 0) {
+    FAIL = 1;
+    print("== FAIL 2");
+  }
+
+  if (1 != 1) {
+    FAIL = 1;
+    print("== FAIL 1");
+  }
+
+  if (1 != 0) { } else {
+    FAIL = 1;
+    print("== FAIL 2");
+  }
+
+  if ((1 and 1) == 0){
+    FAIL = 1;
+    print("AND FAIL 1");
+  }
+
+  if ((1 and 0) == 1){
+    FAIL = 1;
+    print("AND FAIL 2");
+  }
+
+  if ((1 or 0) == 0){
+    FAIL = 1;
+    print("OR FAIL 1");
+  }
+
+  if ((0 or 0) == 1){
+    FAIL = 1;
+    print("OR FAIL 2");
+  }
+
+  if ((not 1) == 1){
+    FAIL = 1;
+    print("NOT FAIL 1");
+  }
+
+  if ((not 0) == 0){
+    FAIL = 1;
+    print("NOT FAIL 2");
+  }
+
+  if ((2 < 1) or (1 > 2) or (2 <= 1) or (1 >= 2)){
+    FAIL = 1;
+    print("< > <= >= FAIL 1");
+  }
+
+  if (not ((1 < 2) and (1 < 2) and (1 <= 2) and (2 >= 1) and (1 <= 1) and (1 >= 1))) {
+    FAIL = 1;
+    print("< > <= >= FAIL 2");
+  }
+
+  if(1 + 3 != 4) {
+    FAIL = 1;
+    print("+ FAIL 1");
+  }
+
+  if((1 - 3 != (-2)) or (8 - 5 != 3)) {
+    FAIL = 1;
+    print("- FAIL 1");
+  }
+
+  if((1 * 3 != (3)) or (8 * 5 != 40)) {
+    FAIL = 1;
+    print("* FAIL 1");
+  }
+
+  if((15 / 3 != 5) or (15 / 5 != 3)) {
+    FAIL = 1;
+    print("/ FAIL 1");
+  }
+
+  if((15 % 3 != 0) or (82 % 5 != 2)) {
+    FAIL = 1;
+    print("% FAIL 1");
+  }
+
+  if(FAIL == 0) {
+    print("NUM type ops: PASSED");
+  } else {
+    print("NUM type ops: FAIL");
+  }
+
+  #str: ==, !=, +str, +num, +flt
+
+  if ("a" == "b") {
+    FAIL = 1;
+    print("str!=str FAIL");
+  }
+
+  if (("a" != "a") == 1 or ("a" != "b") == 0) {
+    FAIL = 1;
+    print("str!=str FAIL");
+  }
+
+  if (("a" == "a") == 0 or ("a" == "b") == 1) {
+    FAIL = 1;
+    print("str!=str FAIL");
+  }
+
+  if ("a" + 1 != "a1"){
+    FAIL = 1;
+    print("str+num FAIL");
+  }
+
+  if (1 + "a" != "1a"){
+    FAIL = 1;
+    print("num+str FAIL");
+  }
+
+  if ("a" + 1.23 != "a1.23"){
+    FAIL = 1;
+    print("str+flt FAIL");
+  }
+
+  if (1.23 + "a" != "1.23a"){
+    FAIL = 1;
+    print("flt+str FAIL");
+  }
+
+  if(FAIL == 0) {
+    print("STR type ops: PASSED");
+  } else {
+    print("STR type ops: FAIL");
+  }
+
+  #flt: ==, !=, >, <, <=, >=, +, -, *, /
+
+  if (1.123 == 1.123) { } else {
+    FAIL = 1;
+    print("== FAIL 1");
+  }
+
+  if (1.23 == 0.23) {
+    FAIL = 1;
+    print("== FAIL 2");
+  }
+
+  if (1.123 != 1.123) {
+    FAIL = 1;
+    print("== FAIL 1");
+  }
+
+  if (1.123 != 0.23) { } else {
+    FAIL = 1;
+    print("== FAIL 2");
+  }
+
+  if ((2.234 < 1.234) or (1.234 > 2.234) or (2.234 <= 1.234) or (1.234 >= 2.234)) {
+    FAIL = 1;
+    print("< > <= >= FAIL 1");
+  }
+
+  if (not ((1.234 < 2.234) and (1.234 < 2.234) and (1.234 <= 2.234) and (2.234 >= 1.234) and (1.234 <= 1.234) and (1.234 >= 1.234))) {
+    FAIL = 1;
+    print("< > <= >= FAIL 2");
+  }
+
+  if(1.2 + 3.8 != 5.0) {
+    FAIL = 1;
+    print("+ FAIL 1");
+  }
+
+  if((1.2 - 3.2 != (-2.0)) or (8.2 - 5.2 != 3.0)) {
+    FAIL = 1;
+    print("- FAIL 1");
+  }
+
+  if((1.5 * 3.0 != (4.5)) or (8.2 * 5.6 != 45.92)) {
+    FAIL = 1;
+    print("* FAIL 1");
+  }
+
+  if((15.9 / 3.0 != 5.3) or (16.0 / 5.0  != 3.2)) {
+    FAIL = 1;
+    print("/ FAIL 1");
+  }
+
+  if(FAIL == 0) {
+    print("FLT type ops: PASSED");
+  } else {
+    print("FLT type ops: FAIL");
+  }
+  print("");
+  if(FAIL == 0) {
+    print("Final result: PASSED");
+  } else {
+    print("Final result: FAIL");
+  }
+  return FAIL;
+}

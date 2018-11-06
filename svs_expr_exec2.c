@@ -442,13 +442,10 @@ void exprExecLvl2(uint16_t index, varRetVal *result, svsVM *s) {
   exprExecDMSG("ExprExecLvl2 Exit", result->value.val_s, result->tokenId);
 }
 
-// TODO: pokračovat s revizí standardu kódu
-
 //expressionExec
 void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
   //== != <= >= < > --hotovo
   uint16_t tokenId;
-  //uint16_t x;
   varRetVal prac;
   varRetValZero(&prac);
 
@@ -463,328 +460,329 @@ void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
   }
   tokenId = result->tokenId;
 
-  while ((getTokenType(tokenId,s)>=18)&&(getTokenType(tokenId,s)<=23)){
-    if (getTokenType(tokenId,s)==18){ //==
+  while ((getTokenType(tokenId, s) >= SVS_TOKEN_EQUALS) && (getTokenType(tokenId, s) <= 23)) {
+    if (getTokenType(tokenId,s) == SVS_TOKEN_EQUALS) { //==
       tokenId++;
-      exprExecDMSG("ExprExecLvl1: == ",prac.value.val_s,tokenId);
-      exprExecLvl2(tokenId, &prac,s);
-      if (errCheck(s)){
+      exprExecDMSG("ExprExecLvl1: == ", prac.value.val_s, tokenId);
+      exprExecLvl2(tokenId, &prac, s);
+      if (errCheck(s)) {
         return;
       }
-      if (result->type==prac.type){ //typová kontrola
-        if (result->type==0){
-          if (result->value.val_s==prac.value.val_s){ //porovnání dvou čísel
-            result->value.val_s=1;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: == (NUM) TRUE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
-          }else{
-            result->value.val_s=0;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: == (NUM) FALSE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
+      if (result->type == prac.type) { //typová kontrola/type check
+        if (result->type == SVS_TYPE_NUM) {
+          if (result->value.val_s == prac.value.val_s) { //porovnání dvou čísel / comparing num types
+            result->value.val_s = 1;
+            result->type = 0;
+            exprExecDMSG("ExprExecLvl1: == (NUM) TRUE", prac.value.val_s,tokenId);
+            result->tokenId = prac.tokenId;
+          } else {
+            result->value.val_s = 0;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: == (NUM) FALSE", prac.value.val_s,tokenId);
+            result->tokenId = prac.tokenId;
           }
-        }else if (result->type==1){
-          if (strCmp( s->stringField+result->value.val_str , s->stringField+prac.value.val_str)==1){//porovnání dvou stringů
-            result->value.val_s=1;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: == (STR) TRUE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
-          }else{
-            result->value.val_s=0;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: == (STR) FALSE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
+        }else if (result->type == SVS_TYPE_STR) {
+          if (strCmp(s->stringField + result->value.val_str, s->stringField + prac.value.val_str) == 1) {
+            result->value.val_s = 1;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: == (STR) TRUE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
+          } else {
+            result->value.val_s = 0;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: == (STR) FALSE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
           }
-        }else if (result->type==3){
+        }else if (result->type == SVS_TYPE_FLT) {
         #ifdef USE_FLOAT
-          if (result->value.val_f==prac.value.val_f){ //porovnání dvou čísel
-            result->value.val_s=1;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: == (FLT) TRUE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
-          }else{
-            result->value.val_s=0;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: == (FLT) FALSE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
+          if (svsFloatCompare(result->value.val_f, prac.value.val_f)) { //porovnání dvou floatů / comparing float types
+            result->value.val_s = 1;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: == (FLT) TRUE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
+          } else {
+            result->value.val_s = 0;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: == (FLT) FALSE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
           }
         #endif
         }
-      }else{
-        errSoft((uint8_t *)"Can only compare (==) same types!",s);
-        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
-        errSoftSetToken(tokenId,s);
+      } else {
+        errSoft((uint8_t *)"Can only compare (==) same types!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+        errSoftSetToken(tokenId, s);
         return;
       }
-    }else if (getTokenType(tokenId,s)==19){ //!=
+    }else if (getTokenType(tokenId, s) == SVS_TOKEN_NOTEQUALS) { //!=
       tokenId++;
-      exprExecDMSG("ExprExecLvl1: != ",prac.value.val_s,tokenId);
-      exprExecLvl2(tokenId, &prac,s);
-      if (errCheck(s)){
+      exprExecDMSG("ExprExecLvl1: != ", prac.value.val_s, tokenId);
+      exprExecLvl2(tokenId, &prac, s);
+      if (errCheck(s)) {
         return;
       }
-      if (result->type==prac.type){ //typová kontrola
-        if (result->type==0){
-          if (result->value.val_s!=prac.value.val_s){ //porovnání dvou čísel
-            result->value.val_s=1;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: != (NUM) TRUE",prac.value.val_str,tokenId);
-            result->tokenId=prac.tokenId;
-          }else{
-            result->value.val_s=0;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: != (NUM) FALSE",prac.value.val_str,tokenId);
-            result->tokenId=prac.tokenId;
+      if (result->type == prac.type) { //typová kontrola / type check
+        if (result->type == SVS_TYPE_NUM) {
+          if (result->value.val_s != prac.value.val_s) { //porovnání dvou čísel
+            result->value.val_s = 1;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: != (NUM) TRUE", prac.value.val_str, tokenId);
+            result->tokenId = prac.tokenId;
+          } else {
+            result->value.val_s = 0;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: != (NUM) FALSE", prac.value.val_str, tokenId);
+            result->tokenId = prac.tokenId;
           }
-        }else if (result->type==3){
+        }else if (result->type == SVS_TYPE_FLT) {
         #ifdef USE_FLOAT
-          if (result->value.val_f!=prac.value.val_f){ //porovnání dvou floatů
-            result->value.val_s=1;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: != (FLT) TRUE",prac.value.val_str,tokenId);
-            result->tokenId=prac.tokenId;
-          }else{
-            result->value.val_s=0;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: != (FLT) FALSE",prac.value.val_str,tokenId);
-            result->tokenId=prac.tokenId;
+          if (!svsFloatCompare(result->value.val_f, prac.value.val_f)) { //porovnání dvou floatů
+            result->value.val_s = 1;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: != (FLT) TRUE", prac.value.val_str, tokenId);
+            result->tokenId = prac.tokenId;
+          } else {
+            result->value.val_s = 0;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: != (FLT) FALSE", prac.value.val_str, tokenId);
+            result->tokenId = prac.tokenId;
           }
         #endif
-        }else if (result->type==1){
-          if (strCmp( s->stringField+result->value.val_str , s->stringField+prac.value.val_str)!=1){//porovnání dvou stringů
-            result->value.val_s=1;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: != (STR) TRUE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
-          }else{
-            result->value.val_s=0;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: != (STR) FALSE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
+        } else if (result->type == SVS_TYPE_STR) {
+          if (strCmp(s->stringField + result->value.val_str, s->stringField + prac.value.val_str) != 1) {
+            result->value.val_s = 1;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: != (STR) TRUE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
+          } else {
+            result->value.val_s = 0;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: != (STR) FALSE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
           }
         }
-      }else{
-        errSoft((uint8_t *)"Can only compare (!=) same types",s);
-        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
-        errSoftSetToken(tokenId,s);
+      } else {
+        errSoft((uint8_t *)"Can only compare (!=) same types", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+        errSoftSetToken(tokenId, s);
         return;
       }
-    }else if (getTokenType(tokenId,s)==20){ //<
+    }else if (getTokenType(tokenId, s) == SVS_TOKEN_LESS_THAN) { //<
       tokenId++;
-      exprExecDMSG("ExprExecLvl1: < ",prac.value.val_s,tokenId);
-      exprExecLvl2(tokenId, &prac,s);
-      if (errCheck(s)){
+      exprExecDMSG("ExprExecLvl1: < ", prac.value.val_s, tokenId);
+      exprExecLvl2(tokenId, &prac, s);
+      if (errCheck(s)) {
         return;
       }
-      if (result->type==prac.type){ //typová kontrola
-        if (result->type==0){
-          if (result->value.val_s<prac.value.val_s){ //<
-            result->value.val_s=1;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: < (NUM) TRUE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
-          }else{
-            result->value.val_s=0;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: < (NUM) FALSE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
+      if (result->type == prac.type) {
+        if (result->type == SVS_TYPE_NUM) {
+          if (result->value.val_s < prac.value.val_s) { //<
+            result->value.val_s = 1;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: < (NUM) TRUE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
+          } else {
+            result->value.val_s = 0;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: < (NUM) FALSE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
           }
-        }else if (result->type==3){
+        }else if (result->type == SVS_TYPE_FLT) {
         #ifdef USE_FLOAT
-          if (result->value.val_f<prac.value.val_f){ //<
-            result->value.val_s=1;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: < (FLT) TRUE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
-          }else{
-            result->value.val_s=0;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: < (FLT) FALSE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
+          if (result->value.val_f < prac.value.val_f) { //<
+            result->value.val_s = 1;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: < (FLT) TRUE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
+          } else {
+            result->value.val_s = 0;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: < (FLT) FALSE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
           }
         #endif
-        }else{
-          errSoft((uint8_t *)"Can not use < operator on strings!",s);
-          errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
+        } else {
+          errSoft((uint8_t *)"Can not use < operator on strings!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
           errSoftSetToken(tokenId,s);
           return;
         }
-      }else{
-        errSoft((uint8_t *)"Can not compare (<) string and num!",s);
-        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
-        errSoftSetToken(tokenId,s);
+      } else {
+        errSoft((uint8_t *)"Can not compare (<) string and num!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+        errSoftSetToken(tokenId, s);
         return;
       }
-    }else if (getTokenType(tokenId,s)==21){ //>
+    }else if (getTokenType(tokenId, s) == SVS_TOKEN_GREATER_THAN) { //>
       tokenId++;
-      exprExecDMSG("ExprExecLvl1: > ",prac.value.val_s,tokenId);
-      exprExecLvl2(tokenId, &prac,s);
-      if (errCheck(s)){
+      exprExecDMSG("ExprExecLvl1: > ", prac.value.val_s, tokenId);
+      exprExecLvl2(tokenId, &prac, s);
+      if (errCheck(s)) {
         return;
       }
-      if (result->type==prac.type){ //typová kontrola
-        if (result->type==0){
-          if (result->value.val_s>prac.value.val_s){ //<
-            result->value.val_s=1;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: > (NUM) TRUE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
-          }else{
-            result->value.val_s=0;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: > (NUM) FALSE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
+      if (result->type == prac.type) {
+        if (result->type == SVS_TYPE_NUM) {
+          if (result->value.val_s > prac.value.val_s) { //<
+            result->value.val_s = 1;
+            result->type = 0;
+            exprExecDMSG("ExprExecLvl1: > (NUM) TRUE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
+          } else {
+            result->value.val_s = 0;
+            result->type = 0;
+            exprExecDMSG("ExprExecLvl1: > (NUM) FALSE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
           }
-        }else if (result->type==3){
+        }else if (result->type == 3) {
         #ifdef USE_FLOAT
-          if (result->value.val_f>prac.value.val_f){ //<
-            result->value.val_s=1;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: > (FLT) TRUE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
-          }else{
-            result->value.val_s=0;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: > (FLT) FALSE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
+          if (result->value.val_f > prac.value.val_f) { //<
+            result->value.val_s = 1;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: > (FLT) TRUE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
+          } else {
+            result->value.val_s = 0;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: > (FLT) FALSE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
           }
         #endif
-        }else{
-          errSoft((uint8_t *)"Can not use > operator on strings!",s);
-          errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
-          errSoftSetToken(tokenId,s);
+        } else {
+          errSoft((uint8_t *)"Can not use > operator on strings!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+          errSoftSetToken(tokenId, s);
           return;
         }
-      }else{
-        errSoft((uint8_t *)"Can only compare (>) same types",s);
-        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
-        errSoftSetToken(tokenId,s);
+      } else {
+        errSoft((uint8_t *)"Can only compare (>) same types", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+        errSoftSetToken(tokenId, s);
         return;
       }
-    }else if (getTokenType(tokenId,s)==22){ //<=
+//TODO: Pokračovat s CS revizí
+    } else if (getTokenType(tokenId, s) == SVS_TOKEN_LESS_OR_EQ) { //<=
       tokenId++;
-      exprExecDMSG("ExprExecLvl1: <= ",prac.value.val_s,tokenId);
-      exprExecLvl2(tokenId, &prac,s);
-      if (errCheck(s)){
+      exprExecDMSG("ExprExecLvl1: <= ", prac.value.val_s, tokenId);
+      exprExecLvl2(tokenId, &prac, s);
+      if (errCheck(s)) {
         return;
       }
-      if (result->type==prac.type){ //typová kontrola
-        if (result->type==0){
-          if (result->value.val_s<=prac.value.val_s){ //<=
-            result->value.val_s=1;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: <= (NUM) TRUE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
-          }else{
-            result->value.val_s=0;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: <= (NUM) FALSE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
+      if (result->type == prac.type) { //typová kontrola
+        if (result->type == SVS_TYPE_NUM) {
+          if (result->value.val_s <= prac.value.val_s) { //<=
+            result->value.val_s = 1;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: <= (NUM) TRUE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
+          } else {
+            result->value.val_s = 0;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: <= (NUM) FALSE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
           }
-        }else if (result->type==3){
+        } else if (result->type == SVS_TYPE_FLT) {
         #ifdef USE_FLOAT
-          if (result->value.val_f<=prac.value.val_f){ //<=
-            result->value.val_s=1;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: <= (FLT) TRUE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
+          if (result->value.val_f <= prac.value.val_f) { //<=
+            result->value.val_s = 1;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: <= (FLT) TRUE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
           }else{
-            result->value.val_s=0;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: <= (FLT) FALSE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
+            result->value.val_s = 0;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: <= (FLT) FALSE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
           }
         #endif
-        }else{
-          errSoft((uint8_t *)"Can not use <= operator on strings!",s);
-          errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
-          errSoftSetToken(tokenId,s);
+        } else {
+          errSoft((uint8_t *)"Can not use <= operator on strings!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+          errSoftSetToken(tokenId, s);
           return;
         }
-      }else{
-        errSoft((uint8_t *)"Can only compare (<=) same types",s);
-        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
-        errSoftSetToken(tokenId,s);
+      } else {
+        errSoft((uint8_t *)"Can only compare (<=) same types", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+        errSoftSetToken(tokenId, s);
         return;
       }
-    }else if (getTokenType(tokenId,s)==23){ //>=
+    }else if (getTokenType(tokenId, s) == SVS_TOKEN_GREATER_OR_EQ) { //>=
       tokenId++;
-      exprExecDMSG("ExprExecLvl1: >= ",prac.value.val_s,tokenId);
-      exprExecLvl2(tokenId, &prac,s);
-      if (errCheck(s)){
+      exprExecDMSG("ExprExecLvl1: >= ", prac.value.val_s, tokenId);
+      exprExecLvl2(tokenId, &prac, s);
+      if (errCheck(s)) {
         return;
       }
-      if (result->type==prac.type){ //typová kontrola
-        if (result->type==0){
-          if (result->value.val_s>=prac.value.val_s){ //>=
-            result->value.val_s=1;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: >= (NUM) TRUE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
-          }else{
-            result->value.val_s=0;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: >= (NUM) FALSE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
+      if (result->type == prac.type) { //typová kontrola
+        if (result->type == SVS_TYPE_NUM) {
+          if (result->value.val_s >= prac.value.val_s) { //>=
+            result->value.val_s = 1;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: >= (NUM) TRUE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
+          } else {
+            result->value.val_s = 0;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: >= (NUM) FALSE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
           }
-        }else if (result->type==3){
+        }else if (result->type == SVS_TYPE_FLT) {
         #ifdef USE_FLOAT
-          if (result->value.val_f>=prac.value.val_f){ //>=
-            result->value.val_s=1;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: >= (FLT) TRUE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
-          }else{
-            result->value.val_s=0;
-            result->type=0;
-            exprExecDMSG("ExprExecLvl1: >= (FLT) FALSE",prac.value.val_s,tokenId);
-            result->tokenId=prac.tokenId;
+          if (result->value.val_f >= prac.value.val_f) { //>=
+            result->value.val_s = 1;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: >= (FLT) TRUE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
+          } else {
+            result->value.val_s = 0;
+            result->type = SVS_TYPE_NUM;
+            exprExecDMSG("ExprExecLvl1: >= (FLT) FALSE", prac.value.val_s, tokenId);
+            result->tokenId = prac.tokenId;
           }
         #endif
-        }else{
-          errSoft((uint8_t *)"Can not use >= operator on strings!",s);
-          errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
-          errSoftSetToken(tokenId,s);
+        } else {
+          errSoft((uint8_t *)"Can not use >= operator on strings!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+          errSoftSetToken(tokenId, s);
           return;
         }
-      }else{
-        errSoft((uint8_t *)"Can only compare (>=) same types",s);
-        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
-        errSoftSetToken(tokenId,s);
+      } else {
+        errSoft((uint8_t *)"Can only compare (>=) same types", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+        errSoftSetToken(tokenId, s);
         return;
       }
     }
   }
 
-  exprExecDMSG("ExprExecLvl1 Exit",result->value.val_u,result->tokenId);
+  exprExecDMSG("ExprExecLvl1 Exit", result->value.val_u, result->tokenId);
 
   return;
 }
 
-void exprExecLvlLogic(uint16_t index, varRetVal *result, svsVM *s){
+void exprExecLvlLogic(uint16_t index, varRetVal *result, svsVM *s) {
   // AND OR
   varRetVal prac;
   uint16_t tokenId;
 
   varRetValZero(&prac);
 
-  tokenId=index;
-  exprExecDMSG("ExprExecLvlLogic (0) Begin",result->value.val_s,tokenId);
-  exprExecLvl1(tokenId, result,s);
-  if (errCheck(s)){
+  tokenId = index;
+  exprExecDMSG("ExprExecLvlLogic (0) Begin", result->value.val_s, tokenId);
+  exprExecLvl1(tokenId, result, s);
+  if (errCheck(s)) {
     return;
   }
-  tokenId=result->tokenId;
+  tokenId = result->tokenId;
 
-  while ((getTokenType(tokenId,s) == 37) || (getTokenType(tokenId,s) == 38)) {
-    if (getTokenType(tokenId,s) == 37) { // and
-      exprExecDMSG("ExprExecLvlLogic AND operator",result->value.val_s,tokenId);
-      exprExecLvl1(result->tokenId + 1, &prac,s); //získáme druhý operand
-      if (errCheck(s)){
+  while ((getTokenType(tokenId, s) == SVS_TOKEN_AND) || (getTokenType(tokenId, s) == SVS_TOKEN_OR)) {
+    if (getTokenType(tokenId, s) == SVS_TOKEN_AND) { // and
+      exprExecDMSG("ExprExecLvlLogic AND operator", result->value.val_s, tokenId);
+      exprExecLvl1(result->tokenId + 1, &prac, s); //získáme druhý operand
+      if (errCheck(s)) {
         return;
       }
-      if ((result->type == 0) && (prac.type == 0)) { //ověříme typ a pokud je to num, tak
+      if ((result->type == SVS_TYPE_NUM) && (prac.type == SVS_TYPE_NUM)) { //ověříme typ a pokud je to num, tak
         if (result->value.val_s && prac.value.val_s) {
           result->value.val_s = 1;
         } else {
@@ -792,20 +790,20 @@ void exprExecLvlLogic(uint16_t index, varRetVal *result, svsVM *s){
         }
         tokenId = prac.tokenId;  //nastavíme token id co se vrátilo
         result->tokenId = prac.tokenId; //nastavíme znova
-        exprExecDMSG("ExprExecLogic AND: ",result->value.val_s,tokenId);
+        exprExecDMSG("ExprExecLogic AND: ", result->value.val_s, tokenId);
       } else {
-        errSoft((uint8_t *)"Can only use logic operators (AND) on num type!",s);
-        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
-        errSoftSetToken(tokenId,s);
+        errSoft((uint8_t *)"Can only use logic operators (AND) on num type!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+        errSoftSetToken(tokenId, s);
         return;
       }
-    }else  if (getTokenType(tokenId,s) == 38) { // or
-      exprExecDMSG("ExprExecLvlLogic OR operator",result->value.val_s,tokenId);
-      exprExecLvl1(result->tokenId + 1, &prac,s); //získáme druhý operand
-      if (errCheck(s)){
+    }else  if (getTokenType(tokenId,s) == SVS_TOKEN_OR) { // or
+      exprExecDMSG("ExprExecLvlLogic OR operator", result->value.val_s, tokenId);
+      exprExecLvl1(result->tokenId + 1, &prac, s); //získáme druhý operand
+      if (errCheck(s)) {
         return;
       }
-      if ((result->type == 0) && (prac.type == 0)) { //ověříme typ a pokud je to num, tak
+      if ((result->type == SVS_TYPE_NUM) && (prac.type == SVS_TYPE_NUM)) { //ověříme typ a pokud je to num, tak
         if (result->value.val_s || prac.value.val_s) {
           result->value.val_s = 1;
         } else {
@@ -813,17 +811,17 @@ void exprExecLvlLogic(uint16_t index, varRetVal *result, svsVM *s){
         }
         tokenId = prac.tokenId;  //nastavíme token id co se vrátilo
         result->tokenId = prac.tokenId; //nastavíme znova
-        exprExecDMSG("ExprExecLogic OR: ",result->value.val_s,tokenId);
+        exprExecDMSG("ExprExecLogic OR: ", result->value.val_s, tokenId);
       } else {
-        errSoft((uint8_t *)"Can only use logic operators (OR) on num type!",s);
-        errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
-        errSoftSetToken(tokenId,s);
+        errSoft((uint8_t *)"Can only use logic operators (OR) on num type!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+        errSoftSetToken(tokenId, s);
         return;
       }
     }
   }
 
-  exprExecDMSG("ExprExecLvlLogic (0) Exit",result->value.val_s,result->tokenId);
+  exprExecDMSG("ExprExecLvlLogic (0) Exit", result->value.val_s, result->tokenId);
 }
 
 void exprExec(uint16_t index, varRetVal *result, svsVM *s) {
@@ -846,13 +844,24 @@ void exprExec(uint16_t index, varRetVal *result, svsVM *s) {
   s->gcSafePoint = s->stringFieldLen - 1;
   unsecureCommandFlag = unsecureCommand;
 
-  exprExecDMSG("ExprExec Begin", result->value.val_s,tokenId);
+  exprExecDMSG("ExprExec Begin", result->value.val_s, tokenId);
 
   exprExecLvlLogic(tokenId, result, s);
   if (errCheck(s)) {
     return;
   }
   tokenId = result->tokenId;
+
+  // Unsecure command is any command that might introduce more new strings in the memory
+  // than just the result of the expression.
+  // If there is no call, then small garbage collection is done after which the only new string
+  // is the expression result, this is much quicker than full garbage collection.
+  // In industry terms this would be sort of gen 0 garbage collection.
+  // But by design this would also remove strings introduced by functions called inside expression.
+  // So this garbage collection is only triggered if there is no function call in the expression stack.
+
+  // For example x = "abc" + func(); function func{ b = "text"; return "def";}
+  // Without this unsecure command mechanism the string in variable b would be lost.
 
   if (unsecureCommand == 0) {
     if ((strBeginVal < s->stringFieldLen) && (result->type == 1)) {
@@ -868,6 +877,15 @@ void exprExec(uint16_t index, varRetVal *result, svsVM *s) {
       result->value.val_s = strBeginVal;
     }
   }
+
+  // gc safepoint is introduced because of function call,
+	// because garbage collection inside this call might remove
+	// unwanted strings from unfinished expression, unsecure command is flagged and garbage collector
+	// safe point is set.
+
+	// for example: x = "alpha" + 1 + func();
+	// new string "alpha1" would be created before calling func(), garbage collector call inside func
+	// would remove the "alpha1", because there is no referenece to it yet.
 
   s->gcSafePoint = gcSafePointPrev;
 

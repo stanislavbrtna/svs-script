@@ -59,6 +59,10 @@ uint8_t * getRetValStr(svsVM *s);
 float getRetValFlt(svsVM *s);
 float exp_helper(uint16_t a, uint16_t ex);
 
+#ifdef USE_FLOAT
+uint8_t svsFloatCompare(float a, float b);
+#endif
+
 #ifdef LOCAL_VARIABLES_ENABLED
 void varAddLocal(varType Id, svsVM *s);
 #endif

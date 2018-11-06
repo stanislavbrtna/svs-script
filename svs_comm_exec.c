@@ -41,16 +41,16 @@ uint16_t exprSkip(uint16_t index, svsVM *s) {
   uint16_t count = 0;
 
   while(1) {
-    if (getTokenType(x,s) == 5) {
+    if (getTokenType(x, s) == SVS_TOKEN_LBR) {
       count += 1 ;
     }
 
-    if (getTokenType(x,s) == 6) {
+    if (getTokenType(x, s) == SVS_TOKEN_RBR) {
       if (count > 0) {
       count -= 1;
       } else {
-        errSoft((uint8_t *)"commSkip: Bracket sanity error." ,s);
-        errSoftSetParam((uint8_t *)"TokenId", (varType)x ,s);
+        errSoft((uint8_t *)"commSkip: Bracket sanity error.", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)x, s);
         errSoftSetToken(x, s);
         return 0;
       }
@@ -101,11 +101,11 @@ uint16_t commSkip(uint16_t index, svsVM *s) {
   }
 
   while(1) { //začátek bloku
-    if (getTokenType(x,s) == 7) {
+    if (getTokenType(x,s) == SVS_TOKEN_LCBR) {
       count += 1 ;
     }
 
-    if (getTokenType(x ,s) == 8) {
+    if (getTokenType(x ,s) == SVS_TOKEN_RCBR) {
       if (count > 0) {
         count -= 1;
       } else {
@@ -423,7 +423,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 
         currToken++;
 
-        if (getTokenType(currToken, s) != SVS_TOKEN_EQUALS) {
+        if (getTokenType(currToken, s) != SVS_TOKEN_ASSIGN) {
           errSoft((uint8_t *)"commEx: Syntax error, missing =.", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);

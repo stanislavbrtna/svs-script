@@ -332,3 +332,24 @@ float exp_helper(uint16_t a, uint16_t ex) {
   }
   return val;
 }
+
+#ifdef USE_FLOAT
+uint8_t svsFloatCompare(float a, float b) {
+	float diff = 0.000001; //00
+	float tmp;
+
+	tmp = a - b;
+
+	if (tmp < 0) {
+		tmp*=-1.0;
+	}
+	//printf("fltcmp: a:%f b:%f, tmp:%f, diff:%f ", a, b, tmp, diff);
+	if (tmp <= diff) {
+		//printf("EQ\n");
+		return 1;
+	} else {
+		//printf("NOT EQ\n");
+		return 0;
+	}
+}
+#endif
