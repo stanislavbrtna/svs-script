@@ -88,10 +88,11 @@ function main {
     print("% FAIL 1");
   }
 
+  print("NUM type ops: ","");
   if(FAIL == 0) {
-    print("NUM type ops: PASSED");
+    print("PASSED");
   } else {
-    print("NUM type ops: FAIL");
+    print("FAIL");
   }
 
   #str: ==, !=, +str, +num, +flt
@@ -131,10 +132,11 @@ function main {
     print("flt+str FAIL");
   }
 
+  print("STR type ops: ", "");
   if(FAIL == 0) {
-    print("STR type ops: PASSED");
+    print("PASSED");
   } else {
-    print("STR type ops: FAIL");
+    print("FAIL");
   }
 
   #flt: ==, !=, >, <, <=, >=, +, -, *, /
@@ -189,16 +191,18 @@ function main {
     print("/ FAIL 1");
   }
 
+  print("FLT type ops: ", "");
   if(FAIL == 0) {
-    print("FLT type ops: PASSED");
+    print("PASSED");
   } else {
-    print("FLT type ops: FAIL");
+    print("FAIL");
   }
   print("");
+  print("Final result: ", "");
   if(FAIL == 0) {
-    print("Final result: PASSED");
+    print("PASSED");
   } else {
-    print("Final result: FAIL");
+    print("FAIL");
   }
   return FAIL;
 }

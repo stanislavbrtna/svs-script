@@ -101,14 +101,14 @@ Operators of the same priority are executed from left to right. Operations insid
 | float | a = 6.22; <br /> b = 8.5; <br /> c = 0.0; | 32 bit float.* |
 | string | a = "car";  <br /> b = "bed"; | String,<br />maximal length of string is limited by the string memory. |
 
-If you need to use # symbol in a text constant, you need to write it twice (##).
 #### Text constants allows these escape sequences
 |Sequence| Meaning |
 |--|--|
 | \\n | newline |
 | \\\\ | backslash |
 | \\" | double quote |
-| ## | # |
+
+Note: Before SVS version 1.1 pound (#) symbol inside text constant must be written as ##, otherwise rest of line is threated like a comment, bit of a design oversight.
 
 #### Operations across types
 |  | string | num | float |
@@ -177,7 +177,7 @@ Function *getcp(string, position)* returns new string containing only one char t
 Function *substr(string, [num]begin, [num]end)* returns new string containing portion of a given string begining at index *begin* and ending at index *end*, both included. If the position is invalid, then it returns empty string.
 
 #### Print
-Function *print* prints its parameter on standard output. (In SVS versions lower than 0.8 was used similar command *sys print(string)* that used sys wrapper. )
+Function *print* prints its parameter on standard output. Since SVS version 1.1 print support second optional string argument that is used instead of the default newline character at the end of the printed string.
 
 #### Get SVS version
 Since SVS 0.8.8 you can use *[num]ver()* to get current version of SVS. Version is returned as number, for example version 1.0.0 will return 1000, version 1.5.3 will be 1530.

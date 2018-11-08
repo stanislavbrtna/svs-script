@@ -269,13 +269,26 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
 
   // print
   if (callId == PRINT) {
-    if (count != 1) {
+    if (count != 1 && count != 2) {
       simpleError((uint8_t *)"print(): wrong argument count!", s);
       return 0;
     }
 
-    if (argType[1] == 1) {
-      printf("%s\n", (uint8_t *)(s->stringField+args[1].val_str));
+    if ((count == 2) && (argType[2] != SVS_TYPE_STR)) {
+      simpleError((uint8_t *)"print(): wrong type of argument 2!", s);
+      return 0;
+    }
+
+    if (argType[1] == SVS_TYPE_STR) {
+      if (count == 1) {
+        printf("%s\n", (uint8_t *)(s->stringField + args[1].val_str));
+      } else {
+        printf(
+                "%s%s",
+                (uint8_t *)(s->stringField + args[1].val_str),
+                (uint8_t *)(s->stringField + args[2].val_str)
+              );
+      }
       result->value = (varType)((int32_t)0);
       result->type = 0;
       return 1;

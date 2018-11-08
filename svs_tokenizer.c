@@ -24,8 +24,12 @@ SOFTWARE.
 
 // enable tokenizer debug messages
 static uint8_t tokenizerDebug = 0;
+
 static uint8_t tokenizerInit;
 static uint8_t tokenizerFerrFlag;
+static uint8_t tokenizerStringFlag;
+
+static uint8_t prevChar;
 
 //exact debug helpers
 static uint8_t tokenizer_exact_debug;
@@ -49,6 +53,8 @@ uint8_t tokenGetch();
 void tokenizerReset() {
   tokenizerInit = 0;
   tokenizer_exact_debug = 0;
+  tokenizerStringFlag = 0;
+  prevChar = 0;
 }
 
 void token_line_print() {
@@ -151,33 +157,41 @@ uint8_t tokenPreprocessor() {
 
   c = tokenGetchDbg();
 
-  if (c == '#') {
-    c = tokenGetchDbg();
+  //printf("got: %c", c);
+  if (c == '\"' && prevChar!='\\') {
+    tokenizerStringFlag = 1 - tokenizerStringFlag;
+  }
+
+  //printf(" txt = %u ", tokenizerStringFlag);
+  //printf("\n");
+
+  if (!tokenizerStringFlag) {
     if (c == '#') {
-      return c;
-    } else if (c == '*') {
-      // multiline comment
-      while (1) {
-        c = tokenGetchDbg();
-        if (c == '*') {
+      c = tokenGetchDbg();
+      if (c == '*') {
+        // multiline comment
+        while (1) {
           c = tokenGetchDbg();
-          if (c == '#') {
-            return tokenGetchDbg();
+          if (c == '*') {
+            c = tokenGetchDbg();
+            if (c == '#') {
+              c = tokenGetchDbg();
+              break;
+            }
           }
         }
-      }
-    } else {
-      // single line comment
-      while (c != '\n') {
-        c = tokenGetchDbg();
+      } else {
+        // single line comment
+        while (c != '\n') {
+          c = tokenGetchDbg();
+        }
       }
     }
-    //printf("token prep dbg: %c\n", c);
-    return c;
-  } else {
-    //printf("token prep dbg: %c\n", c);
-    return c;
   }
+
+  //printf("token prep dbg: %c\n", c);
+  prevChar = c;
+  return c;
 }
 
 uint8_t tokenInput(uint16_t index, uint8_t inc) {

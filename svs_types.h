@@ -74,7 +74,7 @@ typedef struct {
   uint16_t tokenId;
 } fTableType;
 
-typedef union{
+typedef union {
    int32_t val_s; //signed const
    uint16_t val_str; //variable Id
    uint32_t val_u; //variable Id
