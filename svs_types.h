@@ -31,6 +31,7 @@ SOFTWARE.
 #define SVS_TYPE_FLT 3
 #define SVS_TYPE_ARR 4
 
+#define SVS_TOKEN_VAR 10
 #define SVS_TOKEN_FUNCTION 11
 #define SVS_TOKEN_IF 12
 #define SVS_TOKEN_ELSE 13
@@ -45,8 +46,11 @@ SOFTWARE.
 #define SVS_TOKEN_GREATER_THAN 21
 #define SVS_TOKEN_GREATER_OR_EQ 23
 #define SVS_TOKEN_ASSIGN 24
+#define SVS_TOKEN_AMP 25
 #define SVS_TOKEN_SYS 28
 #define SVS_TOKEN_FOR 34
+#define SVS_TOKEN_LOCAL 32
+#define SVS_TOKEN_ARG 35
 
 #define SVS_TOKEN_ADD 1
 #define SVS_TOKEN_SUBT 2
@@ -57,8 +61,8 @@ SOFTWARE.
 #define SVS_TOKEN_RBR 6
 #define SVS_TOKEN_LCBR 7 // {
 #define SVS_TOKEN_RCBR 8 // }
-#define SVS_TOKEN_SCOL 9
-#define SVS_TOKEN_COL 33
+#define SVS_TOKEN_SCOL 9 // ;
+#define SVS_TOKEN_COL 33 // ,
 
 #define SVS_TOKEN_AND 37
 #define SVS_TOKEN_OR 38
@@ -67,6 +71,8 @@ SOFTWARE.
 #define SVS_TOKEN_ARRAY 40
 #define SVS_TOKEN_LSQB 41 // [
 #define SVS_TOKEN_RSQB 42 // ]
+
+#define SVS_TOKEN_ENDPROG 255
 
 
 typedef struct {

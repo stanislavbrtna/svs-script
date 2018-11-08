@@ -159,13 +159,9 @@ uint8_t tokenPreprocessor() {
 
   c = tokenGetchDbg();
 
-  //printf("got: %c", c);
   if ((c == '\"' && prevChar!='\\') || (prevChar2 == '\\' && prevChar == '\\' && c == '\"')) {
     tokenizerStringFlag = 1 - tokenizerStringFlag;
   }
-
-  //printf(" txt = %u ", tokenizerStringFlag);
-  //printf("\n");
 
   if (!tokenizerStringFlag) {
     if (c == '#') {
@@ -191,7 +187,6 @@ uint8_t tokenPreprocessor() {
     }
   }
 
-  //printf("token prep dbg: %c\n", c);
   prevChar2 = prevChar;
   prevChar = c;
   return c;
@@ -246,6 +241,33 @@ uint8_t tokenInput(uint16_t index, uint8_t inc){
   return c;
 }
 */
+
+uint8_t tokenEofCheck(int16_t brCount1, int16_t  brCount2) {
+  if ((brCount2 == 0) && (brCount1 == 0)) {
+    return 0;
+  } else {
+    if (brCount1 < 0) {
+      tokenizerErrorPrintNL((uint8_t *)"Bracket chceck error! Missing \"(\"");
+      return 1;
+    }
+
+    if (brCount1 > 0) {
+      tokenizerErrorPrintNL((uint8_t *)"Bracket chceck error! Missing \")\"");
+      return 1;
+    }
+
+    if (brCount2 < 0) {
+      tokenizerErrorPrintNL((uint8_t *)"Bracket chceck error! Missing \"{\"");
+      return 1;
+    }
+
+    if (brCount2 > 0) {
+      tokenizerErrorPrintNL((uint8_t *)"Bracket chceck error! Missing \"}\"");
+      return 1;
+    }
+  }
+  return 1;
+}
 
 uint8_t tokenParse(svsVM *s) {
   uint16_t posText = 0;
@@ -609,10 +631,18 @@ uint8_t tokenParse(svsVM *s) {
         tokenInput(0, 1);
         posText++;
         setTokenType(posToken, SVS_TOKEN_EQUALS, s);
-        tokenDMSG("Token set, type ==", posToken,  getTokenData(posToken, s), getTokenType(posToken, s), posText);
+        tokenDMSG("Token set, type ==",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
       } else {
         setTokenType(posToken, SVS_TOKEN_ASSIGN, s);
-        tokenDMSG("Token set, type =", posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
+        tokenDMSG("Token set, type =",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
       }
       tokenInput(0, 1);
       posText++;
@@ -620,14 +650,23 @@ uint8_t tokenParse(svsVM *s) {
     }
 
     if (tokenInput(posText, 0) == '<') { //< a <=
-      if (tokenInput(posText + 1, 0) == '='){
+      if (tokenInput(posText + 1, 0) == '=') {
         tokenInput(0, 1);
         posText++;
         setTokenType(posToken, SVS_TOKEN_LESS_OR_EQ, s);
-        tokenDMSG("Token set, type <=", posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
+        tokenDMSG(
+                  "Token set, type <=",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
       } else {
         setTokenType(posToken, SVS_TOKEN_LESS_THAN, s);
-        tokenDMSG("Token set, type <", posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
+        tokenDMSG("Token set, type <",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
       }
       tokenInput(0, 1);
       posText++;
@@ -639,10 +678,18 @@ uint8_t tokenParse(svsVM *s) {
         posText++;
         tokenInput(0, 1);
         setTokenType(posToken, SVS_TOKEN_GREATER_OR_EQ, s);
-        tokenDMSG("Token set, type >=", posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
+        tokenDMSG("Token set, type >=",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
       } else {
         setTokenType(posToken, SVS_TOKEN_GREATER_THAN, s);
-        tokenDMSG("Token set, type >", posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
+        tokenDMSG("Token set, type >",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
       }
       tokenInput(0, 1);
       posText++;
@@ -651,7 +698,11 @@ uint8_t tokenParse(svsVM *s) {
 
     if (tokenInput(posText, 0) == '!') {
       if (tokenInput(posText + 1, 0) == '='){ //nerovno
-        tokenDMSG("Token set, type !=", posToken, getTokenData(posToken, s),getTokenType(posToken, s), posText);
+        tokenDMSG("Token set, type !=",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
         posText++;
         tokenInput(0, 1);
         setTokenType(posToken, SVS_TOKEN_NOTEQUALS, s);
@@ -665,53 +716,57 @@ uint8_t tokenParse(svsVM *s) {
     }
 
     //txt
-    if (tokenInput(posText,0)=='\"'){
+    if (tokenInput(posText, 0) == '\"') {
       posText++;
-      tokenInput(0,1);
-      setTokenType(posToken,25,s);
-      setTokenData(posToken,(varType)s->stringFieldLen,s);
+      tokenInput(0, 1);
+      setTokenType(posToken, 25, s);
+      setTokenData(posToken, (varType)s->stringFieldLen, s);
 
       //maximální velikost textových konstant, pro garbage collection
-      s->stringConstMax=s->stringFieldLen;
+      s->stringConstMax = s->stringFieldLen;
       //není použito unifikované funkce, protože tady by stejnak garbage
       //collcector nepomohl
 
-      while((tokenInput(posText,0)!='\"')&&(tokenInput(posText,0)!=0)){
-        if (s->stringFieldLen>=(STRING_FIELD_L-1)){
+      while((tokenInput(posText, 0) != '\"') && (tokenInput(posText, 0) != 0)) {
+        if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
           tokenizerErrorPrint((uint8_t *)"Tokenizer: String field full!");
           return 1;
-          //err.errString=;
-          //err.tokenId=posToken;
-          //errMsg(err);
         }
-        if(tokenInput(posText,0)!='\\'){
-          s->stringField[s->stringFieldLen]=tokenInput(posText,0);
-        }else{
-          esc_c_prac=tokenInput(posText+1,0);
-          if(esc_c_prac=='n'){
-            s->stringField[s->stringFieldLen]='\n'; // \n
-          }else if(esc_c_prac=='\\'){
-            s->stringField[s->stringFieldLen]='\\'; //
-          }else if(esc_c_prac=='\"'){
-            s->stringField[s->stringFieldLen]='\"'; // "
-          }else{
-            //errSoft("tokenParse:Undefined character after \"\\\"",s);
+        if(tokenInput(posText, 0) != '\\') {
+          s->stringField[s->stringFieldLen] = tokenInput(posText, 0);
+        } else {
+          esc_c_prac = tokenInput(posText + 1, 0);
+          if (esc_c_prac == 'n') {
+            s->stringField[s->stringFieldLen] = '\n';
+          } else if(esc_c_prac == '\\') {
+            s->stringField[s->stringFieldLen] = '\\';
+          } else if(esc_c_prac=='\"') {
+            s->stringField[s->stringFieldLen] = '\"';
+          } else {
             tokenizerErrorPrint((uint8_t *)"tokenParse:Undefined character after \"\\\"");
             return 1;
           }
           posText++;
-          tokenInput(0,1);
+          tokenInput(0, 1);
         }
         posText++;
-        tokenInput(0,1);
+        tokenInput(0, 1);
         s->stringFieldLen++;
       }
-      s->stringField[s->stringFieldLen]=0;
+      s->stringField[s->stringFieldLen] = 0;
       s->stringFieldLen++; //míří vždy na první volné místo
       posText++;
-      tokenInput(0,1);
-      tokenDMSG("Token set, type STR, value:", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-      tokenDMSG((char *)s->stringField+getTokenData(posToken,s).val_str,posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
+      tokenInput(0, 1);
+      tokenDMSG("Token set, type STR, value:",
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken, s),
+                posText);
+      tokenDMSG((char *)s->stringField + getTokenData(posToken,  s).val_str,
+                posToken,
+                getTokenData(posToken, s),
+                getTokenType(posToken, s),
+                posText);
       posToken++;
     }
 
@@ -720,22 +775,22 @@ uint8_t tokenParse(svsVM *s) {
       posText++;
       tokenInput(0, 1);
 
-      setTokenType(posToken,25,s);
+      setTokenType(posToken, SVS_TOKEN_AMP, s);
 
       setTokenData(posToken, (varType)s->stringFieldLen, s);
 
       //maximální velikost textových konstant, pro garbage collection
       s->stringConstMax = s->stringFieldLen;
 
-      while((isRegChar(tokenInput(posText,0)) || isNumber(tokenInput(posText,0))) && (tokenInput(posText,0)!=0)) {
-        if (s->stringFieldLen >= (STRING_FIELD_L-1)) {
+      while((isRegChar(tokenInput(posText, 0)) || isNumber(tokenInput(posText, 0))) && (tokenInput(posText, 0) != 0)) {
+        if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
           tokenizerErrorPrint((uint8_t *)"Tokenizer: String field full!");
           return 1;
         }
 
-        s->stringField[s->stringFieldLen] = tokenInput(posText,0);
+        s->stringField[s->stringFieldLen] = tokenInput(posText, 0);
         posText++;
-        tokenInput(0,1);
+        tokenInput(0, 1);
         s->stringFieldLen++;
       }
       s->stringField[s->stringFieldLen] = 0;
@@ -758,27 +813,27 @@ uint8_t tokenParse(svsVM *s) {
     }
 
     // analizace textu
-    if (isRegChar(tokenInput(posText,0))){
+    if (isRegChar(tokenInput(posText, 0))) {
       // A-Z || a-z || _
-      pracStrInd=0;
+      pracStrInd = 0;
       // načtení slova do prac name
-      pracName[pracStrInd]=tokenInput(posText,0);
+      pracName[pracStrInd] = tokenInput(posText, 0);
       posText++;
-      tokenInput(0,1);
+      tokenInput(0, 1);
       pracStrInd++;
-      while(1){
-        if (pracStrInd<NAME_LENGTH){
-          if (isRegChar(tokenInput(posText,0))||isNumber(tokenInput(posText,0))){
-            pracName[pracStrInd]=tokenInput(posText,0);
-          }else{
+      while(1) {
+        if (pracStrInd < NAME_LENGTH) {
+          if (isRegChar(tokenInput(posText, 0)) || isNumber(tokenInput(posText, 0))) {
+            pracName[pracStrInd] = tokenInput(posText, 0);
+          } else {
             break;
           }
           posText++;
-          tokenInput(0,1);
+          tokenInput(0, 1);
           pracStrInd++;
-          pracName[pracStrInd]=0;
-        }else{
-          pracName[NAME_LENGTH-1]=0;
+          pracName[pracStrInd] = 0;
+        } else {
+          pracName[NAME_LENGTH - 1] = 0;
           tokenizerErrorPrint((uint8_t *)"tokenParse: Symbol name too long!");
           return 1;
         }
@@ -796,93 +851,101 @@ uint8_t tokenParse(svsVM *s) {
       10 - var
       */
 
+      if (strCmp(pracName, (uint8_t *)"end")) {
+        setTokenType(posToken, SVS_TOKEN_ENDPROG, s);
+        tokenDMSG("Token set, type EOF/END",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        printf("Tokenizer Done, %u of %u tokens used.\n", s->tokenMax, getTokenMax(s));
 
-      if (strCmp(pracName, (uint8_t *)"end")){
-        //tokenType[posToken]=255;
-        setTokenType(posToken, 255,s);
-        tokenDMSG("Token set, type EOF/END", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        printf("Tokenizer Done, %u of %u tokens used.\n",s->tokenMax, getTokenMax(s) );
-
-        //pozor, tuten kód je ještě jednou dole, když tokenizer narazí na eof namísto endu
-        if((brCount2==0) && (brCount1==0)){
+        if (tokenEofCheck(brCount1, brCount2)) {
+          return 1;
+        } else {
           return 0;
-        }else{
-          if (brCount1<0){
-            tokenizerErrorPrintNL((uint8_t *)"Bracket chceck error! Missing \"(\"");
-            return 1;
-          }
-
-          if (brCount1>0){
-            tokenizerErrorPrintNL((uint8_t *)"Bracket chceck error! Missing \")\"");
-            return 1;
-          }
-
-          if (brCount2<0){
-            tokenizerErrorPrintNL((uint8_t *)"Bracket chceck error! Missing \"{\"");
-            return 1;
-          }
-
-          if (brCount2>0){
-            tokenizerErrorPrintNL((uint8_t *)"Bracket chceck error! Missing \"}\"");
-            return 1;
-          }
         }
 
       }
-      if (strCmp(pracName, (uint8_t *)"if")){
-        tokenDMSG("Token set, type IF", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        //tokenType[posToken]=12;
-        setTokenType(posToken, 12,s);
-        Lock=0;
+      if (strCmp(pracName, (uint8_t *)"if")) {
+        tokenDMSG("Token set, type IF",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        setTokenType(posToken, SVS_TOKEN_IF, s);
+        Lock = 0;
       }
-      if (strCmp(pracName, (uint8_t *)"else")){
-        tokenDMSG("Token set, type ELSE", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        //tokenType[posToken]=13;
-        setTokenType(posToken, 13,s);
-        Lock=0;
+      if (strCmp(pracName, (uint8_t *)"else")) {
+        tokenDMSG("Token set, type ELSE",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        setTokenType(posToken, SVS_TOKEN_ELSE, s);
+        Lock = 0;
       }
-      if (strCmp(pracName, (uint8_t *)"while")){
-        tokenDMSG("Token set, type WHILE", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        //tokenType[posToken]=14;
-        setTokenType(posToken, 14,s);
-        Lock=0;
+      if (strCmp(pracName, (uint8_t *)"while")) {
+        tokenDMSG("Token set, type WHILE",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        setTokenType(posToken, SVS_TOKEN_WHILE, s);
+        Lock = 0;
       }
-      if (strCmp(pracName, (uint8_t *)"break")){
-        tokenDMSG("Token set, type BREAK", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        //tokenType[posToken]=15;
-        setTokenType(posToken, 15,s);
-        Lock=0;
+      if (strCmp(pracName, (uint8_t *)"break")) {
+        tokenDMSG("Token set, type BREAK",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        setTokenType(posToken, SVS_TOKEN_BREAK, s);
+        Lock = 0;
       }
-      if (strCmp(pracName, (uint8_t *)"return")){
-        tokenDMSG("Token set, type RETURN", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        //tokenType[posToken]=16;
-        setTokenType(posToken, 16,s);
-        //tokenData[posToken]=0;
-        setTokenData(posToken, (varType)((uint16_t)0),s);
-        Lock=0;
-      }
-
-      if (strCmp(pracName, (uint8_t *)"local")){
-        tokenDMSG("Token set, type LOCAL", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        //tokenType[posToken]=16;
-        setTokenType(posToken, 32,s);
-        //tokenData[posToken]=0;
-        setTokenData(posToken, (varType)((uint16_t)0),s);
-        Lock=0;
-      }
-
-      if (strCmp(pracName, (uint8_t *)"for")){
-        tokenDMSG("Token set, type FOR", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, 34,s);
-        setTokenData(posToken, (varType)((uint16_t)0),s);
-        Lock=0;
+      if (strCmp(pracName, (uint8_t *)"return")) {
+        tokenDMSG("Token set, type RETURN",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        setTokenType(posToken, SVS_TOKEN_RETURN, s);
+        setTokenData(posToken, (varType)((uint16_t)0), s);
+        Lock = 0;
       }
 
-      if (strCmp(pracName, (uint8_t *)"arg0")){
-        tokenDMSG("Token set, type ARG - id=0", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, 35,s);
-        setTokenData(posToken, (varType)((uint16_t)0),s);
-        Lock=0;
+      if (strCmp(pracName, (uint8_t *)"local")) {
+        tokenDMSG("Token set, type LOCAL",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        setTokenType(posToken, SVS_TOKEN_LOCAL, s);
+        setTokenData(posToken, (varType)((uint16_t)0), s);
+        Lock = 0;
+      }
+
+      if (strCmp(pracName, (uint8_t *)"for")) {
+        tokenDMSG("Token set, type FOR",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        setTokenType(posToken, SVS_TOKEN_FOR, s);
+        setTokenData(posToken, (varType)((uint16_t)0), s);
+        Lock = 0;
+      }
+
+      //TODO: parse args in some sort of loop
+      if (strCmp(pracName, (uint8_t *)"arg0")) {
+        tokenDMSG("Token set, type ARG - id=0",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        setTokenType(posToken, SVS_TOKEN_ARG, s);
+        setTokenData(posToken, (varType)((uint16_t)0), s);
+        Lock = 0;
       }
 
       if (strCmp(pracName, (uint8_t *)"arg1")){
@@ -949,86 +1012,103 @@ uint8_t tokenParse(svsVM *s) {
       }
 
       if (strCmp(pracName, (uint8_t *)"and")){
-        tokenDMSG("Token set, type AND", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, SVS_TOKEN_AND,s);
-        setTokenData(posToken, (varType)((uint16_t)9),s);
-        Lock=0;
-      }
-
-      if (strCmp(pracName, (uint8_t *)"or")){
-        tokenDMSG("Token set, type OR", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, SVS_TOKEN_OR,s);
-        setTokenData(posToken, (varType)((uint16_t)9),s);
-        Lock=0;
-      }
-
-      if (strCmp(pracName, (uint8_t *)"not")){
-        tokenDMSG("Token set, type NOT", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, SVS_TOKEN_NOT,s);
+        tokenDMSG("Token set, type AND",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        setTokenType(posToken, SVS_TOKEN_AND, s);
+        setTokenData(posToken, (varType)((uint16_t)9), s);
         Lock = 0;
       }
 
+      if (strCmp(pracName, (uint8_t *)"or")) {
+        tokenDMSG("Token set, type OR",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        setTokenType(posToken, SVS_TOKEN_OR, s);
+        setTokenData(posToken, (varType)((uint16_t)9), s);
+        Lock = 0;
+      }
 
-      if (strCmp(pracName, (uint8_t *)"array")){
-        tokenDMSG("Token set, type ARRAY", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, SVS_TOKEN_ARRAY,s);
+      if (strCmp(pracName, (uint8_t *)"not")) {
+        tokenDMSG("Token set, type NOT",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        setTokenType(posToken, SVS_TOKEN_NOT, s);
+        Lock = 0;
+      }
+
+      if (strCmp(pracName, (uint8_t *)"array")) {
+        tokenDMSG("Token set, type ARRAY",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        setTokenType(posToken, SVS_TOKEN_ARRAY, s);
         Lock = 0;
       }
 
       //check for constants
-      for(x=0;(x<sysConstsNum)&&(Lock==1);x++){
-        uint16_t y=0;
-        while ((strCmp((uint8_t *)"end", (uint8_t *)(sysConsts[x])[y].name)!=1)&&(Lock==1)){
-          if(strCmp(pracName, (uint8_t *)(sysConsts[x])[y].name)){
-            tokenDMSG("Token set, type SYS CONSTANT", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-            setTokenType(posToken, 0,s);
-            setTokenData(posToken, (varType)((sysConsts[x])[y].value),s);
-            Lock=0;
+      for(x = 0; (x < sysConstsNum) && (Lock == 1); x++) {
+        uint16_t y = 0;
+        while ((strCmp((uint8_t *)"end", (uint8_t *)(sysConsts[x])[y].name) != 1) && (Lock == 1)) {
+          if(strCmp(pracName, (uint8_t *)(sysConsts[x])[y].name)) {
+            tokenDMSG("Token set, type SYS CONSTANT",
+                      posToken,
+                      getTokenData(posToken, s),
+                      getTokenType(posToken, s),
+                      posText);
+            setTokenType(posToken, 0, s);
+            setTokenData(posToken, (varType)((sysConsts[x])[y].value), s);
+            Lock = 0;
           }
           y++;
         }
       }
 
       //end of constants check
-      if (strCmp(pracName, (uint8_t *)"sys")){
-        //tokenType[posToken]=28;
-        setTokenType(posToken, 28,s);
-        setTokenData(posToken, (varType)((uint16_t)0),s);
-
-        Lock=0;
+      if (strCmp(pracName, (uint8_t *)"sys")) {
+        setTokenType(posToken, SVS_TOKEN_SYS, s);
+        setTokenData(posToken, (varType)((uint16_t)0), s);
+        Lock = 0;
 
         //získání názvu interní funkce:
         //filtrace bordelu
-        while(1){
-          if (isRegChar(tokenInput(posText,0))){
+        while(1) {
+          if (isRegChar(tokenInput(posText, 0))) {
             break;
-          }else{
-            if (tokenInput(posText,0)!=' '){
+          } else {
+            if (tokenInput(posText, 0) != ' ') {
               tokenizerErrorPrint((uint8_t *)"tokenParse: Undefined symbol after sys statement!");
               return 1;
             }
           }
           posText++;
-          tokenInput(0,1);
+          tokenInput(0, 1);
         }
         //získání názvu interní funkce
-        pracStrInd=0;
-        pracName2[pracStrInd]=tokenInput(posText,0);
+        pracStrInd = 0;
+        pracName2[pracStrInd] = tokenInput(posText, 0);
         posText++;
-        tokenInput(0,1);
+        tokenInput(0, 1);
         pracStrInd++;
-        while(1){
-          if (pracStrInd<NAME_LENGTH){
-            if (isRegChar(tokenInput(posText,0))||isNumber(tokenInput(posText,0))){
-              pracName2[pracStrInd]=tokenInput(posText,0);
-            }else{
+        while(1) {
+          if (pracStrInd < NAME_LENGTH) {
+            if (isRegChar(tokenInput(posText, 0)) || isNumber(tokenInput(posText, 0))) {
+              pracName2[pracStrInd] = tokenInput(posText, 0);
+            } else {
               break;
             }
             posText++;
-            tokenInput(0,1);
+            tokenInput(0, 1);
             pracStrInd++;
-          }else{
-            pracName2[NAME_LENGTH-1]=0;
+          } else {
+            pracName2[NAME_LENGTH - 1] = 0;
             tokenizerErrorPrint((uint8_t *)"tokenParse: internal function name too long!");
             return 1;
           }
@@ -1037,139 +1117,167 @@ uint8_t tokenParse(svsVM *s) {
         // Zde se dosazují indexy interních funkcí z pole sys name list
         // končícího end
 
-        if (syscallExists(pracName2, s)){ //pokud už máme syscall zarezervovaný
+        if (syscallExists(pracName2, s)) { //pokud už máme syscall zarezervovaný
           setTokenData(posToken, (varType)((uint16_t)syscallGetId(pracName2, s)) ,s); //šoupnem ID do dat
-          tokenDMSG("Token set, type existing SYSCALL", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        }else{
-            //přidáme syscall
-            if(s->syscallTableLen<SYSCALL_TABLE_L){
-
+          tokenDMSG("Token set, type existing SYSCALL",
+                    posToken,
+                    getTokenData(posToken, s),
+                    getTokenType(posToken, s),
+                    posText);
+        } else {
+          //přidáme syscall
+          if(s->syscallTableLen < SYSCALL_TABLE_L) {
             s->syscallTableLen++;
-            for (x=0;x<NAME_LENGTH;x++){
-              s->syscallTable[s->syscallTableLen].sysCallName[x]=pracName2[x];
+            for (x = 0; x < NAME_LENGTH; x++) {
+              s->syscallTable[s->syscallTableLen].sysCallName[x] = pracName2[x];
             }
-            setTokenData(posToken,(varType) s->syscallTableLen ,s);
+            setTokenData(posToken, (varType) s->syscallTableLen, s);
             //printf("syscall id: %u, name: %s \n",s->syscallTableLen,s->syscallTable[s->syscallTableLen].sysCallName );
-            tokenDMSG("Token set, type new SYSCALL", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-          }else{
+            tokenDMSG("Token set, type new SYSCALL",
+                      posToken,
+                      getTokenData(posToken, s),
+                      getTokenType(posToken, s),
+                      posText);
+          } else {
             tokenizerErrorPrint((uint8_t *)"tokenParse: Too many SYS calls in one file!");
             return 1;
           }
         }
-        /*
-        x=0;
-        while((strCmp(sysNameList[x], "end")!=1)){
-          if (strCmp(sysNameList[x], pracName2)){
-            tokenData[posToken]=x;
-            tokenDMSG("Token set, type SYS, function:", posToken, tokenData[posToken],tokenType[posToken], posText);
-            tokenDMSG(sysNameList[x], posToken, tokenData[posToken],tokenType[posToken], posText);
-          }
-          x++;
-        }*/
-
-
       }
 
       //definice funkce: kontrola funkční lookup table -> přidání názvu a tokenu do funkční lookup table
-      if (strCmp(pracName, (uint8_t *)"function")){
-        //tokenType[posToken]=11;
-        setTokenType(posToken, 11,s);
-        tokenDMSG("Token set, type FUNCTION, name:", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        Lock=0;
+      if (strCmp(pracName, (uint8_t *)"function")) {
+        setTokenType(posToken, SVS_TOKEN_FUNCTION, s);
+        tokenDMSG("Token set, type FUNCTION, name:",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        Lock = 0;
         //získání názvu funkce:
         //filtrace bordelu
-        while(1){
-          if (isRegChar(tokenInput(posText,0))){
+        while(1) {
+          if (isRegChar(tokenInput(posText, 0))) {
             break;
-          }else{
-            if (tokenInput(posText,0)!=' '){
+          } else {
+            if (tokenInput(posText, 0) != ' ') {
               tokenizerErrorPrint((uint8_t *)"tokenParse: Undefined symbol after function statement!");
               return 1;
             }
           }
           posText++;
-          tokenInput(0,1);
+          tokenInput(0, 1);
         }
         //získání názvu funkce
-        pracStrInd=0;
-        pracName2[pracStrInd]=tokenInput(posText,0);
+        pracStrInd = 0;
+        pracName2[pracStrInd] = tokenInput(posText, 0);
         posText++;
-        tokenInput(0,1);
+        tokenInput(0, 1);
         pracStrInd++;
-        while(1){
-          if (pracStrInd<NAME_LENGTH){
-            if (isRegChar(tokenInput(posText,0))||isNumber(tokenInput(posText,0))){
-              pracName2[pracStrInd]=tokenInput(posText,0);
-            }else{
+        while(1) {
+          if (pracStrInd < NAME_LENGTH) {
+            if (isRegChar(tokenInput(posText, 0)) || isNumber(tokenInput(posText, 0))) {
+              pracName2[pracStrInd] = tokenInput(posText, 0);
+            } else {
               break;
             }
             posText++;
-            tokenInput(0,1);
+            tokenInput(0, 1);
             pracStrInd++;
-          }else{
-            pracName2[NAME_LENGTH-1]=0;
+          } else {
+            pracName2[NAME_LENGTH - 1] = 0;
             tokenizerErrorPrint((uint8_t *)"tokenParse: function name too long!");
             return 1;
           }
         }
         //název funkce máme v pracName2, zkotrolujem function lookup table
-        if (functionExists(pracName2, s)){
+        if (functionExists(pracName2, s)) {
           tokenizerErrorPrint((uint8_t *)"Error: multiple definitions of function!");
           return 1;
-        }else{
+        } else {
           //přidáme funkci
-          if (s->funcTableLen<FUNCTION_TABLE_L){
+          if (s->funcTableLen<FUNCTION_TABLE_L) {
             s->funcTableLen++;
-            s->funcTable[s->funcTableLen].tokenId=posToken+1; //aby to mířilo rovnou na začátek fce
-            for (x=0;x<NAME_LENGTH;x++){
-              s->funcTable[s->funcTableLen].fString[x]=pracName2[x];
+            s->funcTable[s->funcTableLen].tokenId = posToken + 1; //aby to mířilo rovnou na začátek fce
+            for (x = 0; x < NAME_LENGTH; x++) {
+              s->funcTable[s->funcTableLen].fString[x] = pracName2[x];
             }
-          }else{
+          } else {
             tokenizerErrorPrint((uint8_t *)"Error: too many functions!");
             return 1;
           }
         }
-        tokenDMSG((char *)s->funcTable[s->funcTableLen].fString, posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
+        tokenDMSG((char *)s->funcTable[s->funcTableLen].fString,
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
       }
 
-      if (Lock){
-      //v prac name máme potencionální volání nebo identifikátor promněné
-      // nejprva filtrujeme bordel
-      //filtrace bordelu
-        while(1){
-          if (isRegChar(tokenInput(posText,0))||(tokenInput(posText,0)==0)||(tokenInput(posText,0)=='(')||(tokenInput(posText,0)=='=')||(tokenInput(posText,0)=='<')||(tokenInput(posText,0)=='>')
-          ||(tokenInput(posText,0)==';')||(tokenInput(posText,0)==',')||(tokenInput(posText,0)=='+')||(tokenInput(posText,0)=='-')||(tokenInput(posText,0)=='*')||(tokenInput(posText,0)=='/')||(tokenInput(posText,0)=='!')||(tokenInput(posText,0)==')')||(tokenInput(posText,0)=='%')||(tokenInput(posText,0)=='\n')||(tokenInput(posText,0)=='[')
-          ||(tokenInput(posText,0)==']')){
+      if (Lock) {
+        // variable statement can be folowed with only these symbols
+        // there was attempt to do some sort of syntax check on tokenizer level
+        // but the outcome was only this.
+        while(1) {
+          if (isRegChar(tokenInput(posText, 0))
+              || (tokenInput(posText, 0) == 0)
+              || (tokenInput(posText, 0) == '(')
+              || (tokenInput(posText, 0) == '=')
+              || (tokenInput(posText, 0) == '<')
+              || (tokenInput(posText, 0) == '>')
+              || (tokenInput(posText, 0) == ';')
+              || (tokenInput(posText, 0) == ',')
+              || (tokenInput(posText, 0) == '+')
+              || (tokenInput(posText, 0) == '-')
+              || (tokenInput(posText, 0) == '*')
+              || (tokenInput(posText, 0) == '/')
+              || (tokenInput(posText, 0) == '!')
+              || (tokenInput(posText, 0) == ')')
+              || (tokenInput(posText, 0) == '%')
+              || (tokenInput(posText, 0) == '\n')
+              || (tokenInput(posText, 0) == '[')
+              || (tokenInput(posText, 0) == ']')){
             break;
-          }else{
-            if (tokenInput(posText,0)!=' '){
+          } else {
+            if (tokenInput(posText, 0) != ' ') {
               //printf("symbol: %u (%c):", tokenInput(posText,0), tokenInput(posText,0));
               tokenizerErrorPrint((uint8_t *)"tokenParse: Undefined symbol after variable statement!");
               return 1;
             }
           }
           posText++;
-          tokenInput(0,1);
+          tokenInput(0, 1);
         }
-        if (tokenInput(posText,0)!='('){ //pokud nejde o volání fce
-          if (varExists(pracName, s)){ //jedná se o existující promněnou
-            //tokenType[posToken]=10; //nastavíme typ
-            setTokenType(posToken, 10,s);
+        if (tokenInput(posText, 0) != '(') { //pokud nejde o volání fce
+          if (varExists(pracName, s)) { //jedná se o existující promněnou
+            setTokenType(posToken, 10, s);
             //tokenData[posToken]=varGetId(pracName); //nastavíme id
             setTokenData(posToken, varGetId(pracName, s),s);
             tokenDMSG("Token set, type VAR, name:", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
             tokenDMSG((char *)pracName, posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
           }else{
             s->varTableLen++;
-            setTokenType(posToken, 10,s); //nastavíme typ
-            setTokenData(posToken,(varType) s->varTableLen,s);
-            s->varTable[s->varTableLen].type=0;
-            for (x=0;x<NAME_LENGTH;x++){
-              s->varTable[s->varTableLen].name[x]=pracName[x];
+            setTokenType(posToken, SVS_TOKEN_VAR, s); //nastavíme typ
+            setTokenData(posToken, (varType) s->varTableLen, s);
+            s->varTable[s->varTableLen].type = 0;
+            for (x = 0; x < NAME_LENGTH; x++) {
+              s->varTable[s->varTableLen].name[x] = pracName[x];
             }
-            tokenDMSG("New variable found!", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-            tokenDMSG("Token set, type VAR, name:", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-            tokenDMSG((char *)pracName, posToken, getTokenData(posToken, s), getTokenType(posToken, s), posText);
+            tokenDMSG("New variable found!",
+                      posToken,
+                      getTokenData(posToken, s),
+                      getTokenType(posToken, s),
+                      posText);
+            tokenDMSG("Token set, type VAR, name:",
+                      posToken,
+                      getTokenData(posToken, s),
+                      getTokenType(posToken, s),
+                      posText);
+            tokenDMSG((char *)pracName,
+                      posToken,
+                      getTokenData(posToken, s),
+                      getTokenType(posToken, s),
+                      posText);
           }
         } else {
             // if it is built-in function call and function with that name is not registered
@@ -1177,16 +1285,16 @@ uint8_t tokenParse(svsVM *s) {
             if (getBuiltInCallId(pracName) && !(functionExists(pracName, s))) {
               setTokenType(posToken, 36, s);
               setTokenData(posToken, (varType)getBuiltInCallId(pracName), s);
-              tokenDMSG("Token set, type BUILT-IN CALL, function name:", \
-                          posToken, getTokenData(posToken, s), \
-                          getTokenType(posToken, s), \
-                          posText \
+              tokenDMSG("Token set, type BUILT-IN CALL, function name:",
+                          posToken, getTokenData(posToken, s),
+                          getTokenType(posToken, s),
+                          posText
                         );
-              tokenDMSG((char *)pracName, \
-                          posToken, \
-                          getTokenData(posToken,s), \
-                          getTokenType(posToken,s), \
-                          posText \
+              tokenDMSG((char *)pracName,
+                          posToken,
+                          getTokenData(posToken,s),
+                          getTokenType(posToken,s),
+                          posText
                         );
             } else {
               setTokenType(posToken, 17, s);
@@ -1196,16 +1304,16 @@ uint8_t tokenParse(svsVM *s) {
                 return 1;
               }
               tokenDMSG("Token set, type CALL, function name:",
-                          posToken, \
-                          getTokenData(posToken,s), \
-                          getTokenType(posToken,s), \
-                          posText \
+                          posToken,
+                          getTokenData(posToken,s),
+                          getTokenType(posToken,s),
+                          posText
                         );
               tokenDMSG((char *)s->stringField + getTokenData(posToken, s).val_str,
-                          posToken, \
-                          getTokenData(posToken, s), \
-                          getTokenType(posToken, s), \
-                          posText \
+                          posToken,
+                          getTokenData(posToken, s),
+                          getTokenType(posToken, s),
+                          posText
                         );
             }
 
@@ -1216,7 +1324,7 @@ uint8_t tokenParse(svsVM *s) {
 
     //eof
     if (tokenInput(posText,0) == 0) {
-      setTokenType(posToken, 255, s);
+      setTokenType(posToken, SVS_TOKEN_ENDPROG, s);
       tokenDMSG("Token set, type EOF/END", \
                   posToken, \
                   getTokenData(posToken,s), \
@@ -1224,33 +1332,15 @@ uint8_t tokenParse(svsVM *s) {
                   posText \
                 );
       printf("Tokenizer Done, %u of %u tokens used.\n",s->tokenMax, getTokenMax(s) );
-      if((brCount2 == 0) && (brCount1 == 0)) {
-          return 0;
-        } else {
-          if (brCount1 < 0) {
-            tokenizerErrorPrintNL((uint8_t *)"tokenParse: Bracket chceck error! Missing \"(\"");
-            return 1;
-          }
-
-          if (brCount1 > 0) {
-            tokenizerErrorPrintNL((uint8_t *)"tokenParse: Bracket chceck error! Missing \")\"");
-            return 1;
-          }
-
-          if (brCount2 < 0) {
-            tokenizerErrorPrintNL((uint8_t *)"tokenParse: Bracket chceck error! Missing \"{\"");
-            return 1;
-          }
-
-          if (brCount2 > 0) {
-            tokenizerErrorPrintNL((uint8_t *)"tokenParse: Bracket chceck error! Missing \"}\"");
-            return 1;
-          }
-        }
+      if (tokenEofCheck(brCount1, brCount2)) {
+        return 1;
+      } else {
+        return 0;
+      }
     }
 
     //line level debug
-    if (tokenizer_exact_debug==1){
+    if (tokenizer_exact_debug == 1) {
       if(tokenizer_exact_token <= posToken - 1) {
         return 0;
       }
@@ -1259,7 +1349,6 @@ uint8_t tokenParse(svsVM *s) {
     // update délky programu
     // update script lenght (in tokens)
     s->tokenMax = posToken;
-
   }
 
   errSoft((uint8_t *)"tokenParse: Tokenizer overflow!",s);
