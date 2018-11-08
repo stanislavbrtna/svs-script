@@ -30,6 +30,7 @@ static uint8_t tokenizerFerrFlag;
 static uint8_t tokenizerStringFlag;
 
 static uint8_t prevChar;
+static uint8_t prevChar2;
 
 //exact debug helpers
 static uint8_t tokenizer_exact_debug;
@@ -55,6 +56,7 @@ void tokenizerReset() {
   tokenizer_exact_debug = 0;
   tokenizerStringFlag = 0;
   prevChar = 0;
+  prevChar2 = 0;
 }
 
 void token_line_print() {
@@ -158,7 +160,7 @@ uint8_t tokenPreprocessor() {
   c = tokenGetchDbg();
 
   //printf("got: %c", c);
-  if (c == '\"' && prevChar!='\\') {
+  if ((c == '\"' && prevChar!='\\') || (prevChar2 == '\\' && prevChar == '\\' && c == '\"')) {
     tokenizerStringFlag = 1 - tokenizerStringFlag;
   }
 
@@ -190,6 +192,7 @@ uint8_t tokenPreprocessor() {
   }
 
   //printf("token prep dbg: %c\n", c);
+  prevChar2 = prevChar;
   prevChar = c;
   return c;
 }
