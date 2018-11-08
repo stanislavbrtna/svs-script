@@ -1255,7 +1255,7 @@ uint8_t tokenParse(svsVM *s) {
             setTokenData(posToken, varGetId(pracName, s),s);
             tokenDMSG("Token set, type VAR, name:", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
             tokenDMSG((char *)pracName, posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-          }else{
+          } else {
             s->varTableLen++;
             setTokenType(posToken, SVS_TOKEN_VAR, s); //nastavíme typ
             setTokenData(posToken, (varType) s->varTableLen, s);
@@ -1331,7 +1331,7 @@ uint8_t tokenParse(svsVM *s) {
                   getTokenType(posToken,s), \
                   posText \
                 );
-      printf("Tokenizer Done, %u of %u tokens used.\n",s->tokenMax, getTokenMax(s) );
+      printf("Tokenizer Done, %u of %u tokens used.\n", s->tokenMax, getTokenMax(s));
       if (tokenEofCheck(brCount1, brCount2)) {
         return 1;
       } else {
