@@ -356,21 +356,21 @@ uint8_t tokenParse(svsVM *s) {
 
             if((tokenInput(posText, 0) >= '0') && (tokenInput(posText, 0) <= '9')) {
               numPrac.val_s *= 16;
-              numPrac.val_s += tokenInput(posText, 0) - 48;
+              numPrac.val_s += tokenInput(posText, 0) - '0';
               tokenInput(0, 1);
               posText++;
             }
 
             if((tokenInput(posText, 0) >= 'a') && (tokenInput(posText, 0) <= 'f')) {
               numPrac.val_s *= 16;
-              numPrac.val_s += tokenInput(posText, 0) - 55;
+              numPrac.val_s += tokenInput(posText, 0) - 'a' + 10;
               tokenInput(0, 1);
               posText++;
             }
 
             if((tokenInput(posText,0) >= 'A') && (tokenInput(posText, 0) <= 'F')) {
               numPrac.val_s *= 16;
-              numPrac.val_s += tokenInput(posText, 0) - 87;
+              numPrac.val_s += tokenInput(posText, 0) - 'A' + 10;
               tokenInput(0, 1);
               posText++;
             }
