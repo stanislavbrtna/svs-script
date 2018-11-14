@@ -80,16 +80,22 @@ int main(int argc, char *argv[]) {
 #endif
   puts("Script output begin:\n");
   commExec("main", &s);
-  errSoftPrint(&s);
 
   printf("\n");
-  if (s.commRetType == 0) {
-    printf("Returned: %i\n", getRetValInt(&s));
-    retval = (int)getRetValInt(&s);
-  } else if(s.commRetType == 1) {
-    printf("Returned: %s\n", getRetValStr(&s));
-  } else if(s.commRetType == 2) {
-    printf("Returned: %f\n", getRetValFlt(&s));
+
+  if (errCheck(&s)) {
+    retval = -1;
+    errSoftPrint(&s);
+    printf("\n");
+  } else {
+    if (s.commRetType == 0) {
+      printf("Returned: %i\n", getRetValInt(&s));
+      retval = (int)getRetValInt(&s);
+    } else if(s.commRetType == 1) {
+      printf("Returned: %s\n", getRetValStr(&s));
+    } else if(s.commRetType == 2) {
+      printf("Returned: %f\n", getRetValFlt(&s));
+    }
   }
 
   if (dbginfo == 1) {
