@@ -37,32 +37,31 @@ void commExDMSG(char *text, uint16_t tokenId) {
 }
 
 uint16_t exprSkip(uint16_t index, svsVM *s) {
-  uint16_t x = index;
   uint16_t count = 0;
 
   while(1) {
-    if (getTokenType(x, s) == SVS_TOKEN_LBR) {
+    if (getTokenType(index, s) == SVS_TOKEN_LBR) {
       count += 1 ;
     }
 
-    if (getTokenType(x, s) == SVS_TOKEN_RBR) {
+    if (getTokenType(index, s) == SVS_TOKEN_RBR) {
       if (count > 0) {
       count -= 1;
       } else {
         errSoft((uint8_t *)"commSkip: Bracket sanity error.", s);
-        errSoftSetParam((uint8_t *)"TokenId", (varType)x, s);
-        errSoftSetToken(x, s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
+        errSoftSetToken(index, s);
         return 0;
       }
       if (count == 0) {
-        commExDMSG("commSkip expression skip end, (skipped)", x);
+        commExDMSG("commSkip expression skip end, (skipped)", index);
         break;
       }
     }
-    x++;
+    index++;
   }
 
-  return x; // ends on last bracket
+  return index; // ends on last bracket
 }
 
 
@@ -74,7 +73,6 @@ uint16_t commSkip(uint16_t index, svsVM *s) {
 
   x = index;
   commExDMSG("commSkip start", index);
-
 
   // skip if/else
   if (getTokenType(x, s) == SVS_TOKEN_IF) {
@@ -150,413 +148,447 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
   // zde je uložená pozice ve vartable, pro použití lokálních proměnných
   // varTableSP - variable table stack pointer, used with local variables
   uint16_t varTableSP = 0;
-  uint8_t lock = 1;
+  uint8_t newToken;
   varRetVal varPrac;
 
   varRetValZero(&varPrac);
 
   currToken = index;
 
-  errSoftSetToken(currToken ,s);
+  errSoftSetToken(currToken, s);
 
   if (s->handbrake == 1) {
     return 0;
   }
 
-  if(getTokenType(currToken, s) != 255) {
-    commExDMSG("commExecLoop", currToken);
-    lock = 1;
+  newToken = getTokenType(currToken, s);
 
-    garbageCollect(0, s);
+  if(newToken == SVS_TOKEN_ENDPROG) {
+    return 0;
+  }
 
-    // function call
-    // volání funkce
-    if ((getTokenType(currToken, s) == 17) && lock) {
-      lock = 0;
-      commExDMSG("commExecLoop: Function Call", currToken);
-      commExDMSG((char *)s->stringField + getTokenData(currToken, s).val_u, currToken);
+  commExDMSG("commExecLoop", currToken);
 
-      return commParseCall(currToken, s);
-    }
+  // garbage collection is called each exec loop, but it might do nothing
+  // its behaviour depends on size of the empty memory space
+  garbageCollect(0, s);
 
-    // local statement
-    if ((getTokenType(currToken, s) == 32) && lock) {
-      lock = 0;
-      commExDMSG("commExecLoop: LOCAL statement", currToken);
+  // function call
+  // volání funkce
+  if (newToken == SVS_TOKEN_CALL) {
+    commExDMSG("commExecLoop: Function Call", currToken);
+    commExDMSG((char *)s->stringField + getTokenData(currToken, s).val_u, currToken);
+    return commParseCall(currToken, s);
+  }
+
+  // local statement
+  if (newToken == SVS_TOKEN_LOCAL) {
+    commExDMSG("commExecLoop: LOCAL statement", currToken);
+    currToken++;
+
+    if (getTokenType(currToken, s) != SVS_TOKEN_VAR) { // expecting VAR
+      errSoft((uint8_t *)"commEx: Syntax error next to LOCAL: Expected VAR after LOCAL.", s);
+      errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+      errSoftSetToken(currToken, s);
+      return 0;
+    } else {
+      varAddLocal(getTokenData(currToken, s), s); //přidáme lokální promněnnou / adds a local variable
+
+      if (errCheck(s)) { //kontrola a obsluha možné chyby v předchozím volání / error check
+        return 0;
+      }
       currToken++;
 
-      if (getTokenType(currToken, s) != 10) { // expecting VAR
-        errSoft((uint8_t *)"commEx: Syntax error next to LOCAL: Expected VAR after LOCAL.", s);
+      if (getTokenType(currToken, s) != SVS_TOKEN_SCOL) { //zkontrolujeme středník / semicolon check
+        errSoft((uint8_t *)"commEx: Syntax error, missing ; .", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
         return 0;
-      } else {
-        varAddLocal(getTokenData(currToken, s), s); //přidáme lokální promněnnou / adds a local variable
-
-        if (errCheck(s)) { //kontrola a obsluha možné chyby v předchozím volání / error check
-          return 0;
-        }
-        currToken++;
-
-        if (getTokenType(currToken, s) != 9) { //zkontrolujeme středník / semicolon check
-          errSoft((uint8_t *)"commEx: Syntax error, missing ; .", s);
-          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-          errSoftSetToken(currToken, s);
-          return 0;
-        }
       }
-
-      return currToken;
     }
+    return currToken;
+  }
 
-    // array statement
-    if ((getTokenType(currToken, s) == SVS_TOKEN_ARRAY) && lock) {
-      lock = 0;
-      varType tmp;
-      varType id;
-      varType len;
-      commExDMSG("commExecLoop: ARRAY statement", currToken);
+  // array statement
+  if (newToken == SVS_TOKEN_ARRAY) {
+    varType tmp;
+    varType id;
+    varType len;
+    commExDMSG("commExecLoop: ARRAY statement", currToken);
+    currToken++;
+
+    if (getTokenType(currToken, s) != SVS_TOKEN_VAR) { // expecting VAR
+      errSoft((uint8_t *)"commEx: Syntax error next to ARRAY: Expected VAR after ARRAY.", s);
+      errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+      errSoftSetToken(currToken, s);
+      return 0;
+    } else {
+      id = getTokenData(currToken, s);
+
       currToken++;
 
-      if (getTokenType(currToken, s) != 10) { // expecting VAR
-        errSoft((uint8_t *)"commEx: Syntax error next to ARRAY: Expected VAR after ARRAY.", s);
+      if (getTokenType(currToken, s) != SVS_TOKEN_LSQB) {
+        errSoft((uint8_t *)"commEx: Syntax error next to ARRAY: Missing [.", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
         return 0;
-      } else {
-        id = getTokenData(currToken, s);
-
-        currToken++;
-
-        if (getTokenType(currToken, s) != SVS_TOKEN_LSQB) {
-          errSoft((uint8_t *)"commEx: Syntax error next to ARRAY: Missing [.", s);
-          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-          errSoftSetToken(currToken, s);
-          return 0;
-        }
-
-        currToken++;
-
-        exprExec(currToken, &varPrac, s);
-        if (errCheck(s)) {
-          return 0;
-        }
-
-        if (varPrac.type != SVS_TYPE_NUM || varPrac.value.val_s < 0) {
-          errSoft((uint8_t *)"commEx: Error next to ARRAY: Index can be positive num only.", s);
-          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-          errSoftSetToken(currToken, s);
-          return 0;
-        }
-
-        currToken = varPrac.tokenId;
-
-        len = varPrac.value;
-
-        tmp = newArray(id, (uint16_t) len.val_s, s);
-        if (errCheck(s)) {
-          return 0;
-        }
-
-        varSetVal(id, tmp, s);
-        if (errCheck(s)) {
-          return 0;
-        }
-
-        varSetType(id, SVS_TYPE_ARR, s);
-        if (errCheck(s)) {
-          return 0;
-        }
-
-        if (getTokenType(currToken, s) != SVS_TOKEN_RSQB) {
-          errSoft((uint8_t *)"commEx: Syntax error, missing ].", s);
-          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-          errSoftSetToken(currToken, s);
-          return 0;
-        }
-
-        currToken++;
-
-        if (getTokenType(currToken, s) != 9) { //zkontrolujeme středník / semicolon check
-          errSoft((uint8_t *)"commEx: Syntax error, missing ; .", s);
-          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-          errSoftSetToken(currToken, s);
-          return 0;
-        }
       }
 
-      return currToken;
-    }
+      currToken++;
 
-    if ((getTokenType(currToken, s) == 28) && lock) { //sys statement
-      lock = 0;
-      commExDMSG("commExecLoop: SYS statement", currToken);
-      sysExec(currToken, &varPrac, s);
+      exprExec(currToken, &varPrac, s);
       if (errCheck(s)) {
         return 0;
       }
-      currToken = varPrac.tokenId;
-      return currToken;
-    }
 
-    if ((getTokenType(currToken, s) == 36) && lock) { // built-in function
-      lock = 0;
-      commExDMSG("commExecLoop: BUILT-IN FUNCTION statement", currToken);
-      processBuiltInCall(currToken, &varPrac, s);
-      if (errCheck(s)) {
-        return 0;
-      }
-      currToken = varPrac.tokenId;
-      return currToken;
-    }
-
-    // equals statement
-    if ((getTokenType(currToken, s) == 10) && lock) {
-      //pokud narazíme na typ VAR / if we found a variable
-      lock = 0;
-      x = currToken; //uložíme token indexu promněnné / we store index of the variable
-      currToken++;
-      if (getTokenType(currToken,s) == 24) { // =
-        commExDMSG("commExecLoop: = statement", currToken);
-        if (varGetType(getTokenData(x,s), s) == SVS_TYPE_ARR) {
-          errSoft((uint8_t *)"commEx: Equals on array is not supported.", s);
-          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-          errSoftSetToken(currToken, s);
-          return 0;
-        }
-
-        currToken++;
-        //printf("var set val id: %u, value: %u\n", tokenData[x], exprExec(currToken));
-        //printf("math exec id: %u\n", currToken);
-
-        exprExec(currToken, &varPrac, s); //vykonáme výraz za = / executing expression after =
-        if (errCheck(s)) {
-          return 0;
-        }
-        varSetVal(getTokenData(x,s), varPrac.value, s); //nastavíme value / we set new value
-
-        varSetType(getTokenData(x,s), varPrac.type, s); //nastavíme typ / we set new type
-        if (varPrac.type == 0) {
-          commExDMSG("commExecLoop: = statement: result is NUM", currToken);
-        } else {
-          commExDMSG("commExecLoop: = statement: result is STR", currToken);
-        }
-
-        currToken = varPrac.tokenId; //nastavíme token kde se má pokračovat / we set the token id we got from exprExec
-        commExDMSG("commExecLoop: = statement: continue on token:", currToken);
-
-      } else if(getTokenType(currToken, s) == 1) { // ++
-        commExDMSG("commExecLoop: ++ statement", currToken);
-        currToken++;
-        if (getTokenType(currToken, s) == 1) {
-          if (varGetType(getTokenData(x,s), s) != 0) {
-            errSoft((uint8_t *)"commEx: Syntax error in ++: only num type can be incremented.", s);
-            errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-            errSoftSetToken(currToken, s);
-            return 0;
-          }
-          varType prac;
-          prac = varGetVal(getTokenData(x,s),s);
-          varSetVal(getTokenData(x,s), (varType)(prac.val_s + (int32_t)1), s);
-
-          currToken++;
-        }else{
-          errSoft((uint8_t *)"commEx: Syntax error next to ++ (missing \"+\").", s);
-          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-          errSoftSetToken(currToken, s);
-          return 0;
-        }
-
-      } else if(getTokenType(currToken, s) == 2) { // --
-        commExDMSG("commExecLoop: -- statement", currToken);
-        currToken++;
-        if (getTokenType(currToken, s) == 2) {
-          if (varGetType(getTokenData(x, s), s) != 0) {
-            errSoft((uint8_t *)"commEx: Syntax error in --: only num type can be decremented.", s);
-            errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-            errSoftSetToken(currToken, s);
-            return 0;
-          }
-          varType prac;
-          prac = varGetVal(getTokenData(x,s),s);
-          varSetVal(getTokenData(x, s), (varType)(prac.val_s - (int32_t)1), s);
-
-          currToken++;
-        } else {
-          errSoft((uint8_t *)"commEx: Syntax error next to -- (missing \"-\").", s);
-          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-          errSoftSetToken(currToken, s);
-          return 0;
-        }
-      }else if (getTokenType(currToken, s) == SVS_TOKEN_LSQB) { // []
-        varType index;
-
-        if (varGetType(getTokenData(x, s), s) != SVS_TYPE_ARR) {
-          errSoft((uint8_t *)"commEx: Only array type can be indexed.", s);
-          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-          errSoftSetToken(currToken, s);
-          return 0;
-        }
-
-        currToken++;
-
-        exprExec(currToken, &varPrac, s);
-        if (errCheck(s)) {
-          return 0;
-        }
-
-        if (varPrac.type != SVS_TYPE_NUM || varPrac.value.val_s < 0) {
-          errSoft((uint8_t *)"commEx: Error next to ARRAY: Index can be positive num only.", s);
-          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-          errSoftSetToken(currToken, s);
-          return 0;
-        }
-        currToken = varPrac.tokenId;
-        index = varPrac.value;
-
-        if (getTokenType(currToken, s) != SVS_TOKEN_RSQB) {
-          errSoft((uint8_t *)"commEx: Syntax error, missing ].", s);
-          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-          errSoftSetToken(currToken, s);
-          return 0;
-        }
-
-        currToken++;
-
-        if (getTokenType(currToken, s) != SVS_TOKEN_ASSIGN) {
-          errSoft((uint8_t *)"commEx: Syntax error, missing =.", s);
-          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-          errSoftSetToken(currToken, s);
-          return 0;
-        }
-
-        currToken++;
-
-        // exec
-        exprExec(currToken, &varPrac, s);
-        if (errCheck(s)) {
-          return 0;
-        }
-
-        currToken = varPrac.tokenId;
-
-        if (index.val_s + varGetVal(getTokenData(x, s), s).val_s > SVS_ARRAY_LEN) {
-          errSoft((uint8_t *)"commEx: Array out of range!", s);
-          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-          errSoftSetToken(currToken, s);
-          return 0;
-        } else {
-          s->varArray[index.val_s + varGetVal(getTokenData(x, s), s).val_s] = varPrac.value;
-          s->varArrayType[index.val_s + varGetVal(getTokenData(x, s), s).val_s] = varPrac.type;
-        }
-
-      } else { //očekáváme "=" / expecting "="
-        errSoft((uint8_t *)"commEx: Syntax error next to VAR (missing \"=\", \"++\", \"--\" or \"[\").", s);
+      if (varPrac.type != SVS_TYPE_NUM || varPrac.value.val_s < 0) {
+        errSoft((uint8_t *)"commEx: Error next to ARRAY: Index can be positive num only.", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
         return 0;
       }
 
-      if (getTokenType(currToken,s) != 9) { //zkontrolujeme středník / semicolon check
-          errSoft((uint8_t *)"commEx: Syntax error, missing ; .", s);
+      currToken = varPrac.tokenId;
+
+      len = varPrac.value;
+
+      tmp = newArray(id, (uint16_t) len.val_s, s);
+      if (errCheck(s)) {
+        return 0;
+      }
+
+      varSetVal(id, tmp, s);
+      if (errCheck(s)) {
+        return 0;
+      }
+
+      varSetType(id, SVS_TYPE_ARR, s);
+      if (errCheck(s)) {
+        return 0;
+      }
+
+      if (getTokenType(currToken, s) != SVS_TOKEN_RSQB) {
+        errSoft((uint8_t *)"commEx: Syntax error, missing ].", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+
+      currToken++;
+
+      if (getTokenType(currToken, s) != SVS_TOKEN_SCOL) { //zkontrolujeme středník / semicolon check
+        errSoft((uint8_t *)"commEx: Syntax error, missing ; .", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+    }
+
+    return currToken;
+  }
+
+  if (newToken == SVS_TOKEN_SYS) { //sys statement
+
+    commExDMSG("commExecLoop: SYS statement", currToken);
+    sysExec(currToken, &varPrac, s);
+    if (errCheck(s)) {
+      return 0;
+    }
+    currToken = varPrac.tokenId;
+    return currToken;
+  }
+
+  // built-in function
+  if (newToken == SVS_TOKEN_FUNCTION_BUILTIN) {
+
+    commExDMSG("commExecLoop: BUILT-IN FUNCTION statement", currToken);
+    processBuiltInCall(currToken, &varPrac, s);
+    if (errCheck(s)) {
+      return 0;
+    }
+    currToken = varPrac.tokenId;
+    return currToken;
+  }
+
+  // equals statement
+  if (newToken == SVS_TOKEN_VAR) {
+    //pokud narazíme na typ VAR / if we found a variable
+
+    x = currToken; //uložíme token indexu promněnné / we store index of the variable
+    currToken++;
+    if (getTokenType(currToken,s) == SVS_TOKEN_ASSIGN) { // =
+      commExDMSG("commExecLoop: = statement", currToken);
+      if (varGetType(getTokenData(x, s), s) == SVS_TYPE_ARR) {
+        errSoft((uint8_t *)"commEx: Assign on array is not supported.", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+
+      currToken++;
+      //printf("var set val id: %u, value: %u\n", tokenData[x], exprExec(currToken));
+      //printf("math exec id: %u\n", currToken);
+
+      exprExec(currToken, &varPrac, s); //vykonáme výraz za = / executing expression after =
+      if (errCheck(s)) {
+        return 0;
+      }
+      varSetVal(getTokenData(x, s), varPrac.value, s); //nastavíme value / we set new value
+      varSetType(getTokenData(x, s), varPrac.type, s); //nastavíme typ / we set new type
+
+      if (varPrac.type == 0) {
+        commExDMSG("commExecLoop: = statement: result is NUM", currToken);
+      } else {
+        commExDMSG("commExecLoop: = statement: result is STR", currToken);
+      }
+
+      currToken = varPrac.tokenId; //nastavíme token kde se má pokračovat / we set the token id we got from exprExec
+      commExDMSG("commExecLoop: = statement: continue on token:", currToken);
+
+    } else if(getTokenType(currToken, s) == SVS_TOKEN_ADD) { // ++
+      commExDMSG("commExecLoop: ++ statement", currToken);
+      currToken++;
+      if (getTokenType(currToken, s) == SVS_TOKEN_ADD) {
+        if (varGetType(getTokenData(x,s), s) != SVS_TYPE_NUM) {
+          errSoft((uint8_t *)"commEx: Syntax error in ++: only num type can be incremented.", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
+        varType prac;
+        prac = varGetVal(getTokenData(x,s),s);
+        varSetVal(getTokenData(x,s), (varType)(prac.val_s + (int32_t)1), s);
 
-      return currToken;
-    }
-
-    if ((getTokenType(currToken,s) == 16) && lock) { //return
-      lock = 0;
-      if (s->commRetFlag == 0) {
-        x = currToken;
-        commExDMSG("commExecLoop: RETURN statement", currToken);
         currToken++;
-        exprExec(currToken, &varPrac, s);
-        if (errCheck(s)){
-          return 0;
-        }
-        s->commRetVal = varPrac.value;
-        s->commRetType = varPrac.type;
-        s->commRetFlag = 1;
-        return currToken - 1;
       }else{
+        errSoft((uint8_t *)"commEx: Syntax error next to ++ (missing \"+\").", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+
+    } else if(getTokenType(currToken, s) == SVS_TOKEN_SUBT) { // --
+      commExDMSG("commExecLoop: -- statement", currToken);
+      currToken++;
+      if (getTokenType(currToken, s) == SVS_TOKEN_SUBT) {
+        if (varGetType(getTokenData(x, s), s) != SVS_TYPE_NUM) {
+          errSoft((uint8_t *)"commEx: Syntax error in --: only num type can be decremented.", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+          errSoftSetToken(currToken, s);
+          return 0;
+        }
+        varType prac;
+        prac = varGetVal(getTokenData(x, s), s);
+        varSetVal(getTokenData(x, s), (varType)(prac.val_s - (int32_t)1), s);
+
+        currToken++;
+      } else {
+        errSoft((uint8_t *)"commEx: Syntax error next to -- (missing \"-\").", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+    } else if (getTokenType(currToken, s) == SVS_TOKEN_LSQB) { // []
+      varType index;
+
+      if (varGetType(getTokenData(x, s), s) != SVS_TYPE_ARR) {
+        errSoft((uint8_t *)"commEx: Only array type can be indexed.", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+
+      currToken++;
+
+      exprExec(currToken, &varPrac, s);
+      if (errCheck(s)) {
+        return 0;
+      }
+
+      if (varPrac.type != SVS_TYPE_NUM || varPrac.value.val_s < 0) {
+        errSoft((uint8_t *)"commEx: Error next to ARRAY: Index can be positive num only.", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+      currToken = varPrac.tokenId;
+      index = varPrac.value;
+
+      if (getTokenType(currToken, s) != SVS_TOKEN_RSQB) {
+        errSoft((uint8_t *)"commEx: Syntax error, missing ].", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+
+      currToken++;
+
+      if (getTokenType(currToken, s) != SVS_TOKEN_ASSIGN) {
+        errSoft((uint8_t *)"commEx: Syntax error, missing =.", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+
+      currToken++;
+
+      // exec
+      exprExec(currToken, &varPrac, s);
+      if (errCheck(s)) {
+        return 0;
+      }
+
+      currToken = varPrac.tokenId;
+
+      if (index.val_s + varGetVal(getTokenData(x, s), s).val_s > SVS_ARRAY_LEN) {
+        errSoft((uint8_t *)"commEx: Array out of range!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      } else {
+        s->varArray[index.val_s + varGetVal(getTokenData(x, s), s).val_s] = varPrac.value;
+        s->varArrayType[index.val_s + varGetVal(getTokenData(x, s), s).val_s] = varPrac.type;
+      }
+
+    } else { //očekáváme "=" / expecting "="
+      errSoft((uint8_t *)"commEx: Syntax error next to VAR (missing \"=\", \"++\", \"--\" or \"[\").", s);
+      errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+      errSoftSetToken(currToken, s);
+      return 0;
+    }
+
+    if (getTokenType(currToken,s) != 9) { //zkontrolujeme středník / semicolon check
+        errSoft((uint8_t *)"commEx: Syntax error, missing ; .", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+
+    return currToken;
+  }
+
+  if (newToken == SVS_TOKEN_RETURN) { //return
+
+    if (s->commRetFlag == 0) {
+      x = currToken;
+      commExDMSG("commExecLoop: RETURN statement", currToken);
+      currToken++;
+      exprExec(currToken, &varPrac, s);
+      if (errCheck(s)) {
+        return 0;
+      }
+      s->commRetVal = varPrac.value;
+      s->commRetType = varPrac.type;
+      s->commRetFlag = 1;
+      return currToken - 1;
+    }
+    return currToken;
+  }
+
+  // začátek bloku / start of block
+  if (newToken == SVS_TOKEN_LCBR) {
+
+    commExDMSG("commExecLoop: start of block ({)", currToken);
+    currToken++; // skipping "{"
+    varTableSP = s->varTableLen; // storing current variable stack
+    while (getTokenType(currToken, s) != SVS_TOKEN_RCBR) { // loop until "}"
+      /*
+      Break funguje tak, že když se na něj narazí, tak se snaží commExecLoop
+      returnovat break token tak dlouho, až se narazí na while co ho zavolal
+      a ten se breakne.
+      */
+
+      if (getTokenType(currToken, s) != SVS_TOKEN_BREAK) { //break? ne
+        //vykonáváme příkaz dokud nenarazíme na break a nebo end of block
+        currToken = commExecLoop(currToken, s);
+
+        if (errCheck(s)) {
+          return 0;
+        }
+
+        if (s->handbrake == 1) {
+          return 0;
+        }
+
+        if (getTokenType(currToken, s) == SVS_TOKEN_BREAK) { //break
+          s->varTableLen = varTableSP; //při opuštění bloku vrátíme stack
+          commExDMSG("commExecLoop: block: break occured inside block!", currToken);
+          return currToken;
+        }
+
+        if (getTokenType(currToken, s) == SVS_TOKEN_RETURN) { //return
+          s->varTableLen = varTableSP;
+          commExDMSG("commExecLoop: block: return inside block.", currToken);
+          return currToken;
+        }
+
+        currToken++;
+      } else { // break
+        s->varTableLen = varTableSP;
+        commExDMSG("commExecLoop: start of block: break occured!", currToken);
         return currToken;
       }
     }
+    s->varTableLen = varTableSP;
+    return currToken;
+  }
 
-    if ((getTokenType(currToken, s) == 7) && lock) { // začátek bloku / start of block
-      lock = 0;
-      commExDMSG("commExecLoop: start of block ({)", currToken);
-      currToken++; //odskočíme ze "{"
-      varTableSP = s->varTableLen; //uložíme pozici var stacku
-      while (getTokenType(currToken, s) != 8) { //pokud není "}"
-        /*
-        Break funguje tak, že když se na něj narazí, tak se snaží commExecLoop
-        returnovat break token tak dlouho, až se narazí na while co ho zavolal
-        a ten se breakne.
-        */
-
-        if (getTokenType(currToken, s) != 15) { //break? ne
-          //vykonáváme příkaz dokud nenarazíme na break a nebo end of block
+  if (newToken == SVS_TOKEN_IF) { //if / else
+    commExDMSG("commExecLoop: if statement", currToken);
+    currToken++;
+    if (getTokenType(currToken, s) != 5) { // detekce závorky
+      errSoft((uint8_t *)"commExecLoop: Unknown statement after if", s);
+      errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+      errSoftSetToken(currToken, s);
+      return 0;
+    } else {
+      currToken++;
+      exprExec(currToken, &varPrac, s);
+      if (errCheck(s)) {
+        return 0;
+      }
+      x = varPrac.value.val_s; //výsledek ifu
+      currToken = varPrac.tokenId;
+      if (getTokenType(currToken,s) != 6) {
+        errSoft((uint8_t *)"commEx: Syntax error in if statement, missing \")\"", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+      currToken++;
+      if (x) { //podmínka splněna
+        commExDMSG("commExecLoop: if statement: expression TRUE", currToken);
+        //curr token teď míří přímo na novej příkaz
+        if (getTokenType(currToken, s) != 15) {
           currToken = commExecLoop(currToken, s);
           if (errCheck(s)) {
             return 0;
           }
-          if (s->handbrake == 1) {
-            return 0;
-          }
-
-          if (getTokenType(currToken, s) == 15) { //break
-            s->varTableLen = varTableSP; //při opuštění bloku vrátíme stack
-            commExDMSG("commExecLoop: block: break occured inside block!", currToken);
+          if (getTokenType(currToken, s) == 16) {
+            //printf("if: return occured token: %u \n", currToken);
             return currToken;
           }
-          if (getTokenType(currToken, s) == 16) { //return
-            s->varTableLen = varTableSP;
-            commExDMSG("commExecLoop: block: end of block", currToken);
-            return currToken;
-          }
-          currToken++;
-        } else { //break
-          s->varTableLen = varTableSP;
-          commExDMSG("commExecLoop: start of block: break occured!", currToken);
+        } else {
+          //printf("if: break occured token: %u \n", currToken);
           return currToken;
         }
-      }
-      s->varTableLen = varTableSP;
-      return currToken;
-    }
-
-    if ((getTokenType(currToken, s) == 12) && lock) { //if / else
-      lock = 0;
-      commExDMSG("commExecLoop: if statement", currToken);
-      currToken++;
-      if (getTokenType(currToken, s) != 5) { // detekce závorky
-        errSoft((uint8_t *)"commExecLoop: Unknown statement after if", s);
-        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-        errSoftSetToken(currToken, s);
-        return 0;
       } else {
-        currToken++;
-        exprExec(currToken, &varPrac, s);
+        //currToken++; //curr token teď míří přímo na novej příkaz
+        //printf("comSkip míří na token %u \n", currToken);
+        currToken = commSkip(currToken, s);
         if (errCheck(s)) {
           return 0;
         }
-        x = varPrac.value.val_s; //výsledek ifu
-        currToken = varPrac.tokenId;
-        if (getTokenType(currToken,s) != 6) {
-          errSoft((uint8_t *)"commEx: Syntax error in if statement, missing \")\"", s);
-          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-          errSoftSetToken(currToken, s);
-          return 0;
-        }
-        currToken++;
-        if (x) { //podmínka splněna
-          commExDMSG("commExecLoop: if statement: expression TRUE", currToken);
-          //curr token teď míří přímo na novej příkaz
-          if (getTokenType(currToken, s) != 15) {
+        commExDMSG("commExecLoop: if statement: expression FALSE, code skipped", currToken);
+      }
+      //pokud existuje else větev
+      if(getTokenType(currToken + 1, s) == 13) {
+        commExDMSG("commExecLoop: if statement: else detected", currToken);
+        currToken += 1;
+        if (!x){ //podmínka nesplněna
+          currToken++;
+          commExDMSG("commExecLoop: if statement: else: executing", currToken);
+          if (getTokenType(currToken,s) != 15) {
             currToken = commExecLoop(currToken, s);
             if (errCheck(s)) {
               return 0;
@@ -570,138 +602,172 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
             return currToken;
           }
         } else {
-          //currToken++; //curr token teď míří přímo na novej příkaz
-          //printf("comSkip míří na token %u \n", currToken);
+          currToken++; //curr token teď míří přímo na novej příkaz
           currToken = commSkip(currToken, s);
           if (errCheck(s)) {
             return 0;
           }
-          commExDMSG("commExecLoop: if statement: expression FALSE, code skipped", currToken);
-        }
-        //pokud existuje else větev
-        if(getTokenType(currToken + 1, s) == 13) {
-          commExDMSG("commExecLoop: if statement: else detected", currToken);
-          currToken += 1;
-          if (!x){ //podmínka nesplněna
-            currToken++;
-            commExDMSG("commExecLoop: if statement: else: executing", currToken);
-            if (getTokenType(currToken,s) != 15) {
-              currToken = commExecLoop(currToken, s);
-              if (errCheck(s)) {
-                return 0;
-              }
-              if (getTokenType(currToken, s) == 16) {
-                //printf("if: return occured token: %u \n", currToken);
-                return currToken;
-              }
-            } else {
-              //printf("if: break occured token: %u \n", currToken);
-              return currToken;
-            }
-          } else {
-            currToken++; //curr token teď míří přímo na novej příkaz
-            currToken = commSkip(currToken, s);
-            if (errCheck(s)) {
-              return 0;
-            }
-            commExDMSG("commExecLoop: if statement: else: skipped", currToken);
-          }
+          commExDMSG("commExecLoop: if statement: else: skipped", currToken);
         }
       }
-      commExDMSG("commExecLoop: if statement: end of if", currToken);
-      return currToken;
     }
+    commExDMSG("commExecLoop: if statement: end of if", currToken);
+    return currToken;
+  }
 
-    if ((getTokenType(currToken, s) == 34) && lock) { //for
-      uint16_t exprPrac = 0;
-      uint16_t endPrac = 0;
-      uint16_t loopPrac = 0;
-      uint32_t x = 0;
-      lock = 0;
-      commExDMSG("commExecLoop: for statement", currToken);
+  if (newToken == 34) { //for
+    uint16_t exprPrac = 0;
+    uint16_t endPrac = 0;
+    uint16_t loopPrac = 0;
+    uint32_t x = 0;
+
+    commExDMSG("commExecLoop: for statement", currToken);
+    currToken++;
+
+    //struktura: for(init expr;check expr;endloop expr)
+
+    if (getTokenType(currToken,s) != 5) { // detekce závorky
+      errSoft((uint8_t *)"commEx: Unknown statement after while, missing \"(\"", s);
+      errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+      errSoftSetToken(currToken, s);
+      return 0;
+    } else {
       currToken++;
-
-      //struktura: for(init expr;check expr;endloop expr)
-
-      if (getTokenType(currToken,s) != 5) { // detekce závorky
-        errSoft((uint8_t *)"commEx: Unknown statement after while, missing \"(\"", s);
+      currToken = commExecLoop(currToken, s);
+      if (errCheck(s)) {
+        return 0;
+      }
+      if (getTokenType(currToken, s) != 9) { //zkontrolujeme středník
+        errSoft((uint8_t *)"commExecLoop: for: Syntax error, missing ; .", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
         return 0;
-      } else {
-        currToken++;
-        currToken = commExecLoop(currToken, s);
+      }
+
+      currToken++;
+      //kód podmínky
+      exprPrac = currToken;
+      while(1) {
+        currToken = exprPrac;
+        exprExec(currToken, &varPrac, s);
         if (errCheck(s)) {
           return 0;
         }
-        if (getTokenType(currToken, s) != 9) { //zkontrolujeme středník
-          errSoft((uint8_t *)"commExecLoop: for: Syntax error, missing ; .", s);
+        x = varPrac.value.val_s; //výsledek podmínky
+        currToken = varPrac.tokenId;
+        endPrac = currToken + 1;
+
+        //skip end prac
+        currToken = commSkip(currToken + 1, s);
+        if(x == 0) { //skip
+          commExDMSG("commExecLoop: for: expression FALSE, skipping", currToken);
+          //skip loop body
+          currToken++;
+          currToken = commSkip(currToken + 1, s);
+          if (errCheck(s)) {
+            return 0;
+          }
+          //break out
+          break;
+        } else {
+          commExDMSG("commExecLoop: for: expression TRUE", currToken);
+        }
+        if (getTokenType(currToken, s) == 9) {
+          currToken++; //přeskočíme středník na konci výrazu
+        }
+
+        if (getTokenType(currToken, s) != 6) {
+          errSoft((uint8_t *)"commEx: Syntax error in for statement, missing \")\" or maybe \";\"", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)exprPrac, s);
+          //jako parametr stavíme exprPrac, kdyby current token mířil po skipu někam do háje
+          errSoftSetToken(exprPrac, s);
+          return 0;
+        }
+        currToken++;
+
+        loopPrac = currToken;
+        //tělo smyčky
+        currToken = commExecLoop(loopPrac, s);
+        if (errCheck(s)) {
+          return 0;
+        }
+
+        if (s->handbrake == 1) {
+          return 0;
+        }
+
+        //Detekce breaku
+        if (getTokenType(currToken, s) == 15) {
+          //v případě breaku nahrajeme do current tokenu start smyčky a pak jí přeskočíme comm skipem
+          currToken = loopPrac;
+          currToken = commSkip(currToken, s);
+          if (errCheck(s)) {
+            return 0;
+          }
+          commExDMSG("commExecLoop: for: break occured, skipping", currToken);
+          break;
+        }
+
+        if (getTokenType(currToken, s) == 16) {
+          commExDMSG("commExecLoop: while: return occured, returning", currToken);
+          return currToken;
+        }
+
+        //increment/decrement/whatever
+        commExecLoop(endPrac, s);
+        if (errCheck(s)) {
+          return 0;
+        }
+      }
+    }
+    return currToken;
+  }
+
+  if (newToken == 14) { //while
+    commExDMSG("commExecLoop: while statement", currToken);
+    currToken++;
+    if (getTokenType(currToken, s) != 5) { // detekce závorky
+      errSoft((uint8_t *)"commEx: Unknown statement after while, missing \"(\"", s);
+      errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+      errSoftSetToken(currToken, s);
+      return 0;
+    } else {
+      currToken++;
+      prac = currToken;
+      while(1) {
+        currToken = prac;
+        exprExec(currToken, &varPrac, s);
+        if (errCheck(s)) {
+          return 0;
+        }
+        if (s->handbrake == 1) {
+          return 0;
+        }
+        x = varPrac.value.val_s; //výsledek podmínky
+        currToken = varPrac.tokenId;
+        backBr = currToken;
+        if (getTokenType(currToken, s) != 6) {
+          errSoft((uint8_t *)"commEx: Syntax error in while statement, missing \")\"", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
-
-        currToken++;
-        //kód podmínky
-        exprPrac = currToken;
-        while(1) {
-          currToken = exprPrac;
-          exprExec(currToken, &varPrac, s);
+        if (x) { //podmínka splněna
+          commExDMSG("commExecLoop: while: expression TRUE", currToken);
+          currToken++; //curr token teď míří přímo na novej příkaz
+          currToken = commExecLoop(currToken, s);
           if (errCheck(s)) {
             return 0;
           }
-          x = varPrac.value.val_s; //výsledek podmínky
-          currToken = varPrac.tokenId;
-          endPrac = currToken + 1;
-
-          //skip end prac
-          currToken = commSkip(currToken + 1, s);
-          if(x == 0) { //skip
-            commExDMSG("commExecLoop: for: expression FALSE, skipping", currToken);
-            //skip loop body
-            currToken++;
-            currToken = commSkip(currToken + 1, s);
-            if (errCheck(s)) {
-              return 0;
-            }
-            //break out
-            break;
-          } else {
-            commExDMSG("commExecLoop: for: expression TRUE", currToken);
-          }
-          if (getTokenType(currToken, s) == 9) {
-            currToken++; //přeskočíme středník na konci výrazu
-          }
-
-          if (getTokenType(currToken, s) != 6) {
-            errSoft((uint8_t *)"commEx: Syntax error in for statement, missing \")\" or maybe \";\"", s);
-            errSoftSetParam((uint8_t *)"TokenId", (varType)exprPrac, s);
-            //jako parametr stavíme exprPrac, kdyby current token mířil po skipu někam do háje
-            errSoftSetToken(exprPrac, s);
-            return 0;
-          }
-          currToken++;
-
-          loopPrac = currToken;
-          //tělo smyčky
-          currToken = commExecLoop(loopPrac, s);
-          if (errCheck(s)) {
-            return 0;
-          }
-
-          if (s->handbrake == 1) {
-            return 0;
-          }
-
           //Detekce breaku
           if (getTokenType(currToken, s) == 15) {
             //v případě breaku nahrajeme do current tokenu start smyčky a pak jí přeskočíme comm skipem
-            currToken = loopPrac;
+            currToken = backBr + 1;
             currToken = commSkip(currToken, s);
             if (errCheck(s)) {
               return 0;
             }
-            commExDMSG("commExecLoop: for: break occured, skipping", currToken);
+            commExDMSG("commExecLoop: while: break occured, skipping", currToken);
             break;
           }
 
@@ -710,104 +776,34 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
             return currToken;
           }
 
-          //increment/decrement/whatever
-          commExecLoop(endPrac, s);
+        } else {
+          currToken++; //curr token teď míří přímo na novej příkaz
+          currToken = commSkip(currToken, s);
           if (errCheck(s)) {
             return 0;
           }
+          commExDMSG("commExecLoop: while: expression FALSE, skipping", currToken);
+          break;
         }
       }
-
     }
-    if ((getTokenType(currToken, s) == 14) && lock) { //while
-      lock = 0;
-      commExDMSG("commExecLoop: while statement", currToken);
-      currToken++;
-      if (getTokenType(currToken, s) != 5) { // detekce závorky
-        errSoft((uint8_t *)"commEx: Unknown statement after while, missing \"(\"", s);
-        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-        errSoftSetToken(currToken, s);
-        return 0;
-      } else {
-        currToken++;
-        prac = currToken;
-          while(1) {
-          currToken = prac;
-          exprExec(currToken, &varPrac, s);
-          if (errCheck(s)) {
-            return 0;
-          }
-          if (s->handbrake == 1) {
-            return 0;
-          }
-          x = varPrac.value.val_s; //výsledek podmínky
-          currToken = varPrac.tokenId;
-          backBr = currToken;
-          if (getTokenType(currToken, s) != 6) {
-            errSoft((uint8_t *)"commEx: Syntax error in while statement, missing \")\"", s);
-            errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-            errSoftSetToken(currToken, s);
-            return 0;
-          }
-          if (x) { //podmínka splněna
-            commExDMSG("commExecLoop: while: expression TRUE", currToken);
-            currToken++; //curr token teď míří přímo na novej příkaz
-            currToken = commExecLoop(currToken, s);
-            if (errCheck(s)) {
-              return 0;
-            }
-            //Detekce breaku
-            if (getTokenType(currToken, s) == 15) {
-              //v případě breaku nahrajeme do current tokenu start smyčky a pak jí přeskočíme comm skipem
-              currToken = backBr + 1;
-              currToken = commSkip(currToken, s);
-              if (errCheck(s)) {
-                return 0;
-              }
-              commExDMSG("commExecLoop: while: break occured, skipping", currToken);
-              break;
-            }
-
-            if (getTokenType(currToken, s) == 16) {
-              commExDMSG("commExecLoop: while: return occured, returning", currToken);
-              return currToken;
-            }
-
-          } else {
-            currToken++; //curr token teď míří přímo na novej příkaz
-            currToken = commSkip(currToken, s);
-            if (errCheck(s)) {
-              return 0;
-            }
-            commExDMSG("commExecLoop: while: expression FALSE, skipping", currToken);
-            break;
-          }
-        }
-      }
-      commExDMSG("commExecLoop: while: end of while", currToken);
-    }
-
-    if(lock == 1) {
-      errSoft((uint8_t *)"commEx: Unexpected command!", s);
-      errSoftSetParam((uint8_t *)"TokenType", (varType)(uint16_t)getTokenType(currToken, s), s);
-      errSoftSetToken(currToken, s);
-      return 0;
-    }
+    commExDMSG("commExecLoop: while: end of while", currToken);
     return currToken;
   }
+
+  errSoft((uint8_t *)"commEx: Unexpected command!", s);
+  errSoftSetParam((uint8_t *)"TokenType", (varType)(uint16_t)getTokenType(currToken, s), s);
+  errSoftSetToken(currToken, s);
   return 0;
 }
 
 uint16_t commExecById(uint16_t id, svsVM *s) {
   //třeba nastavit startovací token funkce
   //printf("Jumping into: %s starting at token %u \n",funcTable[id].fString, funcTable[id].tokenId );
-
   s->commRetVal.val_u = 0;
   s->commRetType = 0;
   s->commRetFlag = 0;
-
   commExecLoop(s->funcTable[id].tokenId, s);
-
   return 0;
 }
 

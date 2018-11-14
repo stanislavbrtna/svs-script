@@ -659,7 +659,7 @@ void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
         errSoftSetToken(tokenId, s);
         return;
       }
-//TODO: Pokračovat s CS revizí
+
     } else if (getTokenType(tokenId, s) == SVS_TOKEN_LESS_OR_EQ) { //<=
       tokenId++;
       exprExecDMSG("ExprExecLvl1: <= ", prac.value.val_s, tokenId);
@@ -706,7 +706,7 @@ void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
         errSoftSetToken(tokenId, s);
         return;
       }
-    }else if (getTokenType(tokenId, s) == SVS_TOKEN_GREATER_OR_EQ) { //>=
+    } else if (getTokenType(tokenId, s) == SVS_TOKEN_GREATER_OR_EQ) { //>=
       tokenId++;
       exprExecDMSG("ExprExecLvl1: >= ", prac.value.val_s, tokenId);
       exprExecLvl2(tokenId, &prac, s);
@@ -756,7 +756,6 @@ void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
   }
 
   exprExecDMSG("ExprExecLvl1 Exit", result->value.val_u, result->tokenId);
-
   return;
 }
 

@@ -320,102 +320,115 @@ uint8_t tokenParse(svsVM *s) {
 
     Lock = 1;
 
-    // number a float, záporná čísla řeší až expr exec
-    if (isNumber(tokenInput(posText,0))){
-      numPrac.val_s=0;
-      numPracF.val_s=0;
-      floatFound=0;
-      setTokenType(posToken,0,s);
-      numPrac.val_s=tokenInput(posText,0)-48;
+    // number, float, hex parsing, negative numbers are ignored here,
+    // the minus sign is treated as expression during execution
+    if (isNumber(tokenInput(posText, 0))) {
+      setTokenType(posToken, SVS_TOKEN_CONST_NUM, s);
+      numPrac.val_s  = 0;
+      numPracF.val_s = 0;
+      floatFound     = 0;
+
+      numPrac.val_s = tokenInput(posText, 0) - 48;
       posText++;
-      tokenInput(0,1);
-      if (tokenInput(posText,0)=='.'){
+      tokenInput(0, 1);
+
+      // handling 0.x
+      if (tokenInput(posText,0) == '.') {
       #ifdef USE_FLOAT
-        floatFound=1;
-        float_dp=1;
-        tokenInput(0,1);
+        floatFound = 1;
+        float_dp   = 1;
+        tokenInput(0, 1);
         posText++;
-        numPrac.val_f=(float) numPrac.val_s;
+        numPrac.val_f = (float) numPrac.val_s;
       #else
         tokenizerErrorPrint("tokenParse: Float not supported in this build!");
         return 1;
-
       #endif
       }
       // hex number input
-      if(tokenInput(posText,0)=='x'){
-        numPrac.val_s=0;
-        tokenInput(0,1);
+      if(tokenInput(posText, 0) == 'x') {
+        numPrac.val_s = 0;
+        tokenInput(0, 1);
         posText++;
-        while (((tokenInput(posText,0)>='0')&&(tokenInput(posText,0)<='9')) || ((tokenInput(posText,0)>='a')&&(tokenInput(posText,0)<='f'))
-                  || ((tokenInput(posText,0)>='A')&&(tokenInput(posText,0)<='F'))){
+        while (   ((tokenInput(posText, 0) >= '0') && (tokenInput(posText, 0) <= '9'))
+               || ((tokenInput(posText, 0) >= 'a') && (tokenInput(posText, 0) <= 'f'))
+               || ((tokenInput(posText, 0) >= 'A') && (tokenInput(posText, 0) <= 'F')) ) {
 
-            if((tokenInput(posText,0)>=47)&&(tokenInput(posText,0)<=57)){
-              numPrac.val_s*=16;
-              numPrac.val_s+=tokenInput(posText,0)-48;
-              tokenInput(0,1);
+            if((tokenInput(posText, 0) >= '0') && (tokenInput(posText, 0) <= '9')) {
+              numPrac.val_s *= 16;
+              numPrac.val_s += tokenInput(posText, 0) - 48;
+              tokenInput(0, 1);
               posText++;
             }
 
-            if((tokenInput(posText,0)>=65)&&(tokenInput(posText,0)<=70)){
-              numPrac.val_s*=16;
-              numPrac.val_s+=tokenInput(posText,0)-55;
-              tokenInput(0,1);
+            if((tokenInput(posText, 0) >= 'a') && (tokenInput(posText, 0) <= 'f')) {
+              numPrac.val_s *= 16;
+              numPrac.val_s += tokenInput(posText, 0) - 55;
+              tokenInput(0, 1);
               posText++;
             }
 
-            if((tokenInput(posText,0)>=97)&&(tokenInput(posText,0)<=102)){
-              numPrac.val_s*=16;
-              numPrac.val_s+=tokenInput(posText,0)-87;
-              tokenInput(0,1);
+            if((tokenInput(posText,0) >= 'A') && (tokenInput(posText, 0) <= 'F')) {
+              numPrac.val_s *= 16;
+              numPrac.val_s += tokenInput(posText, 0) - 87;
+              tokenInput(0, 1);
               posText++;
             }
-
         }
-
         setTokenData(posToken, numPrac, s);
-        tokenDMSG("Token set, type NUM", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-      }else{
-        while (isNumber(tokenInput(posText,0))){
-          if(floatFound==0){
-            numPrac.val_s*=10;
-            numPrac.val_s+=tokenInput(posText,0)-48;
-            tokenInput(0,1);
+        tokenDMSG("Token set, type NUM",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+      } else {
+        while (isNumber(tokenInput(posText, 0))) {
+          if(floatFound == 0) {
+            numPrac.val_s *= 10;
+            numPrac.val_s += tokenInput(posText, 0) - 48;
+            tokenInput(0, 1);
             posText++;
-            if (tokenInput(posText,0)=='.'){
+            if (tokenInput(posText,0) == '.') {
             #ifdef USE_FLOAT
-              floatFound=1;
-              float_dp=1;
-              tokenInput(0,1);
+              floatFound = 1;
+              float_dp   = 1;
+              tokenInput(0, 1);
               posText++;
-              numPrac.val_f=(float) numPrac.val_s;
+              numPrac.val_f = (float)numPrac.val_s;
             #else
               tokenizerErrorPrint("tokenParse: Float not supported in this build!");
               return 1;
             #endif
             }
-          }else{
+          } else {
             #ifdef USE_FLOAT
-            numPracF.val_f+=((float)(tokenInput(posText,0)-48)/(float)((exp_helper(10,float_dp))));
-            //printf("flt: %f fdp: %u \n",numPracF.val_f, float_dp);
+            numPracF.val_f += ((float)(tokenInput(posText, 0) - 48) / (float)((exp_helper(10, float_dp))));
             float_dp++;
-            tokenInput(0,1);
+            tokenInput(0, 1);
             posText++;
             #endif
           }
         }
-        if (floatFound==1){
+        if (floatFound == 1) {
           #ifdef USE_FLOAT
-          setTokenType(posToken,31,s);
-          numPrac.val_f+=numPracF.val_f;
+          setTokenType(posToken, SVS_TOKEN_CONST_FLOAT, s);
+          numPrac.val_f += numPracF.val_f;
           setTokenData(posToken, numPrac, s);
-          tokenDMSG("Token set, type FLT", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
+          tokenDMSG("Token set, type FLT",
+                    posToken,
+                    getTokenData(posToken, s),
+                    getTokenType(posToken, s),
+                    posText);
           //printf("flt: %f \n",getTokenData(posToken,s).val_f);
-          floatFound=0;
+          floatFound = 0;
           #endif
-        }else{
+        } else {
           setTokenData(posToken, numPrac, s);
-          tokenDMSG("Token set, type NUM", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
+          tokenDMSG("Token set, type NUM",
+                    posToken,
+                    getTokenData(posToken, s),
+                    getTokenType(posToken, s),
+                    posText);
         }
       }
       posToken++;
@@ -423,7 +436,7 @@ uint8_t tokenParse(svsVM *s) {
 
     // space (ignored)
     // mezeru ignorujeme
-    if (tokenInput(posText,0) == ' ') {
+    if (tokenInput(posText, 0) == ' ') {
       tokenInput(0, 1);
       posText++;
     }
@@ -1240,8 +1253,8 @@ uint8_t tokenParse(svsVM *s) {
             break;
           } else {
             if (tokenInput(posText, 0) != ' ') {
-              //printf("symbol: %u (%c):", tokenInput(posText,0), tokenInput(posText,0));
               tokenizerErrorPrint((uint8_t *)"tokenParse: Undefined symbol after variable statement!");
+              printf("symbol: %u (%c)\n", tokenInput(posText, 0), tokenInput(posText, 0));
               return 1;
             }
           }
@@ -1250,11 +1263,18 @@ uint8_t tokenParse(svsVM *s) {
         }
         if (tokenInput(posText, 0) != '(') { //pokud nejde o volání fce
           if (varExists(pracName, s)) { //jedná se o existující promněnou
-            setTokenType(posToken, 10, s);
-            //tokenData[posToken]=varGetId(pracName); //nastavíme id
-            setTokenData(posToken, varGetId(pracName, s),s);
-            tokenDMSG("Token set, type VAR, name:", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-            tokenDMSG((char *)pracName, posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
+            setTokenType(posToken, SVS_TOKEN_VAR, s);
+            setTokenData(posToken, varGetId(pracName, s), s);
+            tokenDMSG("Token set, type VAR, name:",
+                      posToken,
+                      getTokenData(posToken, s),
+                      getTokenType(posToken, s),
+                      posText);
+            tokenDMSG((char *)pracName,
+                      posToken,
+                      getTokenData(posToken, s),
+                      getTokenType(posToken, s),
+                      posText);
           } else {
             s->varTableLen++;
             setTokenType(posToken, SVS_TOKEN_VAR, s); //nastavíme typ
@@ -1283,7 +1303,7 @@ uint8_t tokenParse(svsVM *s) {
             // if it is built-in function call and function with that name is not registered
             // we register it as a built-in call, otherwise it will be a normal call
             if (getBuiltInCallId(pracName) && !(functionExists(pracName, s))) {
-              setTokenType(posToken, 36, s);
+              setTokenType(posToken, SVS_TOKEN_FUNCTION_BUILTIN, s);
               setTokenData(posToken, (varType)getBuiltInCallId(pracName), s);
               tokenDMSG("Token set, type BUILT-IN CALL, function name:",
                           posToken, getTokenData(posToken, s),
@@ -1297,7 +1317,7 @@ uint8_t tokenParse(svsVM *s) {
                           posText
                         );
             } else {
-              setTokenType(posToken, 17, s);
+              setTokenType(posToken, SVS_TOKEN_CALL, s);
               s->stringConstMax = s->stringFieldLen;
               setTokenData(posToken, (varType)strNew(pracName, s), s);
               if (errCheck(s)) {
