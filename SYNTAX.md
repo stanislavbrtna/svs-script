@@ -1,4 +1,5 @@
 
+
 # How to SVS
 Well, there is not much documentation at the moment. I hope that this document and included examples will help you understand the SVS language.
 ### Hello world
@@ -147,6 +148,13 @@ The output looks like:
 
     Hello
     2
+Function must contain at least one command or empty command block to be valid.
+Examples of minimal valid functions:
+
+    function f1 {}
+    function f2 return arg0 + 2;
+    function f3 b = 2;
+
 
 Maximum of functions in one file is limited by FUNCTION_TABLE_L define. Return command and return value are both optional.
 
