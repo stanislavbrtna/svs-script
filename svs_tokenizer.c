@@ -231,6 +231,17 @@ uint8_t tokenInput(uint16_t index, uint8_t inc) {
   return 0;
 }
 
+#ifdef WEBTARGET
+volatile uint8_t testoid;
+
+void doNotRemoveThese(uint16_t callLen, uint8_t * call)  __attribute__ ((optimize("0")));
+
+void doNotRemoveThese(uint16_t callLen, uint8_t * call) {
+  printf("syscall id: %u, name: %s \n",callLen, call);
+  testoid+= (uint8_t) callLen + (uint8_t) call;
+}
+#endif
+
 /*
 // stub used occasionaly for debug, TODO: use compiler flags
 uint8_t tokenInput(uint16_t index, uint8_t inc){
@@ -1145,6 +1156,10 @@ uint8_t tokenParse(svsVM *s) {
               s->syscallTable[s->syscallTableLen].sysCallName[x] = pracName2[x];
             }
             setTokenData(posToken, (varType) s->syscallTableLen, s);
+            #ifdef WEBTARGET
+            //doNotRemoveThese(s->syscallTableLen, s->syscallTable[s->syscallTableLen].sysCallName);
+            //printf("Hotfix: There must be a better way to tell the llvm to not throw away theese variables than with printf... %u - %s \nyeah, I tried volatilize the s**t out, didn't help.\n",s->syscallTableLen,s->syscallTable[s->syscallTableLen].sysCallName );
+            #endif
             //printf("syscall id: %u, name: %s \n",s->syscallTableLen,s->syscallTable[s->syscallTableLen].sysCallName );
             tokenDMSG("Token set, type new SYSCALL",
                       posToken,
