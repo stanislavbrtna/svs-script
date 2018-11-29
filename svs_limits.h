@@ -27,8 +27,8 @@ This file contains the main defines and limits of SVS.
 
 /*============================= Versions =====================================*/
 
-#define SVS_VERSION  "1.1.2"
-#define SVS_VERSION_NUM 1120
+#define SVS_VERSION  "1.1.3"
+#define SVS_VERSION_NUM 1130
 
 /*============================= Local Config =================================*/
 
@@ -40,7 +40,7 @@ This file contains the main defines and limits of SVS.
 	#define TOKEN_LENGTH 2048 // size of token cache
 	#define TOKEN_CACHE_STEP 128 // size of step for chaching the swap file
 #else
-	#define TOKEN_LENGTH 25000 // token chache size for disabled swap file
+	#define TOKEN_LENGTH 35000 // token chache size for disabled swap file
 #endif
 
 #define SVS_ARRAY_LEN 400

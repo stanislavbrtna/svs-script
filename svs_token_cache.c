@@ -79,6 +79,13 @@ uint8_t closeTokenCache(svsVM *s){
   return 0;
 }
 
+void SVScloseCache(svsVM *s) {
+  return;
+}
+
+void SVSopenCache(svsVM *s) {
+  return;
+}
 
 #else
 
