@@ -1,4 +1,3 @@
 Add del or rm builtin call to handle destroying arrays.
 Move array functions to one place.
-Clean up and simplify defines in limits.h.
 Standard library would be nice.

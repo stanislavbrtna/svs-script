@@ -27,8 +27,8 @@ This file contains the main defines and limits of SVS.
 
 /*============================= Versions =====================================*/
 
-#define SVS_VERSION  "1.1.3"
-#define SVS_VERSION_NUM 1130
+#define SVS_VERSION  "1.1.4"
+#define SVS_VERSION_NUM 1140
 
 /*============================= Local Config =================================*/
 
@@ -36,27 +36,54 @@ This file contains the main defines and limits of SVS.
 	#define TOKEN_CACHE_DISABLED 0
 #endif
 
-#if TOKEN_CACHE_DISABLED==0
+#if TOKEN_CACHE_DISABLED == 0
 	#define TOKEN_LENGTH 2048 // size of token cache
 	#define TOKEN_CACHE_STEP 128 // size of step for chaching the swap file
 #else
-	#define TOKEN_LENGTH 35000 // token chache size for disabled swap file
+  #ifndef TOKEN_LENGTH
+	  #define TOKEN_LENGTH 35000 // token chache size for disabled swap file
+  #endif
 #endif
 
-#define SVS_ARRAY_LEN 400
-#define NAME_LENGTH 15 // max name length (functions&variables)
-#define FILE_NAME_L 32
+#ifndef SVS_ARRAY_LEN
+  #define SVS_ARRAY_LEN 400
+#endif
 
-#define FUNCTION_TABLE_L 50 // počet funkcí v jednom souboru / max functions in one file
-#define VAR_TABLE_L 200 // počet promněnných / max number of variables
-#define STRING_FIELD_L 6000 // počet znaků stringové pamněti / max number of characters in string memory
-#define GC_THRESHOLD 4500 // threshold for garbage collection of strings
+#ifndef NAME_LENGTH
+  #define NAME_LENGTH 15 // max name length (functions&variables)
+#endif
 
-#define SYSCALL_TABLE_L 100  // kolik různých sys volání může obsahovat jeden vm / max number of different syscalls in one file
+#ifndef FILE_NAME_L
+  #define FILE_NAME_L 32
+#endif
 
-#define SYSCALL_WRAPPERS 5 // maximální počet wrapperů / max number of syscall wrappers
+#ifndef FUNCTION_TABLE_L
+  #define FUNCTION_TABLE_L 50 // počet funkcí v jednom souboru / max functions in one file
+#endif
 
-#define FUNCTION_ARGS_MAX 10 // max number of arguments, do not change
+#ifndef VAR_TABLE_L
+  #define VAR_TABLE_L 200 // počet promněnných / max number of variables
+#endif
+
+#ifndef STRING_FIELD_L
+  #define STRING_FIELD_L 6000 // počet znaků stringové pamněti / max number of characters in string memory
+#endif
+
+#ifndef GC_THRESHOLD
+  #define GC_THRESHOLD 4500 // threshold for garbage collection of strings
+#endif
+
+#ifndef SYSCALL_TABLE_L
+  #define SYSCALL_TABLE_L 100  // kolik různých sys volání může obsahovat jeden vm / max number of different syscalls in one file
+#endif
+
+#ifndef SYSCALL_WRAPPERS
+  #define SYSCALL_WRAPPERS 5 // maximální počet wrapperů / max number of syscall wrappers
+#endif
+
+#ifndef FUNCTION_ARGS_MAX
+  #define FUNCTION_ARGS_MAX 10 // max number of arguments, do not change
+#endif
 
 #define LOCAL_VARIABLES_ENABLED // enable local statement
 #define USE_FLOAT // enable floating point math

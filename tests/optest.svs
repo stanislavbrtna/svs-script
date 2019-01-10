@@ -198,7 +198,7 @@ function main {
     print("FAIL");
   }
   print("");
-  print("Final result: ", "");
+  print("Final OP Test result: ", "");
   if(FAIL == 0) {
     print("PASSED");
   } else {
