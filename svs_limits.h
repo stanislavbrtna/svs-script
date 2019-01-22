@@ -27,7 +27,7 @@ This file contains the main defines and limits of SVS.
 
 /*============================= Versions =====================================*/
 
-#define SVS_VERSION  "1.1.4"
+#define SVS_VERSION  "1.1.5"
 #define SVS_VERSION_NUM 1140
 
 /*============================= Local Config =================================*/
@@ -53,8 +53,8 @@ This file contains the main defines and limits of SVS.
   #define NAME_LENGTH 15 // max name length (functions&variables)
 #endif
 
-#ifndef FILE_NAME_L
-  #define FILE_NAME_L 32
+#ifndef SVS_FILE_NAME_L
+  #define SVS_FILE_NAME_L 128
 #endif
 
 #ifndef FUNCTION_TABLE_L

@@ -103,7 +103,7 @@ void svsSetName(uint8_t * name, svsVM *s) {
 
 void svsSetFileName(uint8_t * name, svsVM *s) {
   uint16_t x;
-  for(x = 0; x < FILE_NAME_L; x++) {
+  for(x = 0; x < SVS_FILE_NAME_L; x++) {
     s->fName[x] = name[x];
   }
 }

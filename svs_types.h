@@ -130,7 +130,7 @@ typedef struct {
 typedef struct {
   uint8_t vmName[NAME_LENGTH+1]; //název svsVM
 
-  uint8_t fName[FILE_NAME_L]; //název svs souboru
+  uint8_t fName[SVS_FILE_NAME_L]; //název svs souboru
 
 #ifdef PC //chache file, odlišné pro pc a fatfs
   FILE *vmCache;
