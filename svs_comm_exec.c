@@ -470,7 +470,6 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
   if (newToken == SVS_TOKEN_RETURN) { //return
 
     if (s->commRetFlag == 0) {
-      x = currToken;
       commExDMSG("commExecLoop: RETURN statement", currToken);
       currToken++;
       exprExec(currToken, &varPrac, s);

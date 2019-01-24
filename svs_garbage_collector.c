@@ -93,8 +93,6 @@ uint8_t gcRemoveString(uint16_t strId, svsVM *s) {
 
   s->stringFieldLen -= str_len;
 
-  x = 0;
-
   for(x = 1; x <= s->varTableLen; x++) {
     if (s->varTable[x].type == 1) {
       if (s->varTable[x].value.val_str > strId) {

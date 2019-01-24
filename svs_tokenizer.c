@@ -431,7 +431,6 @@ uint8_t tokenParse(svsVM *s) {
                     getTokenType(posToken, s),
                     posText);
           //printf("flt: %f \n",getTokenData(posToken,s).val_f);
-          floatFound = 0;
           #endif
         } else {
           setTokenData(posToken, numPrac, s);

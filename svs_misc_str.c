@@ -281,8 +281,6 @@ varType floatToString(varType num, svsVM *s) {
     a++;
   }
 
-  a = 0;
-
   while (decnum > 5) {
     if ((prac2 % 10) >= 5) {
       prac2 /= 10;

@@ -164,7 +164,6 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
       result->value = (varType)((int32_t)1);
     }
     exprExecDMSG("ExprExecLvl5 NOT statement end", result->value.val_s, result->tokenId);
-    index = result->tokenId;
   }else if (((getTokenType(index, s) == 5) || (getTokenType(index, s) == 6))) {
     while ((getTokenType(index, s) == 5) || (getTokenType(index, s) == 6)) {
       if (getTokenType(index, s) == 5) { // (
@@ -177,7 +176,7 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
       }
       if(getTokenType(index, s) == 6) { // ) když nám přišel konec závorky, posuneme tokenId returnu a skočíme pryč
         result->tokenId++;
-        exprExecDMSG("ExprExecLvl5 Exit on )", result->value.val_s,index);
+        exprExecDMSG("ExprExecLvl5 Exit on )", result->value.val_s, index);
         return;
       }
     }
@@ -849,7 +848,6 @@ void exprExec(uint16_t index, varRetVal *result, svsVM *s) {
   if (errCheck(s)) {
     return;
   }
-  tokenId = result->tokenId;
 
   // Unsecure command is any command that might introduce more new strings in the memory
   // than just the result of the expression.
