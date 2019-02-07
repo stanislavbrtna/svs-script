@@ -177,9 +177,8 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
     if (sysExecTypeCheck(argS, argType, 1,s)){
       return 0;
     }
-    setCommExDebug(argS->arg[1].val_s);
-    setExprExecDebug(argS->arg[1].val_s);
-    result->value.val_s=0;
+    s->globalDebug = (uint8_t) argS->arg[1].val_s;
+    result->value.val_s = 0;
     return 1;
   }
 

@@ -30,8 +30,8 @@ void setCommExDebug (uint8_t level) {
   commExDebug = level;
 }
 
-void commExDMSG(char *text, uint16_t tokenId) {
-  if (commExDebug == 1) {
+void commExDMSG(char *text, uint16_t tokenId, svsVM *s) {
+  if ((commExDebug == 1) || (s->globalDebug)) {
     printf("commExDMSG: %s \ntokenId: %u\n", text, tokenId);
   }
 }
@@ -54,7 +54,7 @@ uint16_t exprSkip(uint16_t index, svsVM *s) {
         return 0;
       }
       if (count == 0) {
-        commExDMSG("commSkip expression skip end, (skipped)", index);
+        commExDMSG("commSkip expression skip end, (skipped)", index, s);
         break;
       }
     }
@@ -72,7 +72,7 @@ uint16_t commSkip(uint16_t index, svsVM *s) {
   uint16_t count = 0;
 
   x = index;
-  commExDMSG("commSkip start", index);
+  commExDMSG("commSkip start", index, s);
 
   // skip if/else
   if (getTokenType(x, s) == SVS_TOKEN_IF) {
@@ -113,14 +113,14 @@ uint16_t commSkip(uint16_t index, svsVM *s) {
         return 0;
       }
       if (count == 0) {
-        commExDMSG("commSkip end (skipped BLOCK(S))", x);
+        commExDMSG("commSkip end (skipped BLOCK(S))", x, s);
         break;
       }
     }
 
     //řeší situaci kdy za příkazem není závorka, funguje ok, pokud je na konci řádku středník
     if ((getTokenType(x, s) == 9) && (count == 0)) {
-      commExDMSG("commSkip end (skipped LINE)", x);
+      commExDMSG("commSkip end (skipped LINE)", x, s);
       break;
       //blok má ve zvyku obdržet token posledního vykonaného příkazu, inkrement provádí sám.
     }
@@ -167,7 +167,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
     return 0;
   }
 
-  commExDMSG("commExecLoop", currToken);
+  commExDMSG("commExecLoop", currToken, s);
 
   // garbage collection is called each exec loop, but it might do nothing
   // its behaviour depends on size of the empty memory space
@@ -176,14 +176,14 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
   // function call
   // volání funkce
   if (newToken == SVS_TOKEN_CALL) {
-    commExDMSG("commExecLoop: Function Call", currToken);
-    commExDMSG((char *)s->stringField + getTokenData(currToken, s).val_u, currToken);
+    commExDMSG("commExecLoop: Function Call", currToken, s);
+    commExDMSG((char *)s->stringField + getTokenData(currToken, s).val_u, currToken, s);
     return commParseCall(currToken, s);
   }
 
   // local statement
   if (newToken == SVS_TOKEN_LOCAL) {
-    commExDMSG("commExecLoop: LOCAL statement", currToken);
+    commExDMSG("commExecLoop: LOCAL statement", currToken, s);
     currToken++;
 
     if (getTokenType(currToken, s) != SVS_TOKEN_VAR) { // expecting VAR
@@ -214,7 +214,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
     varType tmp;
     varType id;
     varType len;
-    commExDMSG("commExecLoop: ARRAY statement", currToken);
+    commExDMSG("commExecLoop: ARRAY statement", currToken, s);
     currToken++;
 
     if (getTokenType(currToken, s) != SVS_TOKEN_VAR) { // expecting VAR
@@ -289,7 +289,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 
   if (newToken == SVS_TOKEN_SYS) { //sys statement
 
-    commExDMSG("commExecLoop: SYS statement", currToken);
+    commExDMSG("commExecLoop: SYS statement", currToken, s);
     sysExec(currToken, &varPrac, s);
     if (errCheck(s)) {
       return 0;
@@ -301,7 +301,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
   // built-in function
   if (newToken == SVS_TOKEN_FUNCTION_BUILTIN) {
 
-    commExDMSG("commExecLoop: BUILT-IN FUNCTION statement", currToken);
+    commExDMSG("commExecLoop: BUILT-IN FUNCTION statement", currToken, s);
     processBuiltInCall(currToken, &varPrac, s);
     if (errCheck(s)) {
       return 0;
@@ -317,7 +317,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
     x = currToken; //uložíme token indexu promněnné / we store index of the variable
     currToken++;
     if (getTokenType(currToken,s) == SVS_TOKEN_ASSIGN) { // =
-      commExDMSG("commExecLoop: = statement", currToken);
+      commExDMSG("commExecLoop: = statement", currToken, s);
       if (varGetType(getTokenData(x, s), s) == SVS_TYPE_ARR) {
         errSoft((uint8_t *)"commEx: Assign on array is not supported.", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
@@ -337,16 +337,16 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
       varSetType(getTokenData(x, s), varPrac.type, s); //nastavíme typ / we set new type
 
       if (varPrac.type == 0) {
-        commExDMSG("commExecLoop: = statement: result is NUM", currToken);
+        commExDMSG("commExecLoop: = statement: result is NUM", currToken, s);
       } else {
-        commExDMSG("commExecLoop: = statement: result is STR", currToken);
+        commExDMSG("commExecLoop: = statement: result is STR", currToken, s);
       }
 
       currToken = varPrac.tokenId; //nastavíme token kde se má pokračovat / we set the token id we got from exprExec
-      commExDMSG("commExecLoop: = statement: continue on token:", currToken);
+      commExDMSG("commExecLoop: = statement: continue on token:", currToken, s);
 
     } else if(getTokenType(currToken, s) == SVS_TOKEN_ADD) { // ++
-      commExDMSG("commExecLoop: ++ statement", currToken);
+      commExDMSG("commExecLoop: ++ statement", currToken, s);
       currToken++;
       if (getTokenType(currToken, s) == SVS_TOKEN_ADD) {
         if (varGetType(getTokenData(x,s), s) != SVS_TYPE_NUM) {
@@ -368,7 +368,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
       }
 
     } else if(getTokenType(currToken, s) == SVS_TOKEN_SUBT) { // --
-      commExDMSG("commExecLoop: -- statement", currToken);
+      commExDMSG("commExecLoop: -- statement", currToken, s);
       currToken++;
       if (getTokenType(currToken, s) == SVS_TOKEN_SUBT) {
         if (varGetType(getTokenData(x, s), s) != SVS_TYPE_NUM) {
@@ -470,7 +470,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
   if (newToken == SVS_TOKEN_RETURN) { //return
 
     if (s->commRetFlag == 0) {
-      commExDMSG("commExecLoop: RETURN statement", currToken);
+      commExDMSG("commExecLoop: RETURN statement", currToken, s);
       currToken++;
       exprExec(currToken, &varPrac, s);
       if (errCheck(s)) {
@@ -487,7 +487,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
   // začátek bloku / start of block
   if (newToken == SVS_TOKEN_LCBR) {
 
-    commExDMSG("commExecLoop: start of block ({)", currToken);
+    commExDMSG("commExecLoop: start of block ({)", currToken, s);
     currToken++; // skipping "{"
     varTableSP = s->varTableLen; // storing current variable stack
     while (getTokenType(currToken, s) != SVS_TOKEN_RCBR) { // loop until "}"
@@ -511,20 +511,20 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 
         if (getTokenType(currToken, s) == SVS_TOKEN_BREAK) { //break
           s->varTableLen = varTableSP; //při opuštění bloku vrátíme stack
-          commExDMSG("commExecLoop: block: break occured inside block!", currToken);
+          commExDMSG("commExecLoop: block: break occured inside block!", currToken, s);
           return currToken;
         }
 
         if (getTokenType(currToken, s) == SVS_TOKEN_RETURN) { //return
           s->varTableLen = varTableSP;
-          commExDMSG("commExecLoop: block: return inside block.", currToken);
+          commExDMSG("commExecLoop: block: return inside block.", currToken, s);
           return currToken;
         }
 
         currToken++;
       } else { // break
         s->varTableLen = varTableSP;
-        commExDMSG("commExecLoop: start of block: break occured!", currToken);
+        commExDMSG("commExecLoop: start of block: break occured!", currToken, s);
         return currToken;
       }
     }
@@ -533,7 +533,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
   }
 
   if (newToken == SVS_TOKEN_IF) { //if / else
-    commExDMSG("commExecLoop: if statement", currToken);
+    commExDMSG("commExecLoop: if statement", currToken, s);
     currToken++;
     if (getTokenType(currToken, s) != 5) { // detekce závorky
       errSoft((uint8_t *)"commExecLoop: Unknown statement after if", s);
@@ -556,7 +556,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
       }
       currToken++;
       if (x) { //podmínka splněna
-        commExDMSG("commExecLoop: if statement: expression TRUE", currToken);
+        commExDMSG("commExecLoop: if statement: expression TRUE", currToken, s);
         //curr token teď míří přímo na novej příkaz
         if (getTokenType(currToken, s) != 15) {
           currToken = commExecLoop(currToken, s);
@@ -578,15 +578,15 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         if (errCheck(s)) {
           return 0;
         }
-        commExDMSG("commExecLoop: if statement: expression FALSE, code skipped", currToken);
+        commExDMSG("commExecLoop: if statement: expression FALSE, code skipped", currToken, s);
       }
       //pokud existuje else větev
       if(getTokenType(currToken + 1, s) == 13) {
-        commExDMSG("commExecLoop: if statement: else detected", currToken);
+        commExDMSG("commExecLoop: if statement: else detected", currToken, s);
         currToken += 1;
         if (!x){ //podmínka nesplněna
           currToken++;
-          commExDMSG("commExecLoop: if statement: else: executing", currToken);
+          commExDMSG("commExecLoop: if statement: else: executing", currToken, s);
           if (getTokenType(currToken,s) != 15) {
             currToken = commExecLoop(currToken, s);
             if (errCheck(s)) {
@@ -606,11 +606,11 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
           if (errCheck(s)) {
             return 0;
           }
-          commExDMSG("commExecLoop: if statement: else: skipped", currToken);
+          commExDMSG("commExecLoop: if statement: else: skipped", currToken, s);
         }
       }
     }
-    commExDMSG("commExecLoop: if statement: end of if", currToken);
+    commExDMSG("commExecLoop: if statement: end of if", currToken, s);
     return currToken;
   }
 
@@ -620,7 +620,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
     uint16_t loopPrac = 0;
     uint32_t x = 0;
 
-    commExDMSG("commExecLoop: for statement", currToken);
+    commExDMSG("commExecLoop: for statement", currToken, s);
     currToken++;
 
     //struktura: for(init expr;check expr;endloop expr)
@@ -659,7 +659,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         //skip end prac
         currToken = commSkip(currToken + 1, s);
         if(x == 0) { //skip
-          commExDMSG("commExecLoop: for: expression FALSE, skipping", currToken);
+          commExDMSG("commExecLoop: for: expression FALSE, skipping", currToken, s);
           //skip loop body
           currToken++;
           currToken = commSkip(currToken + 1, s);
@@ -669,7 +669,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
           //break out
           break;
         } else {
-          commExDMSG("commExecLoop: for: expression TRUE", currToken);
+          commExDMSG("commExecLoop: for: expression TRUE", currToken, s);
         }
         if (getTokenType(currToken, s) == 9) {
           currToken++; //přeskočíme středník na konci výrazu
@@ -703,12 +703,12 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
           if (errCheck(s)) {
             return 0;
           }
-          commExDMSG("commExecLoop: for: break occured, skipping", currToken);
+          commExDMSG("commExecLoop: for: break occured, skipping", currToken, s);
           break;
         }
 
         if (getTokenType(currToken, s) == 16) {
-          commExDMSG("commExecLoop: while: return occured, returning", currToken);
+          commExDMSG("commExecLoop: while: return occured, returning", currToken, s);
           return currToken;
         }
 
@@ -723,7 +723,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
   }
 
   if (newToken == 14) { //while
-    commExDMSG("commExecLoop: while statement", currToken);
+    commExDMSG("commExecLoop: while statement", currToken, s);
     currToken++;
     if (getTokenType(currToken, s) != 5) { // detekce závorky
       errSoft((uint8_t *)"commEx: Unknown statement after while, missing \"(\"", s);
@@ -752,7 +752,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
           return 0;
         }
         if (x) { //podmínka splněna
-          commExDMSG("commExecLoop: while: expression TRUE", currToken);
+          commExDMSG("commExecLoop: while: expression TRUE", currToken, s);
           currToken++; //curr token teď míří přímo na novej příkaz
           currToken = commExecLoop(currToken, s);
           if (errCheck(s)) {
@@ -766,12 +766,12 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
             if (errCheck(s)) {
               return 0;
             }
-            commExDMSG("commExecLoop: while: break occured, skipping", currToken);
+            commExDMSG("commExecLoop: while: break occured, skipping", currToken, s);
             break;
           }
 
           if (getTokenType(currToken, s) == 16) {
-            commExDMSG("commExecLoop: while: return occured, returning", currToken);
+            commExDMSG("commExecLoop: while: return occured, returning", currToken, s);
             return currToken;
           }
 
@@ -781,12 +781,12 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
           if (errCheck(s)) {
             return 0;
           }
-          commExDMSG("commExecLoop: while: expression FALSE, skipping", currToken);
+          commExDMSG("commExecLoop: while: expression FALSE, skipping", currToken, s);
           break;
         }
       }
     }
-    commExDMSG("commExecLoop: while: end of while", currToken);
+    commExDMSG("commExecLoop: while: end of while", currToken, s);
     return currToken;
   }
 

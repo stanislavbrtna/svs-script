@@ -27,7 +27,7 @@ SOFTWARE.
 
 void varRetValZero(varRetVal *x);
 
-void exprExecDMSG(char *text,int16_t result , uint16_t tokenId);
+void exprExecDMSG(char *text,int16_t result , uint16_t tokenId, svsVM *s);
 
 void exprExec(uint16_t index, varRetVal *result, svsVM *s);
 void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s);
