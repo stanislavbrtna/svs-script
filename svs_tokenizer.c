@@ -460,6 +460,9 @@ uint8_t tokenParse(svsVM *s) {
 
     // newline: current line incremented, otherwise ignored
     if (tokenInput(posText, 0) == '\n') {
+      if(tokenizerDebug){
+        printf("\n->Now proccesing line %u:\n", currLine + 2);
+      }
       currLine++;
       tokenInput(0, 1);
       posText++;
