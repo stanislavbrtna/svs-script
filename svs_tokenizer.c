@@ -1103,13 +1103,13 @@ uint8_t tokenParse(svsVM *s) {
         setTokenData(posToken, (varType)((uint16_t)0), s);
         Lock = 0;
 
-        //získání názvu interní funkce:
-        //filtrace bordelu
+        // now it is time to get the sys function call name:
+        // filtering whitespace etc.
         while(1) {
           if (isRegChar(tokenInput(posText, 0))) {
             break;
           } else {
-            if (tokenInput(posText, 0) != ' ') {
+            if (!(tokenInput(posText, 0) == ' ' || tokenInput(posText, 0) == '.')) {
               tokenizerErrorPrint((uint8_t *)"tokenParse: Undefined symbol after sys statement!");
               return 1;
             }
@@ -1117,7 +1117,8 @@ uint8_t tokenParse(svsVM *s) {
           posText++;
           tokenInput(0, 1);
         }
-        //získání názvu interní funkce
+
+        // function name
         pracStrInd = 0;
         pracName2[pracStrInd] = tokenInput(posText, 0);
         posText++;
