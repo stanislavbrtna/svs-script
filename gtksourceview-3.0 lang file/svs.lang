@@ -1,0 +1,791 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This is syntax highlight file for SVS, to be used with gtksourceview.
+  It is mostly based upon octave syntax highlighs
+  It's not perfect, but works reasonably well with xed, gedit, etc...
+
+  Compatible with: SVS v.1.1.7, SDA_OS v.0.7.2.2
+
+  Copyright (C) 2019 Stanislav Brtna <stanislav.brtna@gmail.com>
+
+  Big thanks to the authors of octave.lang:
+  Copyright (C) 2006 Søren Hauberg <soren@hauberg.org>
+  Copyright (C) 2006 Muthiah Annamalai <gnumuthu@users.sf.net>
+  Copyright (C) 2010-2015 Carnë Draug <carandraug+dev@gmail.com>
+
+  GtkSourceView is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  GtkSourceView is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+-->
+
+<language id="svscript" _name="S! script" version="2.0" _section="Scripts">
+  <metadata>
+    <property name="mimetypes">text/x-svs</property>
+    <property name="globs">*.svs</property>
+    <property name="line-comment-start">#</property>
+    <property name="block-comment-start">/*</property>
+    <property name="block-comment-end">*/</property>
+  </metadata>
+
+  <styles>
+    <style id="comment"           _name="Comment"           map-to="def:comment"/>
+    <style id="string"            _name="String"            map-to="def:string"/>
+    <style id="operator"          _name="Operator"          map-to="def:operator"/>
+    <style id="data-type"         _name="Data type"         map-to="def:type"/>
+    <style id="storage-type"      _name="Storage Type"      map-to="def:type"/>
+    <style id="boolean"           _name="Boolean"           map-to="def:boolean"/>
+    <style id="decimal"           _name="Decimal"           map-to="def:decimal"/>
+    <style id="floating-point"    _name="Floating Point"    map-to="def:floating-point"/>
+    <style id="base-n-integer"    _name="Base-N Integer"    map-to="def:base-n-integer"/>
+    <style id="keyword"           _name="Keyword"           map-to="def:keyword"/>
+    <style id="variable"          _name="Variable"          map-to="def:identifier"/>
+    <style id="reserved-constant" _name="Reserved Constant" map-to="def:special-constant"/>
+    <style id="builtin"           _name="Builtin"           map-to="def:builtin"/>
+  </styles>
+
+  <definitions>
+
+		<context id="block-comment" style-ref="comment" class="comment" class-disabled="no-spell-check">
+      <start>#\*</start>
+      <end>\*#</end>
+      <include>
+				<context ref="def:in-comment"/>
+      </include>
+    </context>
+
+    <context id="line-comment" style-ref="comment" end-at-line-end="true" class="comment" class-disabled="no-spell-check">
+      <start>[^\*]#[^\*]</start>
+      <include>
+        <context ref="def:in-comment"/>
+      </include>
+    </context>
+
+    <!--
+      Line continue in Octave are different from the one in def.lang. They can
+      either be  ... or \ optionally followed by whitespace only.
+    -->
+    <context id="line-continue" style-ref="comment">
+      <start>(\.\.\.|\\)(\s)*?$</start>
+      <end>^</end>
+      <include>
+        <context ref="def:in-comment"/>
+      </include>
+    </context>
+
+    <context id="double-quoted-string" style-ref="string" end-at-line-end="true" class="string" class-disabled="no-spell-check">
+      <start>"</start>
+      <end>"</end>
+      <include>
+         <!-- octave uses the same printf format and escape chars as C -->
+        <context ref="c:printf"/>
+        <context ref="c:escaped-character"/>
+        <context ref="line-continue"/>
+      </include>
+    </context>
+
+    <context id="single-quoted-string" style-ref="string" end-at-line-end="true" class="string" class-disabled="no-spell-check">
+      <!--
+         To do not misdetect the transpose operator ' as the start of a string
+         we assert to not follow a variable name (letters, digits and underscores)
+         or a closing bracket (round, square or curly) or a dot (to form the
+         array transpose operator ".'" ).
+      -->
+      <start>(?&lt;![0-9a-zA-Z_\)\]}\.])'</start>
+      <end>'</end>
+      <include>
+        <context style-ref="def:special-char">
+          <!--
+            Unlike double quoted string, single quote strings in octave do not
+            allow continuation lines or escaped characters. The only escape
+            necessary is the single quote itself which is escaped with two
+            single quotes.
+          -->
+          <match>''</match>
+        </context>
+      </include>
+    </context>
+
+
+    <!--To see the list of operators, use the function __operators__-->
+    <context id="operator">
+    	<include>
+		  	<context style-ref="operator">
+					<keyword>and</keyword>
+				  <keyword>or</keyword>
+				  <keyword>not</keyword>
+				</context>
+		    <context style-ref="operator">
+				  <match extended="true">
+				    (\.)?\+{1,2}?(?!\+) | %|  # arithmetic operators
+				    (\.)?\-{1,2}?(?!\-) |   # already counting
+				    (\.)?\*{1,2}?(?!\*) |   # with auto increment,
+				    (\.)?\/(?!\^) |         # element by element,
+				    (\.)?\\(?!\^) |         # left division
+				    (\.)?\^(?!\^) |         # and both exp
+				    (?&lt;=[0-9a-zA-Z_)\]}])(\.)?' |                  # transpose operator
+				    &lt;=? | &gt;=? | != | ~= | == | &lt;&gt; |       # comparison operators
+				    &amp;{1,2}?(?!&amp;) | \|{1,2}?(?!\|) | ! | ~ |   # boolean operators
+				    = |                                               # assignment operator
+				    :                                                 # range operator
+				  </match>
+		    </context>
+      </include>
+    </context>
+
+    <context id="data-type" style-ref="data-type">
+      <keyword>local</keyword>
+      <keyword>array</keyword>
+    </context>
+
+    <context id="function-handle" style-ref="data-type">
+      <match case-sensitive="false">@([a-z_][a-z1-9_]*)?</match>
+    </context>
+
+    <context id="storage-type" style-ref="storage-type">
+      <keyword>global</keyword>
+      <keyword>persistent</keyword>
+    </context>
+
+    <context id="boolean" style-ref="boolean">
+      <!--
+        false and true can be used as functions too. Do not highlight as boolean
+        if followed by parentheses.
+      -->
+      <suffix>\b(?!(\s)*\()</suffix>
+      <keyword>arg0</keyword>
+      <keyword>arg1</keyword>
+      <keyword>arg2</keyword>
+      <keyword>arg3</keyword>
+      <keyword>arg4</keyword>
+      <keyword>arg5</keyword>
+      <keyword>arg6</keyword>
+      <keyword>arg7</keyword>
+      <keyword>arg8</keyword>
+      <keyword>arg9</keyword>
+    </context>
+
+    <context id="decimal" style-ref="decimal">
+      <match>\b([1-9][0-9]*|0)([Uu]([Ll]|LL|ll)?|([Ll]|LL|ll)[Uu]?)?\b</match>
+    </context>
+
+    <context id="floating-point-number" style-ref="floating-point">
+      <match>\b([0-9]+[Ee][-]?[0-9]+|([0-9]*\.[0-9]+|[0-9]+\.)([Ee][-]?[0-9]+)?)[fFlL]?</match>
+    </context>
+
+    <context id="octal-number" style-ref="base-n-integer">
+      <match>\b0[0-7]+([Uu]([Ll]|LL|ll)?|([Ll]|LL|ll)[Uu]?)?\b</match>
+    </context>
+
+    <context id="hex-number" style-ref="base-n-integer">
+      <match>\b0[xX][0-9a-fA-F]+([Uu]([Ll]|LL|ll)?|([Ll]|LL|ll)[Uu]?)?\b</match>
+    </context>
+
+    <context id="variables" style-ref="variable">
+      <keyword>ans</keyword>
+    </context>
+
+    <context id="reserved-constant" style-ref="reserved-constant">
+      <!--
+        Most of the constants can be used as functions too. Do not highlight as
+        constants if followed by parentheses.
+      -->
+      <suffix>\b(?!(\s)*\()</suffix>
+      <keyword>EV_NONE</keyword>
+      <keyword>EV_PRESSED</keyword>
+      <keyword>EV_HOLD</keyword>
+      <keyword>EV_RELEASED</keyword>
+
+      <keyword>SVP_LANG_CZ</keyword>
+      <keyword>SVP_LANG_ENG</keyword>
+      <keyword>LED_ON</keyword>
+      <keyword>LED_OFF</keyword>
+      <keyword>LED_BLINK</keyword>
+      <keyword>LED_SHORTBLINK</keyword>
+      <keyword>LED_ALARM</keyword>
+      <keyword>BTN_A</keyword>
+      <keyword>BTN_LEFT</keyword>
+      <keyword>BTN_UP</keyword>
+      <keyword>BTN_DOWN</keyword>
+      <keyword>BTN_RIGHT</keyword>
+      <keyword>BTN_B</keyword>
+    </context>
+
+    <context id="keyword">
+      <include>
+        <context id="svs-keyword" style-ref="keyword">
+          <!--
+            Octave and Matlab have already implemented most of each others keywords
+            but not all. Both Octave and Matlab are still missing keywords from the
+            other. As such, this block only has the keywords already implemented in
+            both. When adding a new keyword, make sure you place it on the right
+            place.
+          -->
+          <!--keyword>sys</keyword-->
+          <keyword>do</keyword>
+          <keyword>else(if)?</keyword>
+          <keyword>end</keyword>
+          <keyword>function</keyword>
+          <keyword>if</keyword>
+          <keyword>return</keyword>
+          <keyword>while</keyword>
+          <keyword>for</keyword>
+          <keyword>break</keyword>
+        </context>
+      </include>
+    </context>
+
+    <define-regex id="is-type-functions" extended="true">
+      _absolute_filename         | dir                        |numeric        |
+      _dq_string                 | empty                      | object        |
+      _function_handle           | equal                      | obsv          |
+      _leap_year                 | equalwithequalnans         |
+      _real_matrix               | field                      |
+      _real_scalar               | figure                     |
+      _real_square_matrix        | finite                     | pc            |
+      _real_vector               | float                      | pref          |
+      _rooted_relative_filename  | global                     | prime         |
+      _sq_string                 | graph                      | print         |
+      _valid_file_id             | gray                       | prop          |
+      a                          | handle                     | punct         |
+      alnum                      | hermitian                  | real          |
+      alpha                      | hghandle                   | rgb           |
+      appdata                    | hold                       | row           |
+      argout                     | ieee                       | sample        |
+      ascii                      | ind                        | scalar        |
+      bool                       | index                      | sorted        |
+      bw                         | inf                        | space         |
+      cell                       | integer                    | sparse        |
+      cellstr                    | keyword                    | square        |
+      char                       | letter                     | stabilizable  |
+      cntrl                      | logical                    | strprop       |
+      column                     | lower                      | struct        |
+      complex                    | mac                        | symmetric     |
+      ctrb                       | matrix                     | unix          |
+      debugmode                  | member                     | upper         |
+      definite                   | method                     | varname       |
+      deployed                   | na                         | vector        |
+      detectable                 | nan                        | xdigit        |
+      digit                      | null
+    </define-regex>
+
+    <!--
+      While there are many more builtin functions in octave, only some are listed
+      here. This is to avoid maintenance problems specially in the case of
+      functions that may later be removed. Extra functions can easily be added
+      manually. Function __list_functions__ lists them all.
+    -->
+    <context id="builtin" style-ref="builtin">
+      <prefix>(?&lt;!\.)\%[</prefix>
+      <suffix>\%](?!\.)</suffix>
+
+      <!-- Integrated calls -->
+      <keyword>sys.num</keyword>
+      <keyword>sys.float</keyword>
+      <keyword>sys.isnum</keyword>
+      <keyword>sys.typeof</keyword>
+      <keyword>sys.getcp</keyword>
+      <keyword>sys.len</keyword>
+      <keyword>sys.substr</keyword>
+      <keyword>sys.print</keyword>
+
+      <keyword>sys.real</keyword>
+      <keyword>sys.arrayNew</keyword>
+      <keyword>sys.arrayGet</keyword>
+      <keyword>sys.arraySet</keyword>
+      <keyword>sys.dbg</keyword>
+      <keyword>sys.GC</keyword>
+      <keyword>sys.info</keyword>
+      <keyword>sys.profiler</keyword>
+
+      <!-- GR2 -->
+      <keyword>sys.pAddScreen</keyword>
+      <keyword>sys.pAddFrame</keyword>
+
+      <keyword>sys.pAddText</keyword>
+      <keyword>sys.pAddButton</keyword>
+      <keyword>sys.pAddCButton</keyword>
+      <keyword>sys.pAddCheckBox</keyword>
+      <keyword>sys.pAddImage</keyword>
+      <keyword>sys.pAddSliderV</keyword>
+      <keyword>sys.pAddSliderH</keyword>
+      <keyword>sys.pAddBar</keyword>
+
+      <keyword>sys.pDestroy</keyword>
+      <keyword>sys.pDestroyScr</keyword>
+
+      <keyword>sys.pGetValue</keyword>
+      <keyword>sys.pSetValue</keyword>
+      <keyword>sys.pSetModif</keyword>
+
+      <keyword>sys.pGetParam</keyword>
+      <keyword>sys.pSetParam</keyword>
+
+      <keyword>sys.pGetEvent</keyword>
+      <keyword>sys.pGetEventC</keyword>
+      <keyword>sys.pSetEvent</keyword>
+
+      <keyword>sys.pClrScrEv</keyword>
+
+      <keyword>sys.pSetScreen</keyword>
+
+      <keyword>sys.pGetGrayout</keyword>
+      <keyword>sys.pSetGrayout</keyword>
+
+      <keyword>sys.pGetVisible</keyword>
+      <keyword>sys.pSetVisible</keyword>
+
+      <keyword>sys.pGetStr</keyword>
+      <keyword>sys.pSetStr</keyword>
+      <keyword>sys.pSetTxtSize</keyword>
+
+			<keyword>sys.pSetRelInit</keyword>
+      <keyword>sys.pSetXYXY</keyword>
+      <keyword>sys.pGetXcell</keyword>
+      <keyword>sys.pSetXcell</keyword>
+      <keyword>sys.pGetYcell</keyword>
+      <keyword>sys.pSetYcell</keyword>
+
+      <keyword>sys.pGetXscroll</keyword>
+      <keyword>sys.pSetXscroll</keyword>
+
+      <keyword>sys.pGetYscroll</keyword>
+      <keyword>sys.pSetYscroll</keyword>
+
+      <keyword>sys.pSetDFont</keyword>
+
+      <keyword>sys.pGetTexAct</keyword>
+      <keyword>sys.pSetTexAct</keyword>
+
+      <keyword>sys.pSetTexFit</keyword>
+
+      <keyword>sys.pSetTexEd</keyword>
+
+      <keyword>sys.pSetColor</keyword>
+      <keyword>sys.pGetColor</keyword>
+
+      <!-- SDA-OS -->
+
+      <!-- SDA Main -->
+      <keyword>sys.pSetMainScr</keyword>
+      <keyword>sys.pGetMainScr</keyword>
+
+      <keyword>sys.pGetRedraw</keyword>
+      <keyword>sys.pSetRedraw</keyword>
+
+      <keyword>sys.error</keyword>
+
+      <keyword>sys.cntSet</keyword>
+      <keyword>sys.cntGet</keyword>
+
+      <keyword>sys.btnGetEv</keyword>
+      <keyword>sys.btnClrEv</keyword>
+
+      <keyword>sys.pHandleText</keyword>
+
+      <keyword>sys.keybHide</keyword>
+      <keyword>sys.keybShow</keyword>
+
+      <keyword>sys.rnd</keyword>
+
+      <keyword>sys.getMute</keyword>
+
+      <keyword>sys.wCalInit</keyword>
+      <keyword>sys.wCalSelect</keyword>
+      <keyword>sys.wCalUpdate</keyword>
+      <keyword>sys.wCalMark</keyword>
+      <keyword>sys.wCalGetDay</keyword>
+
+      <keyword>sys.sleepLock</keyword>
+      <keyword>sys.lcdWake</keyword>
+      <keyword>sys.getLcdState</keyword>
+      <keyword>sys.exit</keyword>
+      <keyword>sys.checkSVSVer</keyword>
+      <keyword>sys.sdaGetLang</keyword>
+
+      <keyword>sys.crUnLock</keyword>
+      <keyword>sys.crLock</keyword>
+      <keyword>sys.crEncrypt</keyword>
+      <keyword>sys.crDecrypt</keyword>
+
+      <keyword>sys.setSingular</keyword>
+      <keyword>sys.subProcess</keyword>
+      <keyword>sys.subRetval</keyword>
+
+			<keyword>sys.beep</keyword>
+      <keyword>sys.beepDef</keyword>
+      <keyword>sys.beepT</keyword>
+      <keyword>sys.beepF</keyword>
+
+			<keyword>sys.serialTrs</keyword>
+			<keyword>sys.srlTrsQAdd</keyword>
+			<keyword>sys.srlTrsQClr</keyword>
+			<keyword>sys.srlTrsQ</keyword>
+			<keyword>sys.serialRcv</keyword>
+
+
+			<keyword>sys.sdaSetLed</keyword>
+
+      <!-- SDA Files -->
+
+      <keyword>sys.pFrOpen</keyword>
+      <keyword>sys.fReadChars</keyword>
+      <keyword>sys.pFrSize</keyword>
+      <keyword>sys.pFrExists</keyword>
+      <keyword>sys.pFrSeek</keyword>
+      <keyword>sys.pFrClose</keyword>
+
+      <keyword>sys.fDelete</keyword>
+
+			<keyword>sys.cOpen</keyword>
+      <keyword>sys.cClose</keyword>
+      <keyword>sys.cKeyExists</keyword>
+      <keyword>sys.cKeyRead</keyword>
+      <keyword>sys.cKeyReadInt</keyword>
+      <keyword>sys.cKeyWrite</keyword>
+      <keyword>sys.cKeyRemove</keyword>
+
+      <keyword>sys.fFind</keyword>
+      <keyword>sys.fFindNext</keyword>
+
+      <keyword>sys.fReadStr</keyword>
+      <keyword>sys.fWriteStr</keyword>
+
+      <!-- SDA Overlays -->
+
+      <keyword>sys.pSetOvrScr</keyword>
+
+      <keyword>sys.pGetOvrId</keyword>
+      <keyword>sys.pOvrDestroy</keyword>
+      <keyword>sys.pOvrSetXYXY</keyword>
+      <keyword>sys.pSetOvrY</keyword>
+
+      <keyword>sys.oDateAdd</keyword>
+      <keyword>sys.oDateUpd</keyword>
+      <keyword>sys.oDateGetOk</keyword>
+      <keyword>sys.oDateClrOk</keyword>
+      <keyword>sys.oDateGetYr</keyword>
+      <keyword>sys.oDateGetDay</keyword>
+      <keyword>sys.oDateGetMon</keyword>
+
+      <keyword>sys.oTimAdd</keyword>
+      <keyword>sys.oTimSet</keyword>
+      <keyword>sys.oTimUpd</keyword>
+      <keyword>sys.oTimGetOk</keyword>
+      <keyword>sys.oTimGetMin</keyword>
+      <keyword>sys.oTimGetHr</keyword>
+      <keyword>sys.oTimClrOk</keyword>
+
+      <!-- SDA Time -->
+
+			<keyword>sys.getTime</keyword>
+      <keyword>sys.getTimeUpd</keyword>
+      <keyword>sys.getTimeSec</keyword>
+      <keyword>sys.getTimeMin</keyword>
+      <keyword>sys.getTimeHr</keyword>
+      <keyword>sys.getTimeDay</keyword>
+      <keyword>sys.getTimeMonth</keyword>
+      <keyword>sys.getTimeYear</keyword>
+      <keyword>sys.getUptime</keyword>
+
+			<keyword>sys.setTs</keyword>
+			<keyword>sys.getTsSec</keyword>
+			<keyword>sys.getTsMin</keyword>
+			<keyword>sys.getTsHr</keyword>
+			<keyword>sys.getTsDay</keyword>
+			<keyword>sys.getTsWkDay</keyword>
+			<keyword>sys.getTsMonth</keyword>
+			<keyword>sys.getTsYear</keyword>
+			<keyword>sys.alarmSetFixed</keyword>
+			<keyword>sys.alarmSetRep</keyword>
+			<keyword>sys.alarmDestroy</keyword>
+			<keyword>sys.alarmGetFlag</keyword>
+			<keyword>sys.alarmClrFlag</keyword>
+			<keyword>sys.alarmGetId</keyword>
+			<keyword>sys.alarmGetPar</keyword>
+
+      <!-- DirectS -->
+      <keyword>sys.sxMixColor</keyword>
+      <keyword>sys.sxSetArea</keyword>
+      <keyword>sys.sxDrawRect</keyword>
+      <keyword>sys.sxFillRect</keyword>
+      <keyword>sys.sxDrawCircle</keyword>
+      <keyword>sys.sxFillCircle</keyword>
+      <keyword>sys.sxDrawLine</keyword>
+      <keyword>sys.sxDrawText</keyword>
+      <keyword>sys.sxClearArea</keyword>
+      <keyword>sys.pDrawPPM</keyword>
+
+      <!-- To be removed -->
+      <keyword>sys num</keyword>
+      <keyword>sys float</keyword>
+      <keyword>sys isnum</keyword>
+      <keyword>sys typeof</keyword>
+      <keyword>sys getcp</keyword>
+      <keyword>sys len</keyword>
+      <keyword>sys substr</keyword>
+      <keyword>sys print</keyword>
+
+      <keyword>sys real</keyword>
+      <keyword>sys arrayNew</keyword>
+      <keyword>sys arrayGet</keyword>
+      <keyword>sys arraySet</keyword>
+      <keyword>sys dbg</keyword>
+      <keyword>sys GC</keyword>
+      <keyword>sys info</keyword>
+      <keyword>sys profiler</keyword>
+
+      <!-- GR2 -->
+      <keyword>sys pAddScreen</keyword>
+      <keyword>sys pAddFrame</keyword>
+
+      <keyword>sys pAddText</keyword>
+      <keyword>sys pAddButton</keyword>
+      <keyword>sys pAddCButton</keyword>
+      <keyword>sys pAddCheckBox</keyword>
+      <keyword>sys pAddImage</keyword>
+      <keyword>sys pAddSliderV</keyword>
+      <keyword>sys pAddSliderH</keyword>
+      <keyword>sys pAddBar</keyword>
+
+      <keyword>sys pDestroy</keyword>
+      <keyword>sys pDestroyScr</keyword>
+
+      <keyword>sys pGetValue</keyword>
+      <keyword>sys pSetValue</keyword>
+      <keyword>sys pSetModif</keyword>
+
+      <keyword>sys pGetParam</keyword>
+      <keyword>sys pSetParam</keyword>
+
+      <keyword>sys pGetEvent</keyword>
+      <keyword>sys pGetEventC</keyword>
+      <keyword>sys pSetEvent</keyword>
+
+      <keyword>sys pClrScrEv</keyword>
+
+      <keyword>sys pSetScreen</keyword>
+
+      <keyword>sys pGetGrayout</keyword>
+      <keyword>sys pSetGrayout</keyword>
+
+      <keyword>sys pGetVisible</keyword>
+      <keyword>sys pSetVisible</keyword>
+
+      <keyword>sys pGetStr</keyword>
+      <keyword>sys pSetStr</keyword>
+      <keyword>sys pSetTxtSize</keyword>
+
+			<keyword>sys pSetRelInit</keyword>
+      <keyword>sys pSetXYXY</keyword>
+      <keyword>sys pGetXcell</keyword>
+      <keyword>sys pSetXcell</keyword>
+      <keyword>sys pGetYcell</keyword>
+      <keyword>sys pSetYcell</keyword>
+
+      <keyword>sys pGetXscroll</keyword>
+      <keyword>sys pSetXscroll</keyword>
+
+      <keyword>sys pGetYscroll</keyword>
+      <keyword>sys pSetYscroll</keyword>
+
+      <keyword>sys pSetDFont</keyword>
+
+      <keyword>sys pGetTexAct</keyword>
+      <keyword>sys pSetTexAct</keyword>
+
+      <keyword>sys pSetTexFit</keyword>
+
+      <keyword>sys pSetTexEd</keyword>
+
+      <keyword>sys pSetColor</keyword>
+      <keyword>sys pGetColor</keyword>
+
+      <!-- SDA-OS -->
+
+      <!-- SDA Main -->
+      <keyword>sys pSetMainScr</keyword>
+      <keyword>sys pGetMainScr</keyword>
+
+      <keyword>sys pGetRedraw</keyword>
+      <keyword>sys pSetRedraw</keyword>
+
+      <keyword>sys error</keyword>
+
+      <keyword>sys cntSet</keyword>
+      <keyword>sys cntGet</keyword>
+
+      <keyword>sys btnGetEv</keyword>
+      <keyword>sys btnClrEv</keyword>
+
+      <keyword>sys pHandleText</keyword>
+
+      <keyword>sys keybHide</keyword>
+      <keyword>sys keybShow</keyword>
+
+      <keyword>sys rnd</keyword>
+
+      <keyword>sys getMute</keyword>
+
+      <keyword>sys wCalInit</keyword>
+      <keyword>sys wCalSelect</keyword>
+      <keyword>sys wCalUpdate</keyword>
+      <keyword>sys wCalMark</keyword>
+      <keyword>sys wCalGetDay</keyword>
+
+      <keyword>sys sleepLock</keyword>
+      <keyword>sys lcdWake</keyword>
+      <keyword>sys getLcdState</keyword>
+      <keyword>sys exit</keyword>
+      <keyword>sys checkSVSVer</keyword>
+      <keyword>sys sdaGetLang</keyword>
+
+      <keyword>sys crUnLock</keyword>
+      <keyword>sys crLock</keyword>
+      <keyword>sys crEncrypt</keyword>
+      <keyword>sys crDecrypt</keyword>
+
+      <keyword>sys setSingular</keyword>
+      <keyword>sys subProcess</keyword>
+      <keyword>sys subRetval</keyword>
+
+			<keyword>sys beep</keyword>
+      <keyword>sys beepDef</keyword>
+      <keyword>sys beepT</keyword>
+      <keyword>sys beepF</keyword>
+
+			<keyword>sys serialTrs</keyword>
+			<keyword>sys srlTrsQAdd</keyword>
+			<keyword>sys srlTrsQClr</keyword>
+			<keyword>sys srlTrsQ</keyword>
+			<keyword>sys serialRcv</keyword>
+
+			<keyword>sys sdaSetLed</keyword>
+
+      <!-- SDA Files -->
+
+      <keyword>sys pFrOpen</keyword>
+      <keyword>sys fReadChars</keyword>
+      <keyword>sys pFrSize</keyword>
+      <keyword>sys pFrExists</keyword>
+      <keyword>sys pFrSeek</keyword>
+      <keyword>sys pFrClose</keyword>
+
+      <keyword>sys fDelete</keyword>
+
+			<keyword>sys cOpen</keyword>
+      <keyword>sys cClose</keyword>
+      <keyword>sys cKeyExists</keyword>
+      <keyword>sys cKeyRead</keyword>
+      <keyword>sys cKeyReadInt</keyword>
+      <keyword>sys cKeyWrite</keyword>
+      <keyword>sys cKeyRemove</keyword>
+
+      <keyword>sys fFind</keyword>
+      <keyword>sys fFindNext</keyword>
+
+      <keyword>sys fReadStr</keyword>
+      <keyword>sys fWriteStr</keyword>
+
+      <!-- SDA Overlays -->
+
+      <keyword>sys pSetOvrScr</keyword>
+
+      <keyword>sys pGetOvrId</keyword>
+      <keyword>sys pOvrDestroy</keyword>
+      <keyword>sys pOvrSetXYXY</keyword>
+      <keyword>sys pSetOvrY</keyword>
+
+      <keyword>sys oDateAdd</keyword>
+      <keyword>sys oDateUpd</keyword>
+      <keyword>sys oDateGetOk</keyword>
+      <keyword>sys oDateClrOk</keyword>
+      <keyword>sys oDateGetYr</keyword>
+      <keyword>sys oDateGetDay</keyword>
+      <keyword>sys oDateGetMon</keyword>
+
+      <keyword>sys oTimAdd</keyword>
+      <keyword>sys oTimSet</keyword>
+      <keyword>sys oTimUpd</keyword>
+      <keyword>sys oTimGetOk</keyword>
+      <keyword>sys oTimGetMin</keyword>
+      <keyword>sys oTimGetHr</keyword>
+      <keyword>sys oTimClrOk</keyword>
+
+      <!-- SDA Time -->
+
+			<keyword>sys getTime</keyword>
+      <keyword>sys getTimeUpd</keyword>
+      <keyword>sys getTimeSec</keyword>
+      <keyword>sys getTimeMin</keyword>
+      <keyword>sys getTimeHr</keyword>
+      <keyword>sys getTimeDay</keyword>
+      <keyword>sys getTimeMonth</keyword>
+      <keyword>sys getTimeYear</keyword>
+      <keyword>sys getUptime</keyword>
+
+			<keyword>sys setTs</keyword>
+			<keyword>sys getTsSec</keyword>
+			<keyword>sys getTsMin</keyword>
+			<keyword>sys getTsHr</keyword>
+			<keyword>sys getTsDay</keyword>
+			<keyword>sys getTsWkDay</keyword>
+			<keyword>sys getTsMonth</keyword>
+			<keyword>sys getTsYear</keyword>
+			<keyword>sys alarmSetFixed</keyword>
+			<keyword>sys alarmSetRep</keyword>
+			<keyword>sys alarmDestroy</keyword>
+			<keyword>sys alarmGetFlag</keyword>
+			<keyword>sys alarmClrFlag</keyword>
+			<keyword>sys alarmGetId</keyword>
+			<keyword>sys alarmGetPar</keyword>
+
+      <!-- DirectS -->
+      <keyword>sys sxMixColor</keyword>
+      <keyword>sys sxSetArea</keyword>
+      <keyword>sys sxDrawRect</keyword>
+      <keyword>sys sxFillRect</keyword>
+      <keyword>sys sxDrawCircle</keyword>
+      <keyword>sys sxFillCircle</keyword>
+      <keyword>sys sxDrawLine</keyword>
+      <keyword>sys sxDrawText</keyword>
+      <keyword>sys sxClearArea</keyword>
+      <keyword>sys pDrawPPM</keyword>
+
+    </context>
+
+    <context id="svscript" class="no-spell-check">
+      <include>
+        <context ref="def:shebang"/>
+        <context ref="line-comment"/>
+        <context ref="block-comment"/>
+        <context ref="line-continue"/>
+        <context ref="double-quoted-string"/>
+        <context ref="single-quoted-string"/>
+        <context ref="operator"/>
+        <context ref="data-type"/>
+        <context ref="function-handle"/>
+        <context ref="storage-type"/>
+        <context ref="boolean"/>
+        <context ref="decimal"/>
+        <context ref="floating-point-number"/>
+        <context ref="octal-number"/>
+        <context ref="hex-number"/>
+        <context ref="variables"/>
+        <context ref="reserved-constant"/>
+        <context ref="keyword"/>
+        <context ref="builtin"/>
+      </include>
+    </context>
+  </definitions>
+</language>
