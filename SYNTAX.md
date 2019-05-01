@@ -220,6 +220,36 @@ Function *[float]pi()* returns the value of pi.
 #### Sqrt
 Function *[float]sqrt([float]x)* returns the square root of x.
 
+### SYS statement functions
+SVS can be extended through its C function wrapper API, these functions can the be called with *sys* command.
+Sys function call example:
+
+    sys.dbg(1);
+     
+In SVS version 1.1.7 and below *sys* statement uses different syntax. This variant of *sys* function call is still supported in current version of SVS interpreter.
+
+    # in versions 1.1.7 and below
+    sys dbg(1);
+
+#### Useful sys commands in the default  wrapper
+**Debug:**
+
+    sys.dbg([num] enable); # Enables expression and command debug output
+    sys.profiler([num] enable); # Enables garbage collector profiling
+    sys.dbgCache([num] enable); # Enables token cache debug output
+
+**Call string garbage collector:**
+Performs garbage collection of unused strings. Argument to_free specifies how many chars will be collected, if zero is passed, full garbage collection occurs.
+
+    sys.GC([num] to_free);
+
+When your program seemingly randomly runs out of string memory inside a function call, try calling garbage collection before that function call.
+
+**Info:**
+Prints information about SVS interpreter.
+
+    sys.info();
+
 ### Variables
 Variables are by default all global (accessible across different functions), and value of uninitialised variable is (*num*) 0.
 Keyword *local* allows to add local variable to the current block of code. Local variables are destroyed at the end of block.
