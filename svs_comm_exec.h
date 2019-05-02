@@ -31,6 +31,7 @@ void commExDMSG(char *text, uint16_t tokenId, svsVM *s);
 uint16_t commSkip(uint16_t index, svsVM *s);
 uint16_t commExecLoop(uint16_t index, svsVM *s);
 uint16_t commExecById(uint16_t id, svsVM *s);
+uint16_t commExecFromStart(svsVM *s);
 uint16_t commExec(uint8_t * name, svsVM *s);
 void setCommExDebug (uint8_t level);
 

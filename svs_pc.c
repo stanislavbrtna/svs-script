@@ -79,7 +79,11 @@ int main(int argc, char *argv[]) {
   return 0;
 #endif
   puts("Script output begin:\n");
-  commExec("main", &s);
+  if (functionExists("main", &s)){
+    commExec("main", &s);
+  } else{
+    commExecFromStart(&s);
+  }
 
   printf("\n");
 

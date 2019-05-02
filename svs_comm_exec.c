@@ -806,6 +806,46 @@ uint16_t commExecById(uint16_t id, svsVM *s) {
   return 0;
 }
 
+uint16_t commExecFromStart(svsVM *s) {
+  uint16_t currToken = 0;
+  s->commRetVal.val_u = 0;
+  s->commRetType = 0;
+  s->commRetFlag = 0;
+
+  commExDMSG("commExecFromStart: SVS is now running the whole file.", currToken, s);
+
+  while (getTokenType(currToken, s) != SVS_TOKEN_ENDPROG) { // loop until end of program  
+    
+    if (getTokenType(currToken, s) == SVS_TOKEN_FUNCTION) {
+      commExDMSG("commExecFromStart: Skipping function definition.", currToken, s);
+      currToken = commSkip(currToken + 1, s);
+      if (errCheck(s)) {
+        return 0;
+      }
+      currToken++;
+    }
+    
+    currToken = commExecLoop(currToken, s);
+
+    if (errCheck(s)) {
+      return 0;
+    }
+
+    if (s->handbrake == 1) {
+      return 0;
+    }
+
+    if (getTokenType(currToken, s) == SVS_TOKEN_RETURN) { //return
+      
+      commExDMSG("commExecFromStart: return inside main file.", currToken, s);
+      return currToken;
+    }
+    currToken++;
+  }
+
+  return 0;
+}
+
 uint16_t commExec(uint8_t * name, svsVM *s) {
   if (functionExists(name, s)) {
     return commExecById(functionGetId(name, s), s);
