@@ -1,0 +1,16 @@
+
+# this is a comment
+
+#*
+  Since SVS version 1.2 you can make scripts without main function
+  script like this simply runs from start to end of file.
+*#
+print("Hello world program:");
+
+variable = "hello";
+
+variable = variable + " world";
+
+print(variable + "!");
+
+return variable;
