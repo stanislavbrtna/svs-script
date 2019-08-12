@@ -110,6 +110,7 @@ Operators of the same priority are executed from left to right. Operations insid
 | \\" | double quote |
 
 Note: Before SVS version 1.1 pound (#) symbol inside text constant must be written as ##, otherwise rest of line is threated like a comment, bit of a design oversight.
+Escape characters \\a,\\b,\\f,\\r,\\t,\\v are also supported since version 1.2.1.
 
 #### Operations across types
 |  | string | num | float |

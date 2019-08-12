@@ -27,8 +27,8 @@ This file contains the main defines and limits of SVS.
 
 /*============================= Versions =====================================*/
 
-#define SVS_VERSION  "1.2.0"
-#define SVS_VERSION_NUM 1200
+#define SVS_VERSION  "1.2.1"
+#define SVS_VERSION_NUM 1210
 
 /*============================= Local Config =================================*/
 

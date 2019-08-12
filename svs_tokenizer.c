@@ -602,7 +602,7 @@ uint8_t tokenParse(svsVM *s) {
       posToken++;
     }
 
-    // ;
+    // ,
     if (tokenInput(posText, 0) == ',') {
       setTokenType(posToken, SVS_TOKEN_COL, s);
       tokenInput(0, 1);
@@ -762,10 +762,24 @@ uint8_t tokenParse(svsVM *s) {
           s->stringField[s->stringFieldLen] = tokenInput(posText, 0);
         } else {
           esc_c_prac = tokenInput(posText + 1, 0);
-          if (esc_c_prac == 'n') {
+          if (esc_c_prac == 'a') {
+            s->stringField[s->stringFieldLen] = '\a';
+          } else if (esc_c_prac == 'b') {
+            s->stringField[s->stringFieldLen] = '\b';
+          } else if (esc_c_prac == 'f') {
+            s->stringField[s->stringFieldLen] = '\f';
+          } else if (esc_c_prac == 'n') {
             s->stringField[s->stringFieldLen] = '\n';
+          } else if (esc_c_prac == 'r') {
+            s->stringField[s->stringFieldLen] = '\r';
+          } else if (esc_c_prac == 't') {
+            s->stringField[s->stringFieldLen] = '\t';
+          } else if (esc_c_prac == 'v') {
+            s->stringField[s->stringFieldLen] = '\v';
           } else if(esc_c_prac == '\\') {
             s->stringField[s->stringFieldLen] = '\\';
+          } else if(esc_c_prac == '\'') {
+            s->stringField[s->stringFieldLen] = '\'';
           } else if(esc_c_prac=='\"') {
             s->stringField[s->stringFieldLen] = '\"';
           } else {
