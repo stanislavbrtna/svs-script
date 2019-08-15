@@ -282,6 +282,32 @@ uint8_t tokenEofCheck(int16_t brCount1, int16_t  brCount2) {
   return 1;
 }
 
+
+uint8_t getKeyword(uint8_t *buffer, uint16_t *posText) {
+  uint16_t pracStrInd = 0;
+
+  buffer[pracStrInd] = tokenInput(*posText, 0);
+  (*posText)++;
+  tokenInput(0, 1);
+  pracStrInd++;
+  while(1) {
+    if (pracStrInd < NAME_LENGTH) {
+      if (isRegChar(tokenInput(*posText, 0)) || isNumber(tokenInput(*posText, 0))) {
+        buffer[pracStrInd] = tokenInput(*posText, 0);
+      } else {
+        break;
+      }
+      (*posText)++;
+      tokenInput(0, 1);
+      pracStrInd++;
+      buffer[pracStrInd] = 0;
+    } else {
+      buffer[NAME_LENGTH - 1] = 0;
+      return 1;
+    }
+  }
+}
+
 uint8_t tokenParse(svsVM *s) {
   uint16_t posText = 0;
   uint16_t posToken = 0;
@@ -363,30 +389,31 @@ uint8_t tokenParse(svsVM *s) {
         numPrac.val_s = 0;
         tokenInput(0, 1);
         posText++;
-        while (   ((tokenInput(posText, 0) >= '0') && (tokenInput(posText, 0) <= '9'))
+        while (((tokenInput(posText, 0) >= '0') && (tokenInput(posText, 0) <= '9'))
                || ((tokenInput(posText, 0) >= 'a') && (tokenInput(posText, 0) <= 'f'))
-               || ((tokenInput(posText, 0) >= 'A') && (tokenInput(posText, 0) <= 'F')) ) {
+               || ((tokenInput(posText, 0) >= 'A') && (tokenInput(posText, 0) <= 'F'))
+        ) {
 
-            if((tokenInput(posText, 0) >= '0') && (tokenInput(posText, 0) <= '9')) {
-              numPrac.val_s *= 16;
-              numPrac.val_s += tokenInput(posText, 0) - '0';
-              tokenInput(0, 1);
-              posText++;
-            }
+          if((tokenInput(posText, 0) >= '0') && (tokenInput(posText, 0) <= '9')) {
+            numPrac.val_s *= 16;
+            numPrac.val_s += tokenInput(posText, 0) - '0';
+            tokenInput(0, 1);
+            posText++;
+          }
 
-            if((tokenInput(posText, 0) >= 'a') && (tokenInput(posText, 0) <= 'f')) {
-              numPrac.val_s *= 16;
-              numPrac.val_s += tokenInput(posText, 0) - 'a' + 10;
-              tokenInput(0, 1);
-              posText++;
-            }
+          if((tokenInput(posText, 0) >= 'a') && (tokenInput(posText, 0) <= 'f')) {
+            numPrac.val_s *= 16;
+            numPrac.val_s += tokenInput(posText, 0) - 'a' + 10;
+            tokenInput(0, 1);
+            posText++;
+          }
 
-            if((tokenInput(posText,0) >= 'A') && (tokenInput(posText, 0) <= 'F')) {
-              numPrac.val_s *= 16;
-              numPrac.val_s += tokenInput(posText, 0) - 'A' + 10;
-              tokenInput(0, 1);
-              posText++;
-            }
+          if((tokenInput(posText,0) >= 'A') && (tokenInput(posText, 0) <= 'F')) {
+            numPrac.val_s *= 16;
+            numPrac.val_s += tokenInput(posText, 0) - 'A' + 10;
+            tokenInput(0, 1);
+            posText++;
+          }
         }
         setTokenData(posToken, numPrac, s);
         tokenDMSG("Token set, type NUM",
@@ -853,28 +880,9 @@ uint8_t tokenParse(svsVM *s) {
     // analizace textu
     if (isRegChar(tokenInput(posText, 0))) {
       // A-Z || a-z || _
-      pracStrInd = 0;
-      // načtení slova do prac name
-      pracName[pracStrInd] = tokenInput(posText, 0);
-      posText++;
-      tokenInput(0, 1);
-      pracStrInd++;
-      while(1) {
-        if (pracStrInd < NAME_LENGTH) {
-          if (isRegChar(tokenInput(posText, 0)) || isNumber(tokenInput(posText, 0))) {
-            pracName[pracStrInd] = tokenInput(posText, 0);
-          } else {
-            break;
-          }
-          posText++;
-          tokenInput(0, 1);
-          pracStrInd++;
-          pracName[pracStrInd] = 0;
-        } else {
-          pracName[NAME_LENGTH - 1] = 0;
-          tokenizerErrorPrint((uint8_t *)"tokenParse: Symbol name too long!");
-          return 1;
-        }
+      if (getKeyword(pracName, &posText)) {
+        tokenizerErrorPrint((uint8_t *)"tokenParse: Symbol name too long!");
+        return 1;
       }
       // detekce klíčových slov v prac name
       /*
@@ -974,7 +982,6 @@ uint8_t tokenParse(svsVM *s) {
         Lock = 0;
       }
 
-      //TODO: parse args in some sort of loop
       if (pracName[0] == 'a'
           && pracName[1] == 'r'
           && pracName[2] == 'g'
@@ -1074,27 +1081,11 @@ uint8_t tokenParse(svsVM *s) {
         }
 
         // function name
-        pracStrInd = 0;
-        pracName2[pracStrInd] = tokenInput(posText, 0);
-        posText++;
-        tokenInput(0, 1);
-        pracStrInd++;
-        while(1) {
-          if (pracStrInd < NAME_LENGTH) {
-            if (isRegChar(tokenInput(posText, 0)) || isNumber(tokenInput(posText, 0))) {
-              pracName2[pracStrInd] = tokenInput(posText, 0);
-            } else {
-              break;
-            }
-            posText++;
-            tokenInput(0, 1);
-            pracStrInd++;
-          } else {
-            pracName2[NAME_LENGTH - 1] = 0;
-            tokenizerErrorPrint((uint8_t *)"tokenParse: internal function name too long!");
-            return 1;
-          }
+        if (getKeyword(pracName2, &posText)) {
+          tokenizerErrorPrint((uint8_t *)"tokenParse: internal function name too long!");
+          return 1;
         }
+
         // název interní funkce máme v pracName2
         // Zde se dosazují indexy interních funkcí z pole sys name list
         // končícího end
@@ -1156,27 +1147,11 @@ uint8_t tokenParse(svsVM *s) {
           tokenInput(0, 1);
         }
         //získání názvu funkce
-        pracStrInd = 0;
-        pracName2[pracStrInd] = tokenInput(posText, 0);
-        posText++;
-        tokenInput(0, 1);
-        pracStrInd++;
-        while(1) {
-          if (pracStrInd < NAME_LENGTH) {
-            if (isRegChar(tokenInput(posText, 0)) || isNumber(tokenInput(posText, 0))) {
-              pracName2[pracStrInd] = tokenInput(posText, 0);
-            } else {
-              break;
-            }
-            posText++;
-            tokenInput(0, 1);
-            pracStrInd++;
-          } else {
-            pracName2[NAME_LENGTH - 1] = 0;
-            tokenizerErrorPrint((uint8_t *)"tokenParse: function name too long!");
-            return 1;
-          }
+        if (getKeyword(pracName2, &posText)) {
+          tokenizerErrorPrint((uint8_t *)"tokenParse: function name too long!");
+          return 1;
         }
+
         //název funkce máme v pracName2, zkotrolujem function lookup table
         if (functionExists(pracName2, s)) {
           tokenizerErrorPrint((uint8_t *)"Error: multiple definitions of function!");
