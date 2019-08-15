@@ -30,6 +30,7 @@ SOFTWARE.
 #define SVS_TYPE_STR 1
 #define SVS_TYPE_FLT 3
 #define SVS_TYPE_ARR 4
+#define SVS_TYPE_UNDEF 5
 
 #define SVS_TOKEN_VAR 10
 #define SVS_TOKEN_FUNCTION 11

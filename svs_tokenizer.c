@@ -1309,7 +1309,7 @@ uint8_t tokenParse(svsVM *s) {
             s->varTableLen++;
             setTokenType(posToken, SVS_TOKEN_VAR, s); //nastavíme typ
             setTokenData(posToken, (varType) s->varTableLen, s);
-            s->varTable[s->varTableLen].type = 0;
+            s->varTable[s->varTableLen].type = SVS_TYPE_UNDEF;
             s->varTable[s->varTableLen].name = strNewP(pracName, s);
             INCREMENT_STATIC_STRINGS
 

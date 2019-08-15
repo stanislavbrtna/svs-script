@@ -110,7 +110,7 @@ Operators of the same priority are executed from left to right. Operations insid
 | \\" | double quote |
 
 Note: Before SVS version 1.1 pound (#) symbol inside text constant must be written as ##, otherwise rest of line is threated like a comment, bit of a design oversight.
-Escape characters \\a,\\b,\\f,\\r,\\t,\\v are also supported since version 1.2.1.
+Escape characters \\a,\\b,\\f,\\r,\\t,\\v are also supported since SVS version 1.2.1.
 
 #### Operations across types
 |  | string | num | float |
@@ -226,7 +226,7 @@ SVS can be extended through its C function wrapper API, these functions can the 
 Sys function call example:
 
     sys.dbg(1);
-     
+
 In SVS version 1.1.7 and below *sys* statement uses different syntax. This variant of *sys* function call is still supported in current version of SVS interpreter.
 
     # in versions 1.1.7 and below
@@ -252,8 +252,9 @@ Prints information about SVS interpreter.
     sys.info();
 
 ### Variables
-Variables are by default all global (accessible across different functions), and value of uninitialised variable is (*num*) 0.
-Keyword *local* allows to add local variable to the current block of code. Local variables are destroyed at the end of block.
+Variables are by default all global (accessible across different functions), and value of uninitialized variable is *undefined*. Keyword *local* allows to add local variable to the current block of code. Local variables are destroyed at the end of block.
+**Note:** Up to SVS v. 1.2.0 uninitialized variables were set to type *num* and value 0 (zero). SVS 1.3 produces warning when uninitialized variable is used and in future releases this will result in an error.
+
 
     function main {
       a = 5;

@@ -101,7 +101,7 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
     result->type = 1;
     result->tokenId = index + 1;
     exprExecDMSG("ExprExecLvl5 STR const.", result->value.val_s, result->tokenId, s);
-  }else if ((getTokenType(index, s) == 10)) {//VAR   &&(varGetType(tokenData[index])==0)
+  }else if ((getTokenType(index, s) == 10)) {//VAR
     result->value = varGetVal(getTokenData(index, s), s);
     result->type = varGetType(getTokenData(index, s), s);
     result->tokenId = index + 1;
@@ -140,7 +140,22 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
         return;
       }
       result->tokenId = index + 1;
-    }else{
+    } else if (result->type == SVS_TYPE_UNDEF) {
+      exprExecDMSG("ExprExecLvl5 VAR type UNDEF", result->value.val_s, result->tokenId, s);
+      static uint32_t warncount;
+      if (warncount < 10) {
+        printf("WARNING: variable \"%s\" on token %d was used in an expression without initialization.\n\
+This will produce errors in future releases.\n",
+          s->varTable[getTokenData(index, s).val_u].name,
+          result->tokenId
+        );
+        warncount++;
+        if (warncount == 10) {
+          printf("No more warnings like this will be shown in this run.\n");
+        }
+      }
+      result->type = SVS_TYPE_NUM;
+    } else {
       errSoft((uint8_t *)"ExprExecLvl5 VAR: Unknown variable type!", s);
       errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
       errSoftSetToken(index, s);
