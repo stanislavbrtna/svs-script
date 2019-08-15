@@ -26,6 +26,7 @@ SOFTWARE.
 #include "svs_basics.h"
 
 uint16_t strNew(uint8_t *index, svsVM *s);
+uint8_t *strNewP(uint8_t *index, svsVM *s);
 uint16_t strAdd(uint16_t index1, uint16_t index2, svsVM *s);
 uint16_t strInsert(uint16_t index1, uint16_t index2, uint16_t pos, svsVM *s);
 

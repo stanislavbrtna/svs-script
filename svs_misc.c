@@ -142,7 +142,7 @@ uint8_t functionExists(uint8_t *name, svsVM *s) {
   uint16_t x = 0;
   if (s->funcTableLen != 0) {
     for (x = 1; x <= s->funcTableLen; x++) {
-      if (strCmp(name, s->funcTable[x].fString)) {
+      if (strCmp(name, s->funcTable[x].name)) {
         return 1;
       }
     }
@@ -154,7 +154,7 @@ uint8_t functionGetId(uint8_t *name, svsVM *s) {
   uint16_t x = 0;
   if (s->funcTableLen != 0) {
     for (x = 1; x <= s->funcTableLen; x++) {
-      if (strCmp(name, s->funcTable[x].fString)) {
+      if (strCmp(name, s->funcTable[x].name)) {
         return x;
       }
     }

@@ -27,8 +27,8 @@ This file contains the main defines and limits of SVS.
 
 /*============================= Versions =====================================*/
 
-#define SVS_VERSION  "1.2.1"
-#define SVS_VERSION_NUM 1210
+#define SVS_VERSION  "1.3.0"
+#define SVS_VERSION_NUM 1300
 
 /*============================= Local Config =================================*/
 
@@ -66,7 +66,7 @@ This file contains the main defines and limits of SVS.
 #endif
 
 #ifndef STRING_FIELD_L
-  #define STRING_FIELD_L 6000 // počet znaků stringové pamněti / max number of characters in string memory
+  #define STRING_FIELD_L 10000 // počet znaků stringové pamněti / max number of characters in string memory
 #endif
 
 #ifndef GC_THRESHOLD

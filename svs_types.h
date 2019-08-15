@@ -81,7 +81,7 @@ SOFTWARE.
 
 
 typedef struct {
-  uint8_t fString[NAME_LENGTH];
+  uint8_t *name;
   uint16_t tokenId;
 } fTableType;
 
@@ -93,7 +93,7 @@ typedef union {
 } varType;
 
 typedef struct {
-  uint8_t name[NAME_LENGTH];
+  uint8_t *name;
   uint32_t maskId; // maskovací id lokální proměnné
   varType value; //num - hodnota, str-nultý charakter v tabulce, string je ukončen \0
   uint8_t type; //0-num (int32) 1-string 3-float
@@ -116,7 +116,7 @@ typedef struct {
 } tokenCacheStruct;
 
 typedef struct {
-  uint8_t sysCallName[NAME_LENGTH];
+  uint8_t *sysCallName;
 } sysCall;
 
 

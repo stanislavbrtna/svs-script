@@ -44,6 +44,26 @@ uint16_t strNew(uint8_t *index, svsVM *s) {
   return retval;
 }
 
+uint8_t *strNewP(uint8_t *index, svsVM *s) {
+  uint16_t x = 0;
+  uint8_t *retval;
+  retval = &(s->stringField[s->stringFieldLen]);
+
+  while(index[x] != 0) {
+    if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
+      errSoft((uint8_t *)"strNew: String field full!", s);
+      return 0;
+    }
+    s->stringField[s->stringFieldLen] = index[x];
+    x++;
+    s->stringFieldLen++;
+  }
+
+  s->stringField[s->stringFieldLen] = 0;
+  s->stringFieldLen++;
+  return retval;
+}
+
 uint16_t strAdd(uint16_t index1, uint16_t index2, svsVM *s) {
   uint16_t x = 0;
   uint16_t retval;

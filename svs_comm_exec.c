@@ -797,8 +797,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 }
 
 uint16_t commExecById(uint16_t id, svsVM *s) {
-  //třeba nastavit startovací token funkce
-  //printf("Jumping into: %s starting at token %u \n",funcTable[id].fString, funcTable[id].tokenId );
+  //printf("Jumping into: %s starting at token %u \n",funcTable[id].name, funcTable[id].tokenId );
   s->commRetVal.val_u = 0;
   s->commRetType = 0;
   s->commRetFlag = 0;
@@ -814,8 +813,8 @@ uint16_t commExecFromStart(svsVM *s) {
 
   commExDMSG("commExecFromStart: SVS is now running the whole file.", currToken, s);
 
-  while (getTokenType(currToken, s) != SVS_TOKEN_ENDPROG) { // loop until end of program  
-    
+  while (getTokenType(currToken, s) != SVS_TOKEN_ENDPROG) { // loop until end of program
+
     if (getTokenType(currToken, s) == SVS_TOKEN_FUNCTION) {
       commExDMSG("commExecFromStart: Skipping function definition.", currToken, s);
       currToken = commSkip(currToken + 1, s);
@@ -824,7 +823,7 @@ uint16_t commExecFromStart(svsVM *s) {
       }
       currToken++;
     }
-    
+
     currToken = commExecLoop(currToken, s);
 
     if (errCheck(s)) {
@@ -836,7 +835,7 @@ uint16_t commExecFromStart(svsVM *s) {
     }
 
     if (getTokenType(currToken, s) == SVS_TOKEN_RETURN) { //return
-      
+
       commExDMSG("commExecFromStart: return inside main file.", currToken, s);
       return currToken;
     }

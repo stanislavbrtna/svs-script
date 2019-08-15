@@ -22,6 +22,8 @@ SOFTWARE.
 
 #include "svs_tokenizer.h"
 
+#define INCREMENT_STATIC_STRINGS s->stringConstMax = s->stringFieldLen;
+
 // enable tokenizer debug messages
 static uint8_t tokenizerDebug = 0;
 
@@ -741,17 +743,16 @@ uint8_t tokenParse(svsVM *s) {
       posToken++;
     }
 
-    //txt
+    // Text constant
     if (tokenInput(posText, 0) == '\"') {
       posText++;
       tokenInput(0, 1);
       setTokenType(posToken, 25, s);
       setTokenData(posToken, (varType)s->stringFieldLen, s);
 
-      //maximální velikost textových konstant, pro garbage collection
-      s->stringConstMax = s->stringFieldLen;
-      //není použito unifikované funkce, protože tady by stejnak garbage
-      //collcector nepomohl
+      // stores where constant strings end in string mem
+      // usefull for garbage collection
+      INCREMENT_STATIC_STRINGS
 
       while((tokenInput(posText, 0) != '\"') && (tokenInput(posText, 0) != 0)) {
         if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
@@ -816,11 +817,8 @@ uint8_t tokenParse(svsVM *s) {
       tokenInput(0, 1);
 
       setTokenType(posToken, SVS_TOKEN_AMP, s);
-
       setTokenData(posToken, (varType)s->stringFieldLen, s);
-
-      //maximální velikost textových konstant, pro garbage collection
-      s->stringConstMax = s->stringFieldLen;
+      INCREMENT_STATIC_STRINGS
 
       while((isRegChar(tokenInput(posText, 0)) || isNumber(tokenInput(posText, 0))) && (tokenInput(posText, 0) != 0)) {
         if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
@@ -1158,20 +1156,21 @@ uint8_t tokenParse(svsVM *s) {
         // Zde se dosazují indexy interních funkcí z pole sys name list
         // končícího end
 
-        if (syscallExists(pracName2, s)) { //pokud už máme syscall zarezervovaný
-          setTokenData(posToken, (varType)((uint16_t)syscallGetId(pracName2, s)) ,s); //šoupnem ID do dat
+        if (syscallExists(pracName2, s)) { // check if syscall exists
+          // then set token as that syscall
+          setTokenData(posToken, (varType)((uint16_t)syscallGetId(pracName2, s)) ,s);
           tokenDMSG("Token set, type existing SYSCALL",
                     posToken,
                     getTokenData(posToken, s),
                     getTokenType(posToken, s),
                     posText);
         } else {
-          //přidáme syscall
+          // add sys call
           if(s->syscallTableLen < SYSCALL_TABLE_L) {
             s->syscallTableLen++;
-            for (x = 0; x < NAME_LENGTH; x++) {
-              s->syscallTable[s->syscallTableLen].sysCallName[x] = pracName2[x];
-            }
+
+            s->syscallTable[s->syscallTableLen].sysCallName = strNewP(pracName2, s);
+            INCREMENT_STATIC_STRINGS
             setTokenData(posToken, (varType) s->syscallTableLen, s);
             #ifdef WEBTARGET
             //doNotRemoveThese(s->syscallTableLen, s->syscallTable[s->syscallTableLen].sysCallName);
@@ -1240,19 +1239,18 @@ uint8_t tokenParse(svsVM *s) {
           tokenizerErrorPrint((uint8_t *)"Error: multiple definitions of function!");
           return 1;
         } else {
-          //přidáme funkci
-          if (s->funcTableLen<FUNCTION_TABLE_L) {
+          // add new function
+          if (s->funcTableLen < FUNCTION_TABLE_L) {
             s->funcTableLen++;
-            s->funcTable[s->funcTableLen].tokenId = posToken + 1; //aby to mířilo rovnou na začátek fce
-            for (x = 0; x < NAME_LENGTH; x++) {
-              s->funcTable[s->funcTableLen].fString[x] = pracName2[x];
-            }
+            s->funcTable[s->funcTableLen].tokenId = posToken + 1; // point token to first token of the function
+            s->funcTable[s->funcTableLen].name = strNewP(pracName2, s);
+            INCREMENT_STATIC_STRINGS
           } else {
             tokenizerErrorPrint((uint8_t *)"Error: too many functions!");
             return 1;
           }
         }
-        tokenDMSG((char *)s->funcTable[s->funcTableLen].fString,
+        tokenDMSG((char *)s->funcTable[s->funcTableLen].name,
                   posToken,
                   getTokenData(posToken, s),
                   getTokenType(posToken, s),
@@ -1312,9 +1310,9 @@ uint8_t tokenParse(svsVM *s) {
             setTokenType(posToken, SVS_TOKEN_VAR, s); //nastavíme typ
             setTokenData(posToken, (varType) s->varTableLen, s);
             s->varTable[s->varTableLen].type = 0;
-            for (x = 0; x < NAME_LENGTH; x++) {
-              s->varTable[s->varTableLen].name[x] = pracName[x];
-            }
+            s->varTable[s->varTableLen].name = strNewP(pracName, s);
+            INCREMENT_STATIC_STRINGS
+
             tokenDMSG("New variable found!",
                       posToken,
                       getTokenData(posToken, s),
@@ -1350,7 +1348,8 @@ uint8_t tokenParse(svsVM *s) {
                         );
             } else {
               setTokenType(posToken, SVS_TOKEN_CALL, s);
-              s->stringConstMax = s->stringFieldLen;
+              INCREMENT_STATIC_STRINGS
+              // TODO: deduplicate call names somehow
               setTokenData(posToken, (varType)strNew(pracName, s), s);
               if (errCheck(s)) {
                 return 1;
