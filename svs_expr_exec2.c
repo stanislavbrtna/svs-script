@@ -27,8 +27,14 @@ This is the second version of expression exec logic.
 uint8_t unsecureCommand;
 uint8_t exprExecDebug;
 
+static uint32_t warncount;
+
 void setExprExecDebug(uint8_t level) {
   exprExecDebug = level;
+}
+
+void resetWarnCount() {
+  warncount = 0;
 }
 
 void exprExecDMSG(char *text, int16_t result, uint16_t tokenId, svsVM *s) {
@@ -142,7 +148,7 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
       result->tokenId = index + 1;
     } else if (result->type == SVS_TYPE_UNDEF) {
       exprExecDMSG("ExprExecLvl5 VAR type UNDEF", result->value.val_s, result->tokenId, s);
-      static uint32_t warncount;
+
       if (warncount < 10) {
         printf("WARNING: variable \"%s\" on token %d was used in an expression without initialization.\n\
 This will produce errors in future releases.\n",

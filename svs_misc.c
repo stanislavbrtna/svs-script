@@ -73,6 +73,8 @@ void svsReset(svsVM *s){
 
   svsSetName((uint8_t *)"def.b", s);
   svsSetFileName((uint8_t *)"def.svs", s);
+  // TODO: remove this in v.1.4
+  resetWarnCount();
 }
 
 void svsInfo(svsVM *s) {
