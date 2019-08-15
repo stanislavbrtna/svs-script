@@ -975,78 +975,21 @@ uint8_t tokenParse(svsVM *s) {
       }
 
       //TODO: parse args in some sort of loop
-      if (strCmp(pracName, (uint8_t *)"arg0")) {
-        tokenDMSG("Token set, type ARG - id=0",
-                  posToken,
-                  getTokenData(posToken, s),
-                  getTokenType(posToken, s),
-                  posText);
+      if (pracName[0] == 'a'
+          && pracName[1] == 'r'
+          && pracName[2] == 'g'
+          && pracName[3] >= '0'
+          && pracName[3] <= '9'
+      ) {
         setTokenType(posToken, SVS_TOKEN_ARG, s);
-        setTokenData(posToken, (varType)((uint16_t)0), s);
+        setTokenData(posToken, (varType)((uint16_t)(pracName[3] - '0')), s);
+        tokenDMSG("Token set, type ARG",
+          posToken,
+          getTokenData(posToken, s),
+          getTokenType(posToken, s),
+          posText
+        );
         Lock = 0;
-      }
-
-      if (strCmp(pracName, (uint8_t *)"arg1")){
-        tokenDMSG("Token set, type ARG - id=1", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, 35,s);
-        setTokenData(posToken, (varType)((uint16_t)1),s);
-        Lock=0;
-      }
-
-      if (strCmp(pracName, (uint8_t *)"arg2")){
-        tokenDMSG("Token set, type ARG - id=2", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, 35,s);
-        setTokenData(posToken, (varType)((uint16_t)2),s);
-        Lock=0;
-      }
-
-      if (strCmp(pracName, (uint8_t *)"arg3")){
-        tokenDMSG("Token set, type ARG - id=3", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, 35,s);
-        setTokenData(posToken, (varType)((uint16_t)3),s);
-        Lock=0;
-      }
-
-      if (strCmp(pracName, (uint8_t *)"arg4")){
-        tokenDMSG("Token set, type ARG - id=4", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, 35,s);
-        setTokenData(posToken, (varType)((uint16_t)4),s);
-        Lock=0;
-      }
-
-      if (strCmp(pracName, (uint8_t *)"arg5")){
-        tokenDMSG("Token set, type ARG - id=5", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, 35,s);
-        setTokenData(posToken, (varType)((uint16_t)5),s);
-        Lock=0;
-      }
-
-      if (strCmp(pracName, (uint8_t *)"arg6")){
-        tokenDMSG("Token set, type ARG - id=6", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, 35,s);
-        setTokenData(posToken, (varType)((uint16_t)6),s);
-        Lock=0;
-      }
-
-      if (strCmp(pracName, (uint8_t *)"arg7")){
-        tokenDMSG("Token set, type ARG - id=7", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, 35,s);
-        setTokenData(posToken, (varType)((uint16_t)7),s);
-        Lock=0;
-      }
-
-      if (strCmp(pracName, (uint8_t *)"arg8")){
-        tokenDMSG("Token set, type ARG - id=8", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, 35,s);
-        setTokenData(posToken, (varType)((uint16_t)8),s);
-        Lock=0;
-      }
-
-      if (strCmp(pracName, (uint8_t *)"arg9")){
-        tokenDMSG("Token set, type ARG - id=9", posToken, getTokenData(posToken,s),getTokenType(posToken,s), posText);
-        setTokenType(posToken, 35,s);
-        setTokenData(posToken, (varType)((uint16_t)9),s);
-        Lock=0;
       }
 
       if (strCmp(pracName, (uint8_t *)"and")){
