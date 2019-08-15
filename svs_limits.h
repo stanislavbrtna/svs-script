@@ -70,7 +70,7 @@ This file contains the main defines and limits of SVS.
 #endif
 
 #ifndef GC_THRESHOLD
-  #define GC_THRESHOLD 4500 // threshold for garbage collection of strings
+  #define GC_THRESHOLD 8000 // threshold for garbage collection of strings
 #endif
 
 #ifndef SYSCALL_TABLE_L
