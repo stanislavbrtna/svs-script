@@ -59,6 +59,21 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
     result->value = s->commArgs.arg[(uint16_t)getTokenData(index, s).val_u + 1];
     result->type = s->commArgs.argType[(uint16_t)getTokenData(index, s).val_u + 1];
     result->tokenId = index + 1;
+
+    if (result->type == SVS_TYPE_UNDEF) {
+      if (warncount < 10) {
+        printf("WARNING: argument \"arg%u\" on token %d was used in an expression without initialization.\n\
+This will produce errors in future releases.\n",
+          getTokenData(index, s).val_u,
+          result->tokenId
+        );
+        warncount++;
+        if (warncount == 10) {
+          printf("No more warnings like this will be shown in this run.\n");
+        }
+      }
+      result->type = SVS_TYPE_NUM;
+    }
     exprExecDMSG("ExprExecLvl5 ARG (const).", result->value.val_s, result->tokenId, s);
   }else  if (getTokenType(index, s) == 31) { //FLT
     #ifdef USE_FLOAT

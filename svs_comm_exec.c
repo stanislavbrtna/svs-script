@@ -857,9 +857,9 @@ uint16_t commExec(uint8_t * name, svsVM *s) {
 void commArgNull(comExArgs *target) {
   uint8_t x;
 
-  for(x = 0; x < FUNCTION_ARGS_MAX; x++) {
+  for(x = 0; x < FUNCTION_ARGS_MAX + 1; x++) {
     target->arg[x] = (varType)((uint16_t)0);
-    target->argType[x] = 0;
+    target->argType[x] = SVS_TYPE_UNDEF;
   }
 
   target->usedup = 0;
@@ -868,7 +868,7 @@ void commArgNull(comExArgs *target) {
 void commArgCopy(comExArgs* source, comExArgs* target){
   uint8_t x;
 
-  for(x = 0; x < FUNCTION_ARGS_MAX; x++) {
+  for(x = 0; x < FUNCTION_ARGS_MAX + 1; x++) {
     target->arg[x] = source->arg[x];
     target->argType[x] = source->argType[x];
   }
@@ -888,6 +888,8 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
    callName = s->stringField + getTokenData(index, s).val_u;
 
    index++;
+
+  commArgNull(&pracArgs2);
 
    //tady načteme nové
    if ((getTokenType(index, s) == 5)) {

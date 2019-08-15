@@ -134,7 +134,7 @@ function main {
   cnt = cnt + 1;
 
   a = 0;
-  argsfunc(1, 2, 3, 4, 5, 6, "karel", 5.5);
+  argsfunc(1, 2, 3, 4, 5, 6, "karel", 5.5, 6.1, 7.2);
   if (a == 55) {
     sys print(cnt + " - standalone argumented call:OK");
   } else {
@@ -143,7 +143,7 @@ function main {
   }
   cnt = cnt + 1;
 
-  if ((99 == argsfunc(1, 2, 3, 4, 5, 6, "karel", 5.5)) * (1 != 6)) {
+  if ((99 == argsfunc(1, 2, 3, 4, 5, 6, "karel", 5.5, 6.1, 7.2)) * (1 != 6)) {
     sys print(cnt + " - argumented call:OK");
   } else {
     sys print(cnt + " - argumented call:FAIL");
@@ -296,11 +296,12 @@ function standalone{
 }
 
 function argsfunc {
-  if((arg0 == 1)*(arg1 == 2)*(arg2 == 3)*(arg3 == 4)*(arg4 == 5)*(arg5 == 6)*(arg6 == "karel")*(arg7 == 5.5)) {
+  if((arg0 == 1)*(arg1 == 2)*(arg2 == 3)*(arg3 == 4)*(arg4 == 5)*(arg5 == 6)*(arg6 == "karel")*(arg7 == 5.5)*(arg8 == 6.1)*(arg9 == 7.2)) { #
     a = 55;
+    sys print ("ko: "+arg0+" "+arg1+" "+arg2+" "+arg3+" "+arg4+" "+arg5+" "+arg6+" "+arg7+" "+arg8+" "+arg9);
     return 99;
   } else {
-    sys print ("ko: "+arg0+" "+arg1+" "+arg2+" "+arg3+" "+arg4+" "+arg5+" "+arg6+" "+arg7);
+    sys print ("ko: "+arg0+" "+arg1+" "+arg2+" "+arg3+" "+arg4+" "+arg5+" "+arg6+" "+arg7+" "+arg8+" "+arg9);
     return 0;
   }
 }
