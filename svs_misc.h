@@ -66,4 +66,8 @@ uint8_t svsFloatCompare(float a, float b);
 #ifdef LOCAL_VARIABLES_ENABLED
 void varAddLocal(varType Id, svsVM *s);
 #endif
+
+// undef warning
+uint8_t getUndefWarning();
+void resetWarnCount();
 #endif

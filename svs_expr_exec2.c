@@ -27,15 +27,11 @@ This is the second version of expression exec logic.
 uint8_t unsecureCommand;
 uint8_t exprExecDebug;
 
-static uint32_t warncount;
 
 void setExprExecDebug(uint8_t level) {
   exprExecDebug = level;
 }
 
-void resetWarnCount() {
-  warncount = 0;
-}
 
 void exprExecDMSG(char *text, int16_t result, uint16_t tokenId, svsVM *s) {
   if ((exprExecDebug == 1) || (s->globalDebug)) {
@@ -55,40 +51,36 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
     result->type = 0;
     result->tokenId = index + 1;
     exprExecDMSG("ExprExecLvl5 NUM const.", result->value.val_s, result->tokenId, s);
-  }else  if (getTokenType(index, s) == 35) { //ARG
+  } else  if (getTokenType(index, s) == 35) { //ARG
     result->value = s->commArgs.arg[(uint16_t)getTokenData(index, s).val_u + 1];
     result->type = s->commArgs.argType[(uint16_t)getTokenData(index, s).val_u + 1];
     result->tokenId = index + 1;
 
     if (result->type == SVS_TYPE_UNDEF) {
-      if (warncount < 10) {
+      if (getUndefWarning()) {
         printf("WARNING: argument \"arg%u\" on token %d was used in an expression without initialization.\n\
 This will produce errors in future releases.\n",
           getTokenData(index, s).val_u,
           result->tokenId
         );
-        warncount++;
-        if (warncount == 10) {
-          printf("No more warnings like this will be shown in this run.\n");
-        }
       }
       result->type = SVS_TYPE_NUM;
     }
     exprExecDMSG("ExprExecLvl5 ARG (const).", result->value.val_s, result->tokenId, s);
-  }else  if (getTokenType(index, s) == 31) { //FLT
+  } else  if (getTokenType(index, s) == 31) { //FLT
     #ifdef USE_FLOAT
     result->value = getTokenData(index, s);
     result->type = 3;
     result->tokenId = index + 1;
     exprExecDMSG("ExprExecLvl5 FLT const.", result->value.val_s, result->tokenId, s);
     #endif
-  }else  if (getTokenType(index, s) == 28) { //SYS
+  } else  if (getTokenType(index, s) == 28) { //SYS
     sysExec(index, &prac, s);
     result->value.val_s = prac.value.val_s;
     result->type = prac.type;
     result->tokenId = prac.tokenId;
     exprExecDMSG("ExprExecLvl5 SYS", result->value.val_s, result->tokenId, s);
-  }else  if (getTokenType(index, s) == 36) { // BuiltIn FUNC
+  } else  if (getTokenType(index, s) == 36) { // BuiltIn FUNC
     processBuiltInCall(index, &prac, s);
     if (errCheck(s)) {
       return;
@@ -97,7 +89,7 @@ This will produce errors in future releases.\n",
     result->type = prac.type;
     result->tokenId = prac.tokenId;
     exprExecDMSG("ExprExecLvl5 BUILTIN FUNC", result->value.val_s, result->tokenId, s);
-  }else if (getTokenType(index, s) == 17) { //CALL
+  } else if (getTokenType(index, s) == 17) { //CALL
     if ((getTokenType(index + 1, s) == 5)) {
       unsecureCommand = 1;
       gcSafePointPrev = s->gcSafePoint;
@@ -117,22 +109,22 @@ This will produce errors in future releases.\n",
     result->type = s->commRetType;
     result->tokenId = index;
     exprExecDMSG("ExprExecLvl5 Function Call", result->value.val_s, result->tokenId, s);
-  }else if (getTokenType(index, s) == 25) { //STR
+  } else if (getTokenType(index, s) == 25) { //STR
     result->value = getTokenData(index, s);
     result->type = 1;
     result->tokenId = index + 1;
     exprExecDMSG("ExprExecLvl5 STR const.", result->value.val_s, result->tokenId, s);
-  }else if ((getTokenType(index, s) == 10)) {//VAR
+  } else if ((getTokenType(index, s) == 10)) {//VAR
     result->value = varGetVal(getTokenData(index, s), s);
     result->type = varGetType(getTokenData(index, s), s);
     result->tokenId = index + 1;
     if (result->type == 0) {
       exprExecDMSG("ExprExecLvl5 VAR type NUM", result->value.val_s, result->tokenId, s);
-    }else if(result->type == 1) {
+    } else if (result->type == 1) {
       exprExecDMSG("ExprExecLvl5 VAR type STR", result->value.val_s, result->tokenId, s);
-    }else if(result->type == 3) {
+    } else if (result->type == 3) {
       exprExecDMSG("ExprExecLvl5 VAR type FLT", result->value.val_s, result->tokenId, s);
-    }else if(result->type == SVS_TYPE_ARR) {
+    } else if (result->type == SVS_TYPE_ARR) {
       exprExecDMSG("ExprExecLvl5 VAR type ARRAY", result->value.val_s, result->tokenId, s);
       varType arrayIndex;
       varType arrayBase;
@@ -163,17 +155,12 @@ This will produce errors in future releases.\n",
       result->tokenId = index + 1;
     } else if (result->type == SVS_TYPE_UNDEF) {
       exprExecDMSG("ExprExecLvl5 VAR type UNDEF", result->value.val_s, result->tokenId, s);
-
-      if (warncount < 10) {
+      if (getUndefWarning()) {
         printf("WARNING: variable \"%s\" on token %d was used in an expression without initialization.\n\
 This will produce errors in future releases.\n",
           s->varTable[getTokenData(index, s).val_u].name,
           result->tokenId
         );
-        warncount++;
-        if (warncount == 10) {
-          printf("No more warnings like this will be shown in this run.\n");
-        }
       }
       result->type = SVS_TYPE_NUM;
     } else {
@@ -182,7 +169,7 @@ This will produce errors in future releases.\n",
       errSoftSetToken(index, s);
       return;
     }
-  }else if ((getTokenType(index, s) == 39)) {
+  } else if ((getTokenType(index, s) == 39)) {
     exprExecDMSG("ExprExecLvl5 NOT statement", result->value.val_s, result->tokenId, s);
     exprExecLvl5(index + 1, result, s); // get next statement
     if (errCheck(s)) {
@@ -200,7 +187,7 @@ This will produce errors in future releases.\n",
       result->value = (varType)((int32_t)1);
     }
     exprExecDMSG("ExprExecLvl5 NOT statement end", result->value.val_s, result->tokenId, s);
-  }else if (((getTokenType(index, s) == 5) || (getTokenType(index, s) == 6))) {
+  } else if (((getTokenType(index, s) == 5) || (getTokenType(index, s) == 6))) {
     while ((getTokenType(index, s) == 5) || (getTokenType(index, s) == 6)) {
       if (getTokenType(index, s) == 5) { // (
         exprExecDMSG("ExprExecLvl5 recursion on (", result->value.val_s, result->tokenId, s);

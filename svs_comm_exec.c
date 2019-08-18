@@ -349,6 +349,14 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
       commExDMSG("commExecLoop: ++ statement", currToken, s);
       currToken++;
       if (getTokenType(currToken, s) == SVS_TOKEN_ADD) {
+
+        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_UNDEF) {
+          if (getUndefWarning()) {
+            printf("Warning: ++ operator used on a uninitialized variable!\nThis will produce error in a future release.\n");
+          }
+          varSetType(getTokenData(x, s), SVS_TYPE_NUM ,s);
+        }
+
         if (varGetType(getTokenData(x,s), s) != SVS_TYPE_NUM) {
           errSoft((uint8_t *)"commEx: Syntax error in ++: only num type can be incremented.", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
@@ -371,6 +379,14 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
       commExDMSG("commExecLoop: -- statement", currToken, s);
       currToken++;
       if (getTokenType(currToken, s) == SVS_TOKEN_SUBT) {
+
+        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_UNDEF) {
+          if (getUndefWarning()) {
+            printf("Warning: -- operator used on a uninitialized variable!\nThis will produce error in a future release.\n");
+          }
+          varSetType(getTokenData(x, s), SVS_TYPE_NUM ,s);
+        }
+
         if (varGetType(getTokenData(x, s), s) != SVS_TYPE_NUM) {
           errSoft((uint8_t *)"commEx: Syntax error in --: only num type can be decremented.", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);

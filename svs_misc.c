@@ -110,6 +110,24 @@ void svsSetFileName(uint8_t * name, svsVM *s) {
   }
 }
 
+static uint32_t warncount;
+
+void resetWarnCount() {
+  warncount = 0;
+}
+
+uint8_t getUndefWarning() {
+  warncount++;
+  if (warncount < 10) {
+    return 1;
+  }
+
+  if (warncount == 10) {
+    printf("No more warnings like this will be shown in this run.\n");
+  }
+  return 0;
+}
+
 void varRetValZero(varRetVal *x) {
   x->value.val_s = 0;
   x->type = 0;
