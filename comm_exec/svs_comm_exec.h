@@ -25,7 +25,7 @@ This is the main command execution logic header.
 #ifndef SVS_COMM_EXEC_H
 #define SVS_COMM_EXEC_H
 
-#include "svs_basics.h"
+#include "../svs_basics.h"
 
 void commExDMSG(char *text, uint16_t tokenId, svsVM *s);
 uint16_t commSkip(uint16_t index, svsVM *s);

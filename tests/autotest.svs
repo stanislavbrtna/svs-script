@@ -269,6 +269,51 @@ function main {
     FAIL = 1;
   }
 
+  cnt = cnt + 1;
+
+  testVar1 = 56;
+  testVar2 = 56;
+  testVarStr1 = "abcd";
+  testVarStr2 = "abcd";
+  testVarStr3 = "abcd";
+
+  testVarFlt1 = 13.5;
+  testVarFlt2 = 13.5;
+
+  testVar1 += 4;
+  testVar2 += "G";
+
+  testVarStr1 += 1;
+  testVarStr2 += "efg";
+  testVarStr3 += 1.5;
+
+  testVarFlt1 += 0.5;
+  testVarFlt2 += "abcd";
+
+  testVar3 = 70;
+  testVar4 = 70.0;
+
+  testVar3 -= 5;
+  testVar4 -= 0.75;
+
+
+  if (testVar1 == 60
+      and testVar2 == "56G"
+      and testVarStr1 == "abcd1"
+      and testVarStr2 == "abcdefg"
+      and testVarStr3 == "abcd1.5"
+      and testVarFlt1 == 14.0
+      and testVarFlt2 == "13.5abcd"
+      and testVar3 == 65
+      and testVar4 == 69.25
+  ) {
+    sys print(cnt + " - inline ops:OK");
+  }else{
+    sys print(cnt + " - inline ops:FAIL " + testVarStr1 +" "+ testVar2);
+    FAIL = 1;
+  }
+  cnt = cnt + 1;
+
   #comments hopefully works
   if(FAIL) {
     sys print("Test FAILED");
@@ -298,10 +343,10 @@ function standalone{
 function argsfunc {
   if((arg0 == 1)*(arg1 == 2)*(arg2 == 3)*(arg3 == 4)*(arg4 == 5)*(arg5 == 6)*(arg6 == "karel")*(arg7 == 5.5)*(arg8 == 6.1)*(arg9 == 7.2)) { #
     a = 55;
-    sys print ("ko: "+arg0+" "+arg1+" "+arg2+" "+arg3+" "+arg4+" "+arg5+" "+arg6+" "+arg7+" "+arg8+" "+arg9);
+    #sys print ("ko: "+arg0+" "+arg1+" "+arg2+" "+arg3+" "+arg4+" "+arg5+" "+arg6+" "+arg7+" "+arg8+" "+arg9);
     return 99;
   } else {
-    sys print ("ko: "+arg0+" "+arg1+" "+arg2+" "+arg3+" "+arg4+" "+arg5+" "+arg6+" "+arg7+" "+arg8+" "+arg9);
+    #sys print ("ko: "+arg0+" "+arg1+" "+arg2+" "+arg3+" "+arg4+" "+arg5+" "+arg6+" "+arg7+" "+arg8+" "+arg9);
     return 0;
   }
 }

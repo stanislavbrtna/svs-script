@@ -50,7 +50,7 @@ This is the main include file.
 #include "svs_builtin_calls.h"
 #include "svs_tokenizer.h"
 #include "svs_expr_exec2.h"
-#include "svs_comm_exec.h"
+#include "comm_exec/svs_comm_exec.h"
 #include "svs_garbage_collector.h"
 #include "svs_load.h"
 #include "svs_debug.h"
