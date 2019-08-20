@@ -296,6 +296,14 @@ function main {
   testVar3 -= 5;
   testVar4 -= 0.75;
 
+  testVar5 = 15;
+  testVar6 = 15.0;
+
+  testVar5 /= 3;
+  testVar6 /= 3.0;
+
+  testVar7 = 17;
+  testVar7 %= 3;
 
   if (testVar1 == 60
       and testVar2 == "56G"
@@ -306,6 +314,9 @@ function main {
       and testVarFlt2 == "13.5abcd"
       and testVar3 == 65
       and testVar4 == 69.25
+      and testVar5 == 5
+      and testVar6 == 5.0
+      and testVar7 == 2
   ) {
     sys print(cnt + " - inline ops:OK");
   }else{

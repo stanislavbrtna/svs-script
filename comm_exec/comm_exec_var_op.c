@@ -253,6 +253,170 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
         errSoftSetToken(currToken, s);
         return 0;
       }
+    } else if(getTokenType(currToken, s) == SVS_TOKEN_DIV) {
+      currToken++;
+
+      if (getTokenType(currToken, s) == SVS_TOKEN_ASSIGN) {
+        commExDMSG("commExecLoop: /= statement", currToken, s);
+        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_UNDEF) {
+          errSoft((uint8_t *)"commEx: Error: \"/=\" operator used on a uninitialized variable!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+          errSoftSetToken(currToken, s);
+          return 0;
+        }
+
+        currToken++;
+        exprExec(currToken, &varPrac, s);
+        if (errCheck(s)) {
+          return 0;
+        }
+
+        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_NUM) {
+          if (varPrac.type == SVS_TYPE_NUM) {
+            varSetVal(
+              getTokenData(x, s),
+              (varType)((varGetVal(getTokenData(x, s), s)).val_s / (varPrac.value).val_s),
+              s
+            );
+          } else {
+            errSoft((uint8_t *)"commEx: Error: \"/=\" operator only works on NUM or FLT!", s);
+            errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+            errSoftSetToken(currToken, s);
+            return 0;
+          }
+        } else if (varGetType(getTokenData(x, s), s) == SVS_TYPE_FLT) {
+          if (varPrac.type == SVS_TYPE_FLT) {
+            varSetVal(
+              getTokenData(x, s),
+              (varType)((varGetVal(getTokenData(x, s), s)).val_f / (varPrac.value).val_f),
+              s
+            );
+          } else {
+            errSoft((uint8_t *)"commEx: Error: \"/=\" operator only works on NUM or FLT!", s);
+            errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+            errSoftSetToken(currToken, s);
+            return 0;
+          }
+        } else {
+          errSoft((uint8_t *)"commEx: Error: \"/=\" operator only works on NUM or FLT!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+          errSoftSetToken(currToken, s);
+          return 0;
+        }
+
+        currToken = varPrac.tokenId;
+      } else {
+        errSoft((uint8_t *)"commEx: Syntax error next to / (missing \"=\").", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+
+    } else if(getTokenType(currToken, s) == SVS_TOKEN_MUL) {
+      currToken++;
+
+      if (getTokenType(currToken, s) == SVS_TOKEN_ASSIGN) {
+        commExDMSG("commExecLoop: *= statement", currToken, s);
+        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_UNDEF) {
+          errSoft((uint8_t *)"commEx: Error: \"*=\" operator used on a uninitialized variable!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+          errSoftSetToken(currToken, s);
+          return 0;
+        }
+
+        currToken++;
+        exprExec(currToken, &varPrac, s);
+        if (errCheck(s)) {
+          return 0;
+        }
+
+        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_NUM) {
+          if (varPrac.type == SVS_TYPE_NUM) {
+            varSetVal(
+              getTokenData(x, s),
+              (varType)((varGetVal(getTokenData(x, s), s)).val_s * (varPrac.value).val_s),
+              s
+            );
+          } else {
+            errSoft((uint8_t *)"commEx: Error: \"/=\" operator only works on NUM or FLT!", s);
+            errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+            errSoftSetToken(currToken, s);
+            return 0;
+          }
+        } else if (varGetType(getTokenData(x, s), s) == SVS_TYPE_FLT) {
+          if (varPrac.type == SVS_TYPE_FLT) {
+            varSetVal(
+              getTokenData(x, s),
+              (varType)((varGetVal(getTokenData(x, s), s)).val_f * (varPrac.value).val_f),
+              s
+            );
+          } else {
+            errSoft((uint8_t *)"commEx: Error: \"*=\" operator only works on NUM or FLT!", s);
+            errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+            errSoftSetToken(currToken, s);
+            return 0;
+          }
+        } else {
+          errSoft((uint8_t *)"commEx: Error: \"*=\" operator only works on NUM or FLT!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+          errSoftSetToken(currToken, s);
+          return 0;
+        }
+
+        currToken = varPrac.tokenId;
+      } else {
+        errSoft((uint8_t *)"commEx: Syntax error next to * (missing \"=\").", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+
+    } else if(getTokenType(currToken, s) == SVS_TOKEN_MOD) {
+      currToken++;
+
+      if (getTokenType(currToken, s) == SVS_TOKEN_ASSIGN) {
+        commExDMSG("commExecLoop: %= statement", currToken, s);
+        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_UNDEF) {
+          errSoft((uint8_t *)"commEx: Error: \"%=\" operator used on a uninitialized variable!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+          errSoftSetToken(currToken, s);
+          return 0;
+        }
+
+        currToken++;
+        exprExec(currToken, &varPrac, s);
+        if (errCheck(s)) {
+          return 0;
+        }
+
+        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_NUM) {
+          if (varPrac.type == SVS_TYPE_NUM) {
+            varSetVal(
+              getTokenData(x, s),
+              (varType)((varGetVal(getTokenData(x, s), s)).val_s % (varPrac.value).val_s),
+              s
+            );
+          } else {
+            errSoft((uint8_t *)"commEx: Error: \"%=\" operator only works on NUM!", s);
+            errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+            errSoftSetToken(currToken, s);
+            return 0;
+          }
+        } else {
+          errSoft((uint8_t *)"commEx: Error: \"*=\" operator only works on NUM or FLT!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+          errSoftSetToken(currToken, s);
+          return 0;
+        }
+
+        currToken = varPrac.tokenId;
+      } else {
+        errSoft((uint8_t *)"commEx: Syntax error next to * (missing \"=\").", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+
     } else if (getTokenType(currToken, s) == SVS_TOKEN_LSQB) { // []
       varType index;
 

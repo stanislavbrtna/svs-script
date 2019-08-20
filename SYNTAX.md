@@ -69,6 +69,12 @@ All keywords, variables and functions are case sensitive. Here is a table of all
 | >= | greater or equal |
 | > | greater |
 
+Operators +, -, *, /, % can also be used in an variable assignment:
+
+    x += 5; # equivalent to x = x + 5;
+    y -= 17.0;
+    z /= 5;
+    ...
 Note: SVS supports incrementing (decrementing) *num* type variables with ++ (- -), but only as a command outside expression.
 
 This works:
@@ -80,8 +86,9 @@ This works:
 This does **NOT** work:
 
     ...some code...
-    if(i == x++) {
-      ...some code...
+    if (i == x++) {
+    ...some code...
+
 
 ### Priority of operators
 | Priority <br /> (highest to lowest.) | Operator(s) |
@@ -110,6 +117,7 @@ Operators of the same priority are executed from left to right. Operations insid
 | \\" | double quote |
 
 Note: Before SVS version 1.1 pound (#) symbol inside text constant must be written as ##, otherwise rest of line is threated like a comment, bit of a design oversight.
+
 Escape characters \\a,\\b,\\f,\\r,\\t,\\v are also supported since SVS version 1.2.1.
 
 #### Operations across types
