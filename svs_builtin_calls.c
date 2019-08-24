@@ -47,8 +47,10 @@ svsBuiltInCallsTableType svsBuiltInCallsTable[] = {
   {"pi", PI},
   {"sqrt", SQRT},
   {"ver", VER},
+  {"rnd", RND},
   {"end", 0}
 };
+
 
 uint16_t getBuiltInCallId(uint8_t * str) {
   uint16_t x = 0;
@@ -60,7 +62,6 @@ uint16_t getBuiltInCallId(uint8_t * str) {
   }
   return 0;
 }
-
 
 
 uint16_t processBuiltInCall(uint16_t index, varRetVal *result, svsVM *s) {
@@ -662,6 +663,22 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     result->value = (varType)((uint16_t)SVS_VERSION_NUM);
     result->type = SVS_TYPE_NUM;
     return 1;
+  }
+
+  // [num] rnd()
+  if (callId == RND) {
+    if (count != 0) {
+      simpleError("rnd(): wrong argument count!", s);
+      return 0;
+    }
+#ifdef SVS_RND_FUNCTION
+    result->value = (varType)(SVS_RND_FUNCTION);
+    result->type = SVS_TYPE_NUM;
+    return 1;
+#else
+    simpleError("rnd(): Hook not presented!", s);
+    return 0;
+#endif
   }
 
   simpleError((uint8_t *)"execBuiltInCall: Unknown builtin call!", s);
