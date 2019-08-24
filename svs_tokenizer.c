@@ -1080,10 +1080,31 @@ uint8_t tokenParse(svsVM *s) {
           tokenInput(0, 1);
         }
 
-        // function name
+        // function name or wrapper name
         if (getKeyword(pracName2, &posText)) {
           tokenizerErrorPrint((uint8_t *)"tokenParse: internal function name too long!");
           return 1;
+        }
+        if (tokenInput(posText, 0) == '.') {
+          posText++;
+          tokenInput(0, 1);
+          uint16_t wrapperId;
+          wrapperId = getSysWrapperId(pracName2);
+          if (wrapperId) {
+            setTokenData(posToken, (varType)(wrapperId - 1), s);
+            posToken++;
+            setTokenType(posToken, SVS_TOKEN_SYS, s);
+            setTokenData(posToken, (varType)((uint16_t)0), s);
+          } else {
+            tokenizerErrorPrint((uint8_t *)"tokenParse: Named wrapper not found:");
+            printf("Wrapper not found: %s\n", pracName2);
+            return 1;
+          }
+
+          if (getKeyword(pracName2, &posText)) {
+            tokenizerErrorPrint((uint8_t *)"tokenParse: internal function name too long!");
+            return 1;
+          }
         }
 
         // název interní funkce máme v pracName2
@@ -1092,7 +1113,7 @@ uint8_t tokenParse(svsVM *s) {
 
         if (syscallExists(pracName2, s)) { // check if syscall exists
           // then set token as that syscall
-          setTokenData(posToken, (varType)((uint16_t)syscallGetId(pracName2, s)) ,s);
+          setTokenData(posToken, (varType)((uint16_t)syscallGetId(pracName2, s)), s);
           tokenDMSG("Token set, type existing SYSCALL",
                     posToken,
                     getTokenData(posToken, s),

@@ -37,7 +37,7 @@ svsConstType pcBasicWrapConsts[]={
 uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s);
 
 void pcBasicWrapInit(){
-  addSysWrapper(pcBasicsWrap);
+  addSysWrapper(pcBasicsWrap, (uint8_t *)"dbg");
   addSysConsts(pcBasicWrapConsts);
 }
 

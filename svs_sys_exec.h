@@ -41,9 +41,10 @@ extern svsConstType * sysConsts[SYSCALL_WRAPPERS];
 extern volatile uint8_t sysConstsNum;
 
 uint8_t sysExecTypeCheck(argStruct *argS, uint8_t *argType, uint8_t argCnt, svsVM *s );
-void addSysWrapper(uint8_t (*arg) (varRetVal *result, argStruct *argS, svsVM *s));
+void addSysWrapper(uint8_t (*arg) (varRetVal *result, argStruct *argS, svsVM *s), uint8_t *wrapperName);
 uint8_t sysFuncMatch(varType id, char *t, svsVM *s);
 void sysExec(uint16_t index, varRetVal *result, svsVM *s);
 void addSysConsts(svsConstType * consts);
+uint16_t getSysWrapperId(uint8_t *name);
 
 #endif

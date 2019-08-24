@@ -24,18 +24,23 @@ SOFTWARE.
 
 uint8_t sysExecDebug;
 
-void setSysExecDebug (uint8_t level) {
-  sysExecDebug = level;
-}
-
-//syscall wrappers array
+// syscall wrappers array
 uint8_t (*sysWrapper[SYSCALL_WRAPPERS]) (varRetVal *result, argStruct *argS, svsVM *s);
 
-//tokenizer constants array
+// sys wrapper names
+uint8_t *sysWrapperName[SYSCALL_WRAPPERS];
+
+// tokenizer constants array
 svsConstType *sysConsts[SYSCALL_WRAPPERS];
 
 volatile uint8_t sysWrapperNum;
 volatile uint8_t sysConstsNum;
+
+
+void setSysExecDebug (uint8_t level) {
+  sysExecDebug = level;
+}
+
 
 void addSysConsts(svsConstType *consts) {
   if (sysConstsNum < SYSCALL_WRAPPERS) {
@@ -46,14 +51,27 @@ void addSysConsts(svsConstType *consts) {
   }
 }
 
-void addSysWrapper(uint8_t (*arg) (varRetVal *result, argStruct *argS, svsVM *s)) {
+
+void addSysWrapper(uint8_t (*arg) (varRetVal *result, argStruct *argS, svsVM *s), uint8_t *wrapperName) {
   if (sysWrapperNum < SYSCALL_WRAPPERS) {
     sysWrapper[sysWrapperNum] = arg;
+    sysWrapperName[sysWrapperNum] = wrapperName;
     sysWrapperNum++;
   } else {
     errMsgS((uint8_t *)"addSysWrapper: Maximum number of syscall wrappers exceeded!");
   }
 }
+
+
+uint16_t getSysWrapperId(uint8_t *name) {
+  for (uint16_t x = 0; x < sysWrapperNum; x++) {
+    if (strCmp(name, sysWrapperName[x])){
+      return x + 1;
+    }
+  }
+  return 0;
+}
+
 
 uint8_t sysFuncMatch(varType id, char *t, svsVM *s) {
   if (strCmp((uint8_t *)t, s->syscallTable[id.val_u].sysCallName)) {
@@ -62,6 +80,7 @@ uint8_t sysFuncMatch(varType id, char *t, svsVM *s) {
     return 0;
   }
 }
+
 
 uint8_t sysExecTypeCheck(argStruct *argS, uint8_t *argType, uint8_t argCnt, svsVM *s ) {
   uint8_t x;
@@ -84,6 +103,7 @@ uint8_t sysExecTypeCheck(argStruct *argS, uint8_t *argType, uint8_t argCnt, svsV
   return 0;
 }
 
+
 void sysExec(uint16_t index, varRetVal *result, svsVM *s) {
   /*
    * Is called from command execute (commEx) or expression execute (exprEx)
@@ -98,16 +118,24 @@ void sysExec(uint16_t index, varRetVal *result, svsVM *s) {
   argStruct argS;
   uint16_t x;
   uint8_t retval = 0;
-
-  argS.callId = getTokenData(index, s);
-
-  index++;
+  uint16_t preselected_wrapper = 0;
 
   x = 1;
 
-  if ((getTokenType(index, s) == 5)) {
+  // starts on the first sys token, get if there is a second one with a wrapper name
+  if ((getTokenType(index + 1, s) == SVS_TOKEN_SYS)) {
+    // wrapper pre-selection
+    preselected_wrapper = (getTokenData(index, s)).val_u + 1;
     index++;
-    if (getTokenType(index, s) != 6) { // if the brackets are not empty
+  }
+
+  // get call id and move to the bracket (hopefully)
+  argS.callId = getTokenData(index, s);
+  index++;
+
+  if ((getTokenType(index, s) == SVS_TOKEN_LBR)) {
+    index++;
+    if (getTokenType(index, s) != SVS_TOKEN_RBR) { // if the brackets are not empty
       exprExec(index, &pracVar, s); // execute expression
       if (errCheck(s)) {
         return;
@@ -119,7 +147,7 @@ void sysExec(uint16_t index, varRetVal *result, svsVM *s) {
     }
 
     // arguments are separated with coma or semicolon(legacy)
-    while((getTokenType(index, s) == 9) || (getTokenType(index, s) == 33)) {
+    while((getTokenType(index, s) == SVS_TOKEN_SCOL) || (getTokenType(index, s) == SVS_TOKEN_COL)) {
       if (x == FUNCTION_ARGS_MAX + 1) {
         errSoft((uint8_t *)"sysExec: too many arguments in sys call!", s);
         errSoftSetParam(s->syscallTable[argS.callId.val_u].sysCallName, (varType)((uint16_t)0), s);
@@ -138,7 +166,7 @@ void sysExec(uint16_t index, varRetVal *result, svsVM *s) {
       x++;
     }
 
-    if (getTokenType(index,s) != 6) {
+    if (getTokenType(index,s) != SVS_TOKEN_RBR) {
       errSoft((uint8_t *)"sysExec: Syntax error at end of sys call. (missing \")\")", s);
       errSoftSetParam(s->syscallTable[argS.callId.val_u].sysCallName, (varType)((uint16_t)0), s);
       errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
@@ -151,12 +179,16 @@ void sysExec(uint16_t index, varRetVal *result, svsVM *s) {
     index++;
     varRetValZero(&pracVar);
 
+    if (preselected_wrapper == 0) {
     // run the sys wrappers
-    for (x = 0; x < sysWrapperNum; x++) {
-      retval = (*sysWrapper[x]) (&pracVar, &argS, s);
-      if (retval == 1) {
-        break;
+      for (x = 0; x < sysWrapperNum; x++) {
+        retval = (*sysWrapper[x]) (&pracVar, &argS, s);
+        if (retval == 1) {
+          break;
+        }
       }
+    } else {
+      retval = (*sysWrapper[preselected_wrapper - 1]) (&pracVar, &argS, s);
     }
 
     // if all wrappers failed
