@@ -1091,7 +1091,7 @@ uint8_t tokenParse(svsVM *s) {
           uint16_t wrapperId;
           wrapperId = getSysWrapperId(pracName2);
           if (wrapperId) {
-            setTokenData(posToken, (varType)(wrapperId - 1), s);
+            setTokenData(posToken, (varType)((uint32_t)wrapperId - 1), s);
             posToken++;
             setTokenType(posToken, SVS_TOKEN_SYS, s);
             setTokenData(posToken, (varType)((uint16_t)0), s);
