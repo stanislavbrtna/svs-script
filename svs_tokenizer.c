@@ -208,25 +208,35 @@ uint8_t tokenInput(uint16_t index, uint8_t inc) {
   }
 
   if (inc == 1) {
-      vTextPos++;
-      for(x = 0; x < 15; x++) {
-        strBuff[x] = strBuff[x + 1];
-      }
+      // TODO: Remove all the debug prints from token input andget keyword ext
+      // once it is verified to be working
       if (peek == 0) {
+        vTextPos++;
+        for(x = 15; x > 0; x--) {
+          strBuff[x] = strBuff[x - 1];
+        }
         strBuff[0] = tokenPreprocessor();
       }
       if (peek == 1) {
         peek = 0;
       }
+      //printf("r1: wat: %s\n", strBuff);
       return 0;
   }
 
   if (index <= vTextPos) {
-    return strBuff[index - vTextPos];
+    //printf("wat: %s\n", strBuff);
+    //printf("r2: wat: %s\n", strBuff);
+    return strBuff[vTextPos - index];
   } else {
     //peek
-    strBuff[1] = tokenPreprocessor();
+    vTextPos++;
+    for(x = 15; x > 0; x--) {
+      strBuff[x] = strBuff[x - 1];
+    }
+    strBuff[0] = tokenPreprocessor();
     peek = 1;
+    //printf("r3: wat: %s\n", strBuff);
     return strBuff[index - vTextPos];
   }
 
@@ -282,6 +292,74 @@ uint8_t tokenEofCheck(int16_t brCount1, int16_t  brCount2) {
   return 1;
 }
 
+// special case for getting sys.something.somethingelse.fn
+uint8_t getKeywordExt(uint8_t *out_buffer, uint16_t *posText) {
+  uint16_t pracStrInd = 0;
+  uint8_t specChar = 0;
+  uint8_t buffer[NAME_LENGTH*2];
+
+  buffer[pracStrInd] = tokenInput(*posText, 0);
+  (*posText)++;
+  tokenInput(0, 1);
+  pracStrInd++;
+  while(1) {
+    if (pracStrInd < (NAME_LENGTH*2)) {
+      if (isRegChar(tokenInput(*posText, 0)) || isNumber(tokenInput(*posText, 0))
+          || (tokenInput(*posText, 0) == '.')
+      ) {
+        if (tokenInput(*posText, 0) == '.') {
+          specChar = 1;
+        }
+        buffer[pracStrInd] = tokenInput(*posText, 0);
+      } else {
+        break;
+      }
+      (*posText)++;
+      tokenInput(0, 1);
+      pracStrInd++;
+      buffer[pracStrInd] = 0;
+    } else {
+      // Copy the buffers
+      for(uint16_t x = 0; x < NAME_LENGTH; x++){
+        out_buffer[x] = buffer[x];
+      }
+      out_buffer[NAME_LENGTH - 1] = 0;
+      return 1;
+    }
+  }
+
+  if (specChar == 0) {
+    for(uint16_t x = 0; x < NAME_LENGTH; x++){
+      out_buffer[x] = buffer[x];
+      if (buffer[x] == 0) {
+        break;
+      }
+    }
+    return 0;
+  }
+
+  //printf("pt: %u, len: %u\n", *posText, pracStrInd);
+  // move back to the spec char
+  for (uint16_t i = pracStrInd; i > 0; i--) {
+    if (buffer[i] == '.') {
+      buffer[i] = 0;
+      *posText -= pracStrInd - i;
+      //printf("i:%u\n", i);
+      break;
+    }
+  }
+
+  for(uint16_t x = 0; x < NAME_LENGTH; x++){
+    out_buffer[x] = buffer[x];
+    if (buffer[x] == 0) {
+      break;
+    }
+  }
+  //printf("pt: %u\n", *posText);
+  //printf("buffer: %s, index on: %c (%u)\n", buffer, tokenInput(*posText, 0), tokenInput(*posText, 0));
+
+  return 0;
+}
 
 uint8_t getKeyword(uint8_t *buffer, uint16_t *posText) {
   uint16_t pracStrInd = 0;
@@ -306,6 +384,7 @@ uint8_t getKeyword(uint8_t *buffer, uint16_t *posText) {
       return 1;
     }
   }
+  return 0;
 }
 
 uint8_t tokenParse(svsVM *s) {
@@ -1081,10 +1160,12 @@ uint8_t tokenParse(svsVM *s) {
         }
 
         // function name or wrapper name
-        if (getKeyword(pracName2, &posText)) {
+        if (getKeywordExt(pracName2, &posText)) {
           tokenizerErrorPrint((uint8_t *)"tokenParse: internal function name too long!");
+          printf("Function: %s \n", pracName2);
           return 1;
         }
+
         if (tokenInput(posText, 0) == '.') {
           posText++;
           tokenInput(0, 1);
