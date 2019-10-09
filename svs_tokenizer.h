@@ -21,12 +21,13 @@ SOFTWARE.
 */
 #ifndef SVS_TOKENIZER_H
 #define SVS_TOKENIZER_H
+#define SVS_TOK_STR_BUFFLEN 64
 
 #include "svs_basics.h"
 
 uint8_t tokenGetch();
 uint8_t tokenPreprocessor();
-uint8_t tokenInput(uint16_t index, uint8_t inc);
+uint8_t tokenInput(uint16_t *index, uint8_t inc);
 uint8_t tokenParse(svsVM *s);
 void setTokenizerDebug(uint8_t level);
 void tokenizerReset();
