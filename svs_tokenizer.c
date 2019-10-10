@@ -99,6 +99,7 @@ void tokenzer_print_token_line(uint16_t token, svsVM *s) {
   // reset some tokenizer variables
   s->funcTableLen = 0;
   s->varTableLen = 0;
+  s->syscallTableLen = 0;
   s->stringFieldLen = 0;
   s->errToken = 0;
   s->err = 0;
@@ -314,7 +315,7 @@ uint8_t getKeywordExt(uint8_t *out_buffer, uint16_t *posText) {
   pracStrInd++;
 
   while(1) {
-    if (pracStrInd < (NAME_LENGTH*2)) {
+    if (pracStrInd < (NAME_LENGTH*2) - 1) {
       if (isRegChar(tokenInput(posText, 0)) || isNumber(tokenInput(posText, 0))
           || (tokenInput(posText, 0) == '.')
       ) {
@@ -362,7 +363,7 @@ uint8_t getKeywordExt(uint8_t *out_buffer, uint16_t *posText) {
     }
   }
 
-  for(uint16_t x = 0; x < NAME_LENGTH; x++){
+  for(uint16_t x = 0; x < NAME_LENGTH; x++) {
     out_buffer[x] = buffer[x];
     if (buffer[x] == 0) {
       break;

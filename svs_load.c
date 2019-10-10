@@ -25,6 +25,7 @@ SOFTWARE.
 uint8_t filename[64];
 uint8_t ldinit;
 uint8_t ldmode;
+uint8_t fclosed;
 
 void setFName(uint8_t * name) {
   uint16_t x;
@@ -50,6 +51,7 @@ uint8_t loadApp(uint8_t *fname, uint8_t *name, svsVM *s, uint8_t mode) {
   ldinit = 0;
   ldmode = mode; //0=file 1=uart
 
+  fclosed = 0;
   tokenizerReset();
 
   if(mode == 1) {
@@ -72,9 +74,10 @@ uint8_t tokenGetch() {
   static FIL fp;
   uint8_t x = 0;
   uint32_t br;
-  if(ldmode == 0) {
+
+  if (ldmode == 0) {
     if (ldinit == 0) {
-      printf("Opening file: %s\n", filename);
+      printf("tokenGetch: Opening file: %s\n", filename);
       if (f_open(&fp, (char *)filename, FA_READ) != FR_OK) {
         errMsgS((uint8_t *)"tokenGetch: Error while opening file!");
         return 0;
@@ -82,17 +85,19 @@ uint8_t tokenGetch() {
       ldinit = 1;
     }
 
-    if (f_read(&fp,&x,sizeof(x), &br) != FR_OK) {
+    if (f_read(&fp, &x, sizeof(x), &br) != FR_OK) {
       errMsgS((uint8_t *)"tokenGetch: Error while reading from file!");
     }
-
-    if (f_eof(&fp)) {
-      f_close(&fp);
-      //printf("tokenGetch: EOF\n");
-      return 0;
+    if (fclosed == 0) {
+      if (f_eof(&fp)) {
+        f_close(&fp);
+        fclosed = 1;
+        return 0;
+      } else {
+        return x;
+      }
     } else {
-      //printf("tokenGetch: %c\n", x);
-      return x;
+      return 0;
     }
   } else {
     return 0;
@@ -108,7 +113,7 @@ uint8_t tokenGetch() {
   if (ldinit == 0) {
     if(ldmode == 0) {
       printf("tokenGetch: Opening file: %s\n", filename);
-      fp = fopen(filename,"r");
+      fp = fopen(filename, "r");
       if(fp == NULL) {
         puts("tokenGetch: Error while opening file!");
         return(0);
@@ -119,16 +124,21 @@ uint8_t tokenGetch() {
     }
     ldinit = 1;
   }
-  x = fgetc(fp);
+  if (fclosed == 0) {
+    x = fgetc(fp);
 
-  if (feof(fp)) {
-    fclose(fp);
-    return 0;
+    if (feof(fp)) {
+      fclose(fp);
+      fclosed = 1;
+      return 0;
+    } else {
+  #ifdef TOK_CHECK
+    printf("%c", x);
+  #endif
+      return x;
+    }
   } else {
-#ifdef TOK_CHECK
-  printf("%c", x);
-#endif
-    return x;
+    return 0;
   }
 }
 #endif
