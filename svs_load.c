@@ -85,10 +85,11 @@ uint8_t tokenGetch() {
       ldinit = 1;
     }
 
-    if (f_read(&fp, &x, sizeof(x), &br) != FR_OK) {
-      errMsgS((uint8_t *)"tokenGetch: Error while reading from file!");
-    }
     if (fclosed == 0) {
+      if (f_read(&fp, &x, sizeof(x), &br) != FR_OK) {
+        errMsgS((uint8_t *)"tokenGetch: Error while reading from file!");
+      }
+
       if (f_eof(&fp)) {
         f_close(&fp);
         fclosed = 1;

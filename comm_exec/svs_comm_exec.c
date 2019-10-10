@@ -277,8 +277,6 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 
     // =, ++, --, +=, -=, *=, /=, %=
 
-    uint16_t oldCurrTok = currToken;
-
     comm_exec_var_op(&currToken, s);
 
     if (errCheck(s)) {

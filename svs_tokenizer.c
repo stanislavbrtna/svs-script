@@ -404,7 +404,6 @@ uint8_t tokenParse(svsVM *s) {
   uint16_t posToken = 0;
   uint8_t  pracName[NAME_LENGTH];
   uint8_t  pracName2[NAME_LENGTH];
-  uint8_t  pracStrInd = 0;
   uint8_t  Lock = 1;
   uint16_t x;
   uint16_t currLine = 0;
