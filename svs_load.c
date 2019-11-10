@@ -38,6 +38,7 @@ void tokenGetchSetup(uint8_t * fname, uint8_t mode) {
   setFName(fname);
   ldinit = 0;
   ldmode = mode;
+  fclosed = 0;
 }
 
 
@@ -139,6 +140,7 @@ uint8_t tokenGetch() {
       return x;
     }
   } else {
+    puts("Reading file while fclosed!");
     return 0;
   }
 }
