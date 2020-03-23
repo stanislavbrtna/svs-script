@@ -147,27 +147,23 @@ void garbageCollect(uint16_t count, svsVM *s) {
     return;
   }
 
-  //ověříme validitu nultého stringu, páč před ním není nula
-  valid = gcGetValidString(0, s);
-  if (valid == 1) { //pokud byl validní, tak hledáme nějaký další invalidní
-    for(x = s->gcSafePoint; x < s->stringFieldLen - 1; x++) {
-      if (0 == s->stringField[x]) { //ukončovací znak předchozího stringu
-        valid = gcGetValidString(x + 1, s);
-        if (0 == valid) {
-          //cgDMSG("Non-valid string removed.");
-          //printf("stringRM: %s\n",s->stringField+x+1 );
-          gcRemoveString(x + 1, s);
+  for(x = s->gcSafePoint; x < s->stringFieldLen - 1; x++) {
+    if (0 == s->stringField[x]) { // on the end of previous string
+      valid = gcGetValidString(x + 1, s); // check validity of the next one
+      if (0 == valid) {
+        //cgDMSG("Non-valid string removed.");
+        //printf("stringRM: %s\n",s->stringField+x+1 );
+        gcRemoveString(x + 1, s);
 
-          if (count != 0) {
-            if (s->stringFieldLen < (gc_start - count)) {
-              break;
-            }
+        if (count != 0) {
+          if (s->stringFieldLen < (gc_start - count)) {
+            break;
           }
-
         }
       }
     }
   }
+
   if (s->profilerEnabled) {
     printf(" Collecting Done! %u/%u occupied %u freed.\n", s->stringFieldLen, STRING_FIELD_L, gc_start-s->stringFieldLen);
   }

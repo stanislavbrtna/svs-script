@@ -10,11 +10,17 @@ function main {
 		# set up generated test strings
 		testtext1 = "test " + "text " + x + 1;
 		testtext2 = "test " + "text " + x + 2;
+
+		# generate some garbage in the middle
+		for(i = 0; i < 30; i++;) {
+			b = "i:"+(i*i);
+		}
+
 		testtext3 = "test " + "text " + x + 3;
 		testtext4 = "test " + "text " + x + 4;
 		testtext5 = "";
 
-		# crush the strings to grigger collection
+		# crush the strings to trigger collection
 		for(i = 0; i < 300; i++;) {
 			b = 0;
 			if (x < 25) {
