@@ -327,7 +327,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         currToken = commExecLoop(currToken, s);
 
         if (currToken == 0) {
-          printf("WARN!!!!!!!\n");
+          commExDMSG("commExecLoop: Running over token zero (WARN!!)", currToken, s);
         }
 
         if (errCheck(s)) {
@@ -453,7 +453,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
     commExDMSG("commExecLoop: for statement", currToken, s);
     currToken++;
 
-    //struktura: for(init expr;check expr;endloop expr)
+    //struktura: for(init expr;check expr;endloop expr;)
 
     if (getTokenType(currToken,s) != 5) { // detekce závorky
       errSoft((uint8_t *)"commEx: Unknown statement after while, missing \"(\"", s);
