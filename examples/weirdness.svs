@@ -8,7 +8,6 @@ function _ {
 
 
 function main {
-  print("you can have comments #* seriously *# inside strings");
   _();
 
   if (0 and 0 and 0 and print("Lazy evaluation? We don't do that here.")){}
