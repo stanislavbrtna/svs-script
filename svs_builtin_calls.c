@@ -533,7 +533,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
           x++;
           y++;
         }
-        // out of strr but not out of substr
+        // out of str but not out of substr
         if (s->stringField[args[1].val_str + x] == 0 && s->stringField[args[2].val_str + y] != 0) {
           break;
         }
