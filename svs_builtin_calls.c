@@ -48,6 +48,10 @@ svsBuiltInCallsTableType svsBuiltInCallsTable[] = {
   {"sqrt", SQRT},
   {"ver", VER},
   {"rnd", RND},
+  // debug
+  {"dbg", DBG},
+  {"gcprof", GCP},
+  {"gc", GC},
   {"end", 0}
 };
 
@@ -679,6 +683,63 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     simpleError("rnd(): Hook not presented!", s);
     return 0;
 #endif
+  }
+
+  // dbg([num] level)
+  if (callId == DBG) {
+    if (count != 1) {
+      simpleError((uint8_t *)"dbg(): wrong argument count!", s);
+      return 0;
+    }
+
+    if (argType[1] != SVS_TYPE_NUM) {
+      simpleError((uint8_t *)"dbg(): wrong type of argument!", s);
+      return 0;
+    }
+
+    s->globalDebug = args[1].val_u;
+
+    result->value = (varType)(0);
+    result->type = SVS_TYPE_FLT;
+    return 1;
+  }
+
+  // gcp([num] enable)
+  if (callId == GCP) {
+    if (count != 1) {
+      simpleError((uint8_t *)"gcp(): wrong argument count!", s);
+      return 0;
+    }
+
+    if (argType[1] != SVS_TYPE_NUM) {
+      simpleError((uint8_t *)"gcp(): wrong type of argument!", s);
+      return 0;
+    }
+
+    s->profilerEnabled = args[1].val_u;
+
+    result->value = (varType)(0);
+    result->type = SVS_TYPE_FLT;
+    return 1;
+  }
+
+  // gc([num] num_to_free)
+  if (callId == GC) {
+    if (count != 1) {
+      simpleError((uint8_t *)"gc(): wrong argument count!", s);
+      return 0;
+    }
+
+    if (argType[1] != SVS_TYPE_NUM) {
+      simpleError((uint8_t *)"gc(): wrong type of argument!", s);
+      return 0;
+    }
+
+    garbageCollect(args[1].val_u,s);
+
+    result->value = (varType)(0);
+    result->type = SVS_TYPE_FLT;
+    return 1;
   }
 
   simpleError((uint8_t *)"execBuiltInCall: Unknown builtin call!", s);
