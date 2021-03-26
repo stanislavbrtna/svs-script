@@ -247,7 +247,10 @@ varType newArray(varType Id, uint16_t len, svsVM *s) {
     errSoft((uint8_t *)"newArray: Array field full!", s);
     return (varType)((uint16_t)0);
   }
+  // first element of array is its lenght
+  s->varArray[s->varArrayLen] = (varType)len;
   retval = (varType)s->varArrayLen;
+  s->varArrayLen++;
   s->varArrayLen += len;
 
   return retval;

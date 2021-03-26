@@ -1,0 +1,104 @@
+function main {
+  #This will test all the arg operators
+  FAIL = 0;
+  print("ARG Test:");
+  n = 0;
+  
+  n++;  
+  arg0 = 123;
+  
+  if (arg0 != 123) {
+    FAIL = 1;
+    print("test no. " + n + " failed");
+  }
+  
+  n++;
+  arg0 = 0;
+  arg0 += 123;
+  
+  if (arg0 != 123) {
+    FAIL = 1;
+    print("test no. " + n + " failed");
+  }
+  
+  n++;  
+  arg0 = 0;
+  arg0 -= 123;
+  
+  if (arg0 != -123) {
+    FAIL = 1;
+    print("test no. " + n + " failed");
+  }
+  
+  n++;  
+  arg0 = 2;
+  arg0 *= 123;
+  
+  if (arg0 != 246) {
+    FAIL = 1;
+    print("test no. " + n + " failed");
+  }
+  
+  n++;  
+  arg0 = 8;
+  arg0 /= 2;
+  
+  if (arg0 != 4) {
+    FAIL = 1;
+    print("test no. " + n + " failed");
+  }
+  
+  n++;  
+  arg0 = 9;
+  arg0 %= 8;
+  
+  if (arg0 != 1) {
+    FAIL = 1;
+    print("test no. " + n + " failed");
+  }
+  
+  n++;  
+  arg0 = 0;
+  arg0++;
+  
+  if (arg0 != 1) {
+    FAIL = 1;
+    print("test no. " + n + " failed");
+  }
+  
+  n++;  
+  arg0 = 5;
+  arg0--;
+  
+  if (arg0 != 4) {
+    FAIL = 1;
+    print("test no. " + n + " failed");
+  }
+  
+  # array passing
+  n++;  
+  array arr[5];
+  
+  arr[1] = "a";
+  arr[2] = "b";
+   
+  if (result[3] != "ab") {
+    FAIL = 1;
+    print("test no. " + n + " failed");
+  }
+
+  print("");
+  print("Final OP Test result: ", "");
+  if(FAIL == 0) {
+    print("PASSED");
+  } else {
+    print("FAIL");
+  }
+  return FAIL;
+}
+
+function arrtest {
+  arg0[3] = arg0[1] + arg0[2];
+  
+  return arg0;
+}

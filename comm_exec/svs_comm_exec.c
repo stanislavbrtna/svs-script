@@ -272,12 +272,32 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
     return currToken;
   }
 
-  // equals statement
+  // assignment of a value to a variable (or array)
   if (newToken == SVS_TOKEN_VAR) {
 
     // =, ++, --, +=, -=, *=, /=, %=
 
     comm_exec_var_op(&currToken, s);
+
+    if (errCheck(s)) {
+      return 0;
+    }
+
+    if (getTokenType(currToken,s) != 9) { //zkontrolujeme středník / semicolon check
+      errSoft((uint8_t *)"commEx: Syntax error, missing ; .", s);
+      errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+      errSoftSetToken(currToken, s);
+      return 0;
+    }
+    return currToken;
+  }
+
+  // assignment of a value to an argument
+  if (newToken == SVS_TOKEN_ARG) {
+
+    // =, ++, --, +=, -=, *=, /=, %=
+
+    comm_exec_arg_op(&currToken, s);
 
     if (errCheck(s)) {
       return 0;

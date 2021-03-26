@@ -25,17 +25,23 @@ This is the main command execution logic.
 #include "comm_exec_var_op.h"
 
 
-uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
+uint8_t comm_exec_arg_op(uint16_t *token, svsVM * s) {
     uint16_t x;
     varRetVal varPrac;
     volatile uint16_t currToken = *token;
 
-    //pokud narazíme na typ VAR / if we found a variable
+    varType arg_value;
+    uint8_t arg_type;
+
     x = currToken; //uložíme token indexu promněnné / we store index of the variable
+
+    arg_value = s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1];
+    arg_type = s->commArgs.argType[(uint16_t)getTokenData(x, s).val_u + 1];
+
     currToken++;
     if (getTokenType(currToken, s) == SVS_TOKEN_ASSIGN) { // =
-      commExDMSG("commExecLoop: = statement", currToken, s);
-      if (varGetType(getTokenData(x, s), s) == SVS_TYPE_ARR) {
+      commExDMSG("commExecLoop: ARG = statement", currToken, s);
+      if (arg_type == SVS_TYPE_ARR) {
         errSoft((uint8_t *)"commEx: Assign on array is not supported.", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
@@ -48,8 +54,9 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
       if (errCheck(s)) {
         return 0;
       }
-      varSetVal(getTokenData(x, s), varPrac.value, s); //nastavíme value / we set new value
-      varSetType(getTokenData(x, s), varPrac.type, s); //nastavíme typ / we set new type
+
+      s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = varPrac.value; // set value
+      s->commArgs.argType[(uint16_t)getTokenData(x, s).val_u + 1] = varPrac.type; // set type
 
       if (varPrac.type == 0) {
         commExDMSG("commExecLoop: = statement: result is NUM", currToken, s);
@@ -65,26 +72,24 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
       if (getTokenType(currToken, s) == SVS_TOKEN_ADD) {
         commExDMSG("commExecLoop: ++ statement", currToken, s);
 
-        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_UNDEF) {
+        if (arg_type == SVS_TYPE_UNDEF) {
           if (getUndefWarning()) {
-            printf("Warning: ++ operator used on a uninitialized variable!\nThis will produce error in a future release.\n");
+            printf("Warning: ++ operator used on a uninitialized argument!\n");
           }
-          varSetType(getTokenData(x, s), SVS_TYPE_NUM ,s);
+          s->commArgs.argType[(uint16_t)getTokenData(x, s).val_u + 1] = SVS_TYPE_NUM;
         }
 
-        if (varGetType(getTokenData(x,s), s) != SVS_TYPE_NUM) {
+        if (arg_type != SVS_TYPE_NUM) {
           errSoft((uint8_t *)"commEx: Syntax error in ++: only num type can be incremented.", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
-        varType prac;
-        prac = varGetVal(getTokenData(x,s),s);
-        varSetVal(getTokenData(x,s), (varType)(prac.val_s + (int32_t)1), s);
+        s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)(arg_value.val_s + (int32_t)1);
 
         currToken++;
       } else if(getTokenType(currToken, s) == SVS_TOKEN_ASSIGN) {
-        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_UNDEF) {
+        if (arg_type == SVS_TYPE_UNDEF) {
           errSoft((uint8_t *)"commEx: Error: \"+=\" operator used on a uninitialized variable!", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
@@ -98,67 +103,39 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
         }
 
         // inline += on type NUM
-        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_NUM) {
+        if (arg_type == SVS_TYPE_NUM) {
 
           if (varPrac.type == SVS_TYPE_NUM) {
-            varSetVal(
-              getTokenData(x, s),
-              (varType)((varGetVal(getTokenData(x, s), s)).val_s + (varPrac.value).val_s),
-              s
-            );
+            s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)((arg_value).val_s + (varPrac.value).val_s);
           } else if (varPrac.type == SVS_TYPE_FLT) {
             errSoft((uint8_t *)"commEx: Error: \"+=\" operator: Can not add FLT to NUM!", s);
             errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
             errSoftSetToken(currToken, s);
             return 0;
           } else if (varPrac.type == SVS_TYPE_STR) {
-            varSetType(getTokenData(x, s), SVS_TYPE_STR, s);
-            varSetVal(
-              getTokenData(x, s),
-              (varType)strAdd( i16toString(varGetVal(getTokenData(x, s), s), s).val_str, (varPrac.value).val_str, s),
-              s
-            );
+            s->commArgs.argType[(uint16_t)getTokenData(x, s).val_u + 1] = SVS_TYPE_STR;
+            s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)strAdd( i16toString(arg_value, s).val_str, (varPrac.value).val_str, s);
           }
         // inline += on type STR
-        } else if (varGetType(getTokenData(x, s), s) == SVS_TYPE_STR) {
+        } else if (arg_type == SVS_TYPE_STR) {
           if (varPrac.type == SVS_TYPE_NUM) {
-            varSetVal(
-              getTokenData(x, s),
-              (varType)strAdd((varGetVal(getTokenData(x, s), s)).val_str, i16toString(varPrac.value, s).val_str, s),
-              s
-            );
+            s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)strAdd((arg_value).val_str, i16toString(varPrac.value, s).val_str, s);
           } else if (varPrac.type == SVS_TYPE_FLT) {
-            varSetVal(
-              getTokenData(x, s),
-              (varType)strAdd((varGetVal(getTokenData(x, s), s)).val_str, floatToString(varPrac.value, s).val_str, s),
-              s
-            );
+            s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)strAdd((arg_value).val_str, floatToString(varPrac.value, s).val_str, s);
           } else if (varPrac.type == SVS_TYPE_STR) {
-            varSetVal(
-              getTokenData(x, s),
-              (varType)strAdd( varGetVal(getTokenData(x, s), s).val_str, (varPrac.value).val_str, s),
-              s
-            );
+            s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)strAdd( arg_value.val_str, (varPrac.value).val_str, s);
           }
-        } else if (varGetType(getTokenData(x, s), s) == SVS_TYPE_FLT) {
+        } else if (arg_type == SVS_TYPE_FLT) {
           if (varPrac.type == SVS_TYPE_NUM) {
             errSoft((uint8_t *)"commEx: Error: \"+=\" operator: Can not add FLT to NUM!", s);
             errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
             errSoftSetToken(currToken, s);
             return 0;
           } else if (varPrac.type == SVS_TYPE_FLT) {
-            varSetVal(
-              getTokenData(x, s),
-              (varType)((varGetVal(getTokenData(x, s), s)).val_f + (varPrac.value).val_f),
-              s
-            );
+            s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)((arg_value).val_f + (varPrac.value).val_f);
           } else if (varPrac.type == SVS_TYPE_STR) {
-            varSetType(getTokenData(x, s), SVS_TYPE_STR, s);
-            varSetVal(
-              getTokenData(x, s),
-              (varType)strAdd(floatToString(varGetVal(getTokenData(x, s), s), s).val_str, (varPrac.value).val_str, s),
-              s
-            );
+            s->commArgs.argType[(uint16_t)getTokenData(x, s).val_u + 1] = SVS_TYPE_STR;
+            s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)strAdd(floatToString(arg_value, s).val_str, (varPrac.value).val_str, s);
           }
         } else {
           errSoft((uint8_t *)"commEx: Error: \"+=\" operator could be used only on type NUM, STR or FLT!", s);
@@ -180,27 +157,27 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
       currToken++;
       if (getTokenType(currToken, s) == SVS_TOKEN_SUBT) {
         commExDMSG("commExecLoop: -- statement", currToken, s);
-        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_UNDEF) {
+        if (arg_type == SVS_TYPE_UNDEF) {
           if (getUndefWarning()) {
             printf("Warning: -- operator used on a uninitialized variable!\nThis will produce error in a future release.\n");
           }
-          varSetType(getTokenData(x, s), SVS_TYPE_NUM ,s);
+          s->commArgs.argType[(uint16_t)getTokenData(x, s).val_u + 1] = SVS_TYPE_NUM;
         }
 
-        if (varGetType(getTokenData(x, s), s) != SVS_TYPE_NUM) {
+        if (arg_type != SVS_TYPE_NUM) {
           errSoft((uint8_t *)"commEx: Syntax error in --: only num type can be decremented.", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
           return 0;
         }
         varType prac;
-        prac = varGetVal(getTokenData(x, s), s);
-        varSetVal(getTokenData(x, s), (varType)(prac.val_s - (int32_t)1), s);
+        prac = arg_value;
+        s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)(prac.val_s - (int32_t)1);
 
         currToken++;
       } else if (getTokenType(currToken, s) == SVS_TOKEN_ASSIGN) {
         commExDMSG("commExecLoop: -= statement", currToken, s);
-        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_UNDEF) {
+        if (arg_type == SVS_TYPE_UNDEF) {
           errSoft((uint8_t *)"commEx: Error: \"-=\" operator used on a uninitialized variable!", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
@@ -213,26 +190,18 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
           return 0;
         }
 
-        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_NUM) {
+        if (arg_type == SVS_TYPE_NUM) {
           if (varPrac.type == SVS_TYPE_NUM) {
-            varSetVal(
-              getTokenData(x, s),
-              (varType)((varGetVal(getTokenData(x, s), s)).val_s - (varPrac.value).val_s),
-              s
-            );
+            s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)((arg_value).val_s - (varPrac.value).val_s);
           } else {
             errSoft((uint8_t *)"commEx: Error: \"-=\" operator only works on NUM or FLT!", s);
             errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
             errSoftSetToken(currToken, s);
             return 0;
           }
-        } else if (varGetType(getTokenData(x, s), s) == SVS_TYPE_FLT) {
+        } else if (arg_type == SVS_TYPE_FLT) {
           if (varPrac.type == SVS_TYPE_FLT) {
-            varSetVal(
-              getTokenData(x, s),
-              (varType)((varGetVal(getTokenData(x, s), s)).val_f - (varPrac.value).val_f),
-              s
-            );
+            s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)((arg_value).val_f - (varPrac.value).val_f);
           } else {
             errSoft((uint8_t *)"commEx: Error: \"-=\" operator only works on NUM or FLT!", s);
             errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
@@ -258,7 +227,7 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
 
       if (getTokenType(currToken, s) == SVS_TOKEN_ASSIGN) {
         commExDMSG("commExecLoop: /= statement", currToken, s);
-        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_UNDEF) {
+        if (arg_type == SVS_TYPE_UNDEF) {
           errSoft((uint8_t *)"commEx: Error: \"/=\" operator used on a uninitialized variable!", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
@@ -271,26 +240,18 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
           return 0;
         }
 
-        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_NUM) {
+        if (arg_type == SVS_TYPE_NUM) {
           if (varPrac.type == SVS_TYPE_NUM) {
-            varSetVal(
-              getTokenData(x, s),
-              (varType)((varGetVal(getTokenData(x, s), s)).val_s / (varPrac.value).val_s),
-              s
-            );
+            s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)((arg_value).val_s / (varPrac.value).val_s);
           } else {
             errSoft((uint8_t *)"commEx: Error: \"/=\" operator only works on NUM or FLT!", s);
             errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
             errSoftSetToken(currToken, s);
             return 0;
           }
-        } else if (varGetType(getTokenData(x, s), s) == SVS_TYPE_FLT) {
+        } else if (arg_type == SVS_TYPE_FLT) {
           if (varPrac.type == SVS_TYPE_FLT) {
-            varSetVal(
-              getTokenData(x, s),
-              (varType)((varGetVal(getTokenData(x, s), s)).val_f / (varPrac.value).val_f),
-              s
-            );
+            s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)((arg_value).val_f / (varPrac.value).val_f);
           } else {
             errSoft((uint8_t *)"commEx: Error: \"/=\" operator only works on NUM or FLT!", s);
             errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
@@ -317,7 +278,7 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
 
       if (getTokenType(currToken, s) == SVS_TOKEN_ASSIGN) {
         commExDMSG("commExecLoop: *= statement", currToken, s);
-        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_UNDEF) {
+        if (arg_type == SVS_TYPE_UNDEF) {
           errSoft((uint8_t *)"commEx: Error: \"*=\" operator used on a uninitialized variable!", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
@@ -330,26 +291,18 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
           return 0;
         }
 
-        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_NUM) {
+        if (arg_type == SVS_TYPE_NUM) {
           if (varPrac.type == SVS_TYPE_NUM) {
-            varSetVal(
-              getTokenData(x, s),
-              (varType)((varGetVal(getTokenData(x, s), s)).val_s * (varPrac.value).val_s),
-              s
-            );
+            s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)((arg_value).val_s * (varPrac.value).val_s);
           } else {
             errSoft((uint8_t *)"commEx: Error: \"/=\" operator only works on NUM or FLT!", s);
             errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
             errSoftSetToken(currToken, s);
             return 0;
           }
-        } else if (varGetType(getTokenData(x, s), s) == SVS_TYPE_FLT) {
+        } else if (arg_type == SVS_TYPE_FLT) {
           if (varPrac.type == SVS_TYPE_FLT) {
-            varSetVal(
-              getTokenData(x, s),
-              (varType)((varGetVal(getTokenData(x, s), s)).val_f * (varPrac.value).val_f),
-              s
-            );
+            s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)((arg_value).val_f * (varPrac.value).val_f);
           } else {
             errSoft((uint8_t *)"commEx: Error: \"*=\" operator only works on NUM or FLT!", s);
             errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
@@ -376,7 +329,7 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
 
       if (getTokenType(currToken, s) == SVS_TOKEN_ASSIGN) {
         commExDMSG("commExecLoop: %= statement", currToken, s);
-        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_UNDEF) {
+        if (arg_type == SVS_TYPE_UNDEF) {
           errSoft((uint8_t *)"commEx: Error: \"%=\" operator used on a uninitialized variable!", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
           errSoftSetToken(currToken, s);
@@ -389,13 +342,9 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
           return 0;
         }
 
-        if (varGetType(getTokenData(x, s), s) == SVS_TYPE_NUM) {
+        if (arg_type == SVS_TYPE_NUM) {
           if (varPrac.type == SVS_TYPE_NUM) {
-            varSetVal(
-              getTokenData(x, s),
-              (varType)((varGetVal(getTokenData(x, s), s)).val_s % (varPrac.value).val_s),
-              s
-            );
+            s->commArgs.arg[(uint16_t)getTokenData(x, s).val_u + 1] = (varType)((arg_value).val_s % (varPrac.value).val_s);
           } else {
             errSoft((uint8_t *)"commEx: Error: \"%=\" operator only works on NUM!", s);
             errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
@@ -420,7 +369,7 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
     } else if (getTokenType(currToken, s) == SVS_TOKEN_LSQB) { // []
       varType index;
 
-      if (varGetType(getTokenData(x, s), s) != SVS_TYPE_ARR) {
+      if (arg_type != SVS_TYPE_ARR) {
         errSoft((uint8_t *)"commEx: Only array type can be indexed.", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
@@ -469,14 +418,14 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
 
       currToken = varPrac.tokenId;
 
-      if (index.val_s + varGetVal(getTokenData(x, s), s).val_s > SVS_ARRAY_LEN) {
+      if (index.val_s + arg_value.val_s > SVS_ARRAY_LEN) {
         errSoft((uint8_t *)"commEx: Array out of range!", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
         return 0;
       } else {
-        s->varArray[1 + index.val_s + varGetVal(getTokenData(x, s), s).val_s] = varPrac.value;
-        s->varArrayType[1 + index.val_s + varGetVal(getTokenData(x, s), s).val_s] = varPrac.type;
+        s->varArray[1 + index.val_s + arg_value.val_s] = varPrac.value;
+        s->varArrayType[1 + index.val_s + arg_value.val_s] = varPrac.type;
       }
 
     } else { //očekáváme "=" / expecting "="

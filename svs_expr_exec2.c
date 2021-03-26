@@ -51,23 +51,7 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
     result->type = 0;
     result->tokenId = index + 1;
     exprExecDMSG("ExprExecLvl5 NUM const.", result->value.val_s, result->tokenId, s);
-  } else  if (getTokenType(index, s) == 35) { //ARG
-    result->value = s->commArgs.arg[(uint16_t)getTokenData(index, s).val_u + 1];
-    result->type = s->commArgs.argType[(uint16_t)getTokenData(index, s).val_u + 1];
-    result->tokenId = index + 1;
-
-    if (result->type == SVS_TYPE_UNDEF) {
-      if (getUndefWarning()) {
-        printf("WARNING: argument \"arg%u\" on token %d was used in an expression without initialization.\n\
-This will produce errors in future releases.\n",
-          getTokenData(index, s).val_u,
-          result->tokenId
-        );
-      }
-      result->type = SVS_TYPE_NUM;
-    }
-    exprExecDMSG("ExprExecLvl5 ARG (const).", result->value.val_s, result->tokenId, s);
-  } else  if (getTokenType(index, s) == 31) { //FLT
+  } else if (getTokenType(index, s) == 31) { //FLT
     #ifdef USE_FLOAT
     result->value = getTokenData(index, s);
     result->type = 3;
@@ -114,10 +98,30 @@ This will produce errors in future releases.\n",
     result->type = 1;
     result->tokenId = index + 1;
     exprExecDMSG("ExprExecLvl5 STR const.", result->value.val_s, result->tokenId, s);
-  } else if ((getTokenType(index, s) == 10)) {//VAR
-    result->value = varGetVal(getTokenData(index, s), s);
-    result->type = varGetType(getTokenData(index, s), s);
-    result->tokenId = index + 1;
+  } else if ((getTokenType(index, s) == 10) || (getTokenType(index, s) == SVS_TOKEN_ARG))  {//VAR or ARG
+    if (getTokenType(index, s) == SVS_TOKEN_VAR) {
+      // variable
+      result->value = varGetVal(getTokenData(index, s), s);
+      result->type = varGetType(getTokenData(index, s), s);
+      result->tokenId = index + 1;
+    } else {
+      // argument
+      result->value = s->commArgs.arg[(uint16_t)getTokenData(index, s).val_u + 1];
+      result->type = s->commArgs.argType[(uint16_t)getTokenData(index, s).val_u + 1];
+      result->tokenId = index + 1;
+
+      if (result->type == SVS_TYPE_UNDEF) {
+        if (getUndefWarning()) {
+          printf("WARNING: argument \"arg%u\" on token %d was used in an expression without initialization.\n",
+            getTokenData(index - 1, s).val_u,
+            result->tokenId
+          );
+        }
+        result->type = SVS_TYPE_NUM;
+      }
+      exprExecDMSG("ExprExecLvl5 ARG, now internaly assumed as VAR.", result->value.val_s, result->tokenId, s);
+    }
+
     if (result->type == 0) {
       exprExecDMSG("ExprExecLvl5 VAR type NUM", result->value.val_s, result->tokenId, s);
     } else if (result->type == 1) {
@@ -136,23 +140,20 @@ This will produce errors in future releases.\n",
           return;
         }
         index = result->tokenId;
-      } else {
-        errSoft((uint8_t *)"ExprExecLvl5 ARRAY: You can not evaluate whole array (missing \"[\")!", s);
-        errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
-        errSoftSetToken(index, s);
-        return;
-      }
-      arrayIndex = result->value;
-      result->value = s->varArray[arrayIndex.val_s + arrayBase.val_s];
-      result->type = s->varArrayType[arrayIndex.val_s + arrayBase.val_s];
+        arrayIndex = result->value;
+        result->value = s->varArray[1 + arrayIndex.val_s + arrayBase.val_s];
+        result->type = s->varArrayType[1 + arrayIndex.val_s + arrayBase.val_s];
 
-      if (getTokenType(index, s) != SVS_TOKEN_RSQB) {
-        errSoft((uint8_t *)"ExprExecLvl5 ARRAY: Missing \"]\")!", s);
-        errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
-        errSoftSetToken(index, s);
-        return;
+        if (getTokenType(index, s) != SVS_TOKEN_RSQB) {
+          errSoft((uint8_t *)"ExprExecLvl5 ARRAY: Missing \"]\")!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
+          errSoftSetToken(index, s);
+          return;
+        }
+        result->tokenId = index + 1;
+      } else {
+        exprExecDMSG("ExprExecLvl5 passing ARRAY identificator", result->value.val_s, result->tokenId, s);
       }
-      result->tokenId = index + 1;
     } else if (result->type == SVS_TYPE_UNDEF) {
       exprExecDMSG("ExprExecLvl5 VAR type UNDEF", result->value.val_s, result->tokenId, s);
       if (getUndefWarning()) {
@@ -246,6 +247,11 @@ void exprExecLvl4(uint16_t index, varRetVal *result, svsVM *s) {
         tokenId = prac.tokenId;  //nastavíme token id co se vrátilo
         result->tokenId = prac.tokenId; //nastavíme znova
         #endif
+      } else if((result->type == SVS_TYPE_ARR) || (prac.type == SVS_TYPE_ARR)) {
+        errSoft((uint8_t *)"Can not multiply array identificators!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+        errSoftSetToken(tokenId, s);
+        return;
       } else {
         errSoft((uint8_t *)"Can only multiply num and num or float and float!", s);
         errSoftSetParam((uint8_t *)"TokenId",(varType)tokenId,s);
@@ -282,8 +288,13 @@ void exprExecLvl4(uint16_t index, varRetVal *result, svsVM *s) {
         tokenId = prac.tokenId; //nastavíme token id co se vrátilo
         result->tokenId = prac.tokenId; //nastavíme znova
         #endif
+      } else if((result->type == SVS_TYPE_ARR) || (prac.type == SVS_TYPE_ARR)) {
+        errSoft((uint8_t *)"Can not divide array identificators!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+        errSoftSetToken(tokenId, s);
+        return;
       } else {
-        errSoft((uint8_t *)"Can not divide string and num or float and num!", s);
+        errSoft((uint8_t *)"Can only divide num and num or float and float!", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
         errSoftSetToken(tokenId, s);
         return;
@@ -305,6 +316,11 @@ void exprExecLvl4(uint16_t index, varRetVal *result, svsVM *s) {
         }
         tokenId = prac.tokenId;  //nastavíme token id co se vrátilo
         result->tokenId = prac.tokenId; //nastavíme znova
+      } else if((result->type == SVS_TYPE_ARR) || (prac.type == SVS_TYPE_ARR)) {
+        errSoft((uint8_t *)"Can not divide array identificators!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+        errSoftSetToken(tokenId, s);
+        return;
       } else {
         errSoft((uint8_t *)"Can not divide string and num!", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
@@ -359,6 +375,11 @@ void exprExecLvl3(uint16_t index, varRetVal *result, svsVM *s) {
         exprExecDMSG("ExprExecLvl3 + (NUM) operator: Exit", result->value.val_s, tokenId, s);
         result->tokenId = tokenId;
         return;
+      } else if((result->type == SVS_TYPE_ARR) || (prac.type == SVS_TYPE_ARR)) {
+        errSoft((uint8_t *)"Can not add array identificators!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+        errSoftSetToken(tokenId, s);
+        return;
       } else {
         errSoft((uint8_t *)"Can not add float and num!", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
@@ -389,6 +410,11 @@ void exprExecLvl3(uint16_t index, varRetVal *result, svsVM *s) {
         tokenId = prac.tokenId;
         result->tokenId = prac.tokenId;
       #endif
+      } else if((result->type == SVS_TYPE_ARR) || (prac.type == SVS_TYPE_ARR)) {
+        errSoft((uint8_t *)"Can not subtract array identificators!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+        errSoftSetToken(tokenId, s);
+        return;
       } else {
         errSoft((uint8_t *)"Can only subtract num with num or float with float!", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
@@ -623,13 +649,23 @@ void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
             result->tokenId = prac.tokenId;
           }
         #endif
+        } else if((result->type == SVS_TYPE_ARR) || (prac.type == SVS_TYPE_ARR)) {
+          errSoft((uint8_t *)"Can not use < on array identificators!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+          errSoftSetToken(tokenId, s);
+          return;
         } else {
           errSoft((uint8_t *)"Can not use < operator on strings!", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
           errSoftSetToken(tokenId,s);
           return;
         }
-      } else {
+      } else if((result->type == SVS_TYPE_ARR) || (prac.type == SVS_TYPE_ARR)) {
+          errSoft((uint8_t *)"Can not use < on array identificators!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+          errSoftSetToken(tokenId, s);
+          return;
+        } else {
         errSoft((uint8_t *)"Can not compare (<) string and num!", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
         errSoftSetToken(tokenId, s);
@@ -669,13 +705,23 @@ void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
             result->tokenId = prac.tokenId;
           }
         #endif
+        } else if((result->type == SVS_TYPE_ARR) || (prac.type == SVS_TYPE_ARR)) {
+          errSoft((uint8_t *)"Can not use > on array identificators!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+          errSoftSetToken(tokenId, s);
+          return;
         } else {
           errSoft((uint8_t *)"Can not use > operator on strings!", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
           errSoftSetToken(tokenId, s);
           return;
         }
-      } else {
+      } else if((result->type == SVS_TYPE_ARR) || (prac.type == SVS_TYPE_ARR)) {
+          errSoft((uint8_t *)"Can not use > on array identificators!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+          errSoftSetToken(tokenId, s);
+          return;
+        } else {
         errSoft((uint8_t *)"Can only compare (>) same types", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
         errSoftSetToken(tokenId, s);
@@ -716,13 +762,23 @@ void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
             result->tokenId = prac.tokenId;
           }
         #endif
+        } else if((result->type == SVS_TYPE_ARR) || (prac.type == SVS_TYPE_ARR)) {
+          errSoft((uint8_t *)"Can not use <= on array identificators!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+          errSoftSetToken(tokenId, s);
+          return;
         } else {
           errSoft((uint8_t *)"Can not use <= operator on strings!", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
           errSoftSetToken(tokenId, s);
           return;
         }
-      } else {
+      } else if((result->type == SVS_TYPE_ARR) || (prac.type == SVS_TYPE_ARR)) {
+          errSoft((uint8_t *)"Can not use <= on array identificators!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+          errSoftSetToken(tokenId, s);
+          return;
+        } else {
         errSoft((uint8_t *)"Can only compare (<=) same types", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
         errSoftSetToken(tokenId, s);
@@ -762,13 +818,23 @@ void exprExecLvl1(uint16_t index, varRetVal *result, svsVM *s) {
             result->tokenId = prac.tokenId;
           }
         #endif
+        } else if((result->type == SVS_TYPE_ARR) || (prac.type == SVS_TYPE_ARR)) {
+          errSoft((uint8_t *)"Can not use >= on array identificators!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+          errSoftSetToken(tokenId, s);
+          return;
         } else {
           errSoft((uint8_t *)"Can not use >= operator on strings!", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
           errSoftSetToken(tokenId, s);
           return;
         }
-      } else {
+      } else if((result->type == SVS_TYPE_ARR) || (prac.type == SVS_TYPE_ARR)) {
+          errSoft((uint8_t *)"Can not use >= on array identificators!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+          errSoftSetToken(tokenId, s);
+          return;
+        } else {
         errSoft((uint8_t *)"Can only compare (>=) same types", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
         errSoftSetToken(tokenId, s);
