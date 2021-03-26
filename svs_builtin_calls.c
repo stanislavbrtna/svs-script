@@ -430,23 +430,29 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       return 0;
     }
 
-    if (argType[1] != SVS_TYPE_STR){
+    if ((argType[1] != SVS_TYPE_STR) && (argType[1] != SVS_TYPE_ARR)) {
       simpleError((uint8_t *)"len(): wrong type of argument!", s);
       return 0;
     }
 
-    while (s->stringField[args[1].val_str + x] != 0) {
-      if ((s->stringField[args[1].val_str + x] >= 0xC3) \
-          && (s->stringField[args[1].val_str + x] <= 0xC5)) {
+    if (argType[1] == SVS_TYPE_STR) {
+      while (s->stringField[args[1].val_str + x] != 0) {
+        if ((s->stringField[args[1].val_str + x] >= 0xC3) \
+            && (s->stringField[args[1].val_str + x] <= 0xC5)) {
+          x++;
+        }
+        len++;
         x++;
       }
-      len++;
-      x++;
+      // to get just the characters, without end of string
+      result->value = (varType)((int32_t)len);
+      result->type = 0;
+      return 1;
+    } else {
+      result->value = s->varArray[args[1].val_s];
+      result->type = 0;
+      return 1;
     }
-    // to get just the characters, without end of string
-    result->value = (varType)((int32_t)len);
-    result->type = 0;
-    return 1;
   }
 
   // str2 = substr(str, begin, end);
