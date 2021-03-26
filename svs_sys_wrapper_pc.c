@@ -57,7 +57,7 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
     if(sysExecTypeCheck(argS, argType, 5,s)){
       return 0;
     }
-    printf("Voláná sys test funkce!  arg1=%i arg2=%i arg3=%i arg4=%i arg5=%i \n",
+    printf("Sys test called!  arg1=%i arg2=%i arg3=%i arg4=%i arg5=%i \n",
     		(int)argS->arg[1].val_s,
 				(int)argS->arg[2].val_s,
 				(int)argS->arg[3].val_s,

@@ -186,7 +186,7 @@ Function isnum() takes a string and returns non-zero value if the string can be 
 Function *len()* returns length of given string.
 
     return len("abcd");
-Result of this will be 4.
+Result of this will be 4. Since v. 1.4 this function also returns lenght of given array.
 #### Get char at posiotion (getcp)
 Function *getcp(string, position)* returns new string containing only one char that is at given position in a given string. If the position is invalid, then it returns empty string.
 
@@ -229,30 +229,41 @@ Function *[float]pi()* returns the value of pi.
 #### Sqrt
 Function *[float]sqrt([float]x)* returns the square root of x.
 
+### Built-in system functions
+
+#### Rnd
+Function *rnd()* returns random number.
+Note: depends on implememtation of SVS_RND_FUNCTION
+
+#### Ver
+Function *ver()* returns SVS interpreter version.
+
+#### Dbg
+Function *dbg([num] level)* enables expression and command debug output.
+
+#### GC
+Function *gc([num] to_free)* performs garbage collection of unused strings. Argument to_free specifies how many chars will be collected, if zero is passed, full garbage collection occurs.
+
+    gc([num] to_free);
+
+When your program seemingly randomly runs out of string memory inside a function call, try calling garbage collection before that function call.
+
 ### SYS statement functions
 SVS can be extended through its C function wrapper API, these functions can the be called with *sys* command.
 Sys function call example:
 
-    sys.dbg(1);
+    sys.test(1, 2, 3, 4, 5);
 
 In SVS version 1.1.7 and below *sys* statement uses different syntax. This variant of *sys* function call is still supported in current version of SVS interpreter.
 
     # in versions 1.1.7 and below
-    sys dbg(1);
+    sys test(1, 2, 3, 4, 5);
 
 #### Useful sys commands in the default  wrapper
 **Debug:**
 
-    sys.dbg([num] enable); # Enables expression and command debug output
     sys.profiler([num] enable); # Enables garbage collector profiling
     sys.dbgCache([num] enable); # Enables token cache debug output
-
-**Call string garbage collector:**
-Performs garbage collection of unused strings. Argument to_free specifies how many chars will be collected, if zero is passed, full garbage collection occurs.
-
-    sys.GC([num] to_free);
-
-When your program seemingly randomly runs out of string memory inside a function call, try calling garbage collection before that function call.
 
 **Info:**
 Prints information about SVS interpreter.
@@ -297,6 +308,8 @@ You can assign values to the cells of an array:
 Or you can read value of cells in an expression:
 
     print("value: " + a[7]);
+
+String identificator a (in this example), can be (since v.1.4) passed in expressions. In every case only identificator is passed, array is never duplicated.
 Multidimensional arrays are not supported. String functions does not work on arrays because strings in SVS are not internally stored as arrays.
 
 ### Loops and branching
