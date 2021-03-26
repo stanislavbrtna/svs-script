@@ -34,9 +34,11 @@ void pcBasicWrapInit();
 int main(int argc, char *argv[]) {
   svsVM s;
   varRetVal result;
+  time_t t;
   uint8_t dbginfo = 0;
   int retval = 0;
   puts("S! Script interpreter v."SVS_VERSION);
+  srand((unsigned) time(&t));
   setTokenizerDebug(0);
   setCommExDebug(0);
   setExprExecDebug(0);
