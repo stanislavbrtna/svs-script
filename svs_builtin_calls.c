@@ -36,6 +36,7 @@ svsBuiltInCallsTableType svsBuiltInCallsTable[] = {
   {"getcp", GETCP},
   {"len", LEN},
   {"substr", SUBSTR},
+  {"instr", INSTR},
   // advanced math
   {"sin", SIN},
   {"cos", COS},
@@ -498,6 +499,56 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     // to get just the characters, without end of string
     result->value = (varType)(strNewStreamEnd(s));
     result->type = SVS_TYPE_STR;
+    return 1;
+  }
+
+  // contains = instr(str, sub_str);
+  if (callId == INSTR) {
+    uint16_t res = 0;
+    uint16_t x = 0;
+    uint16_t y = 0;
+
+    if (count != 2) {
+      simpleError((uint8_t *)"instr(): wrong argument count!", s);
+      return 0;
+    }
+
+    if (argType[1] != SVS_TYPE_STR
+        || argType[2] != SVS_TYPE_STR) {
+      simpleError((uint8_t *)"instr(): wrong type of argument!", s);
+      return 0;
+    }
+
+    while (s->stringField[args[1].val_str + x] != 0) {
+      if (s->stringField[args[1].val_str + x] == s->stringField[args[2].val_str]) {
+        uint8_t breaked = 0;
+        y = 0;
+        res = x;
+
+        while (s->stringField[args[2].val_str + y] != 0 && s->stringField[args[1].val_str + x] != 0) {
+          if (s->stringField[args[1].val_str + x] != s->stringField[args[2].val_str + y]) {
+            breaked = 1;
+            break;
+          }
+          x++;
+          y++;
+        }
+        // out of strr but not out of substr
+        if (s->stringField[args[1].val_str + x] == 0 && s->stringField[args[2].val_str + y] != 0) {
+          break;
+        }
+
+        if (!breaked) {
+          result->value = (varType)(1 + res);
+          result->type = SVS_TYPE_NUM;
+          return 1;
+        }
+      }
+      x++;
+    }
+    // to get just the characters, without end of string
+    result->value = (varType)(0);
+    result->type = SVS_TYPE_NUM;
     return 1;
   }
 

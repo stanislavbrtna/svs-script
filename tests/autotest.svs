@@ -197,7 +197,13 @@ function main {
   		and isnum(1.1) == 2
   		and len("abcd") == 4
   		and getcp("abcd", 2) == "b"
-  		and substr("ABCDEF", 2, 5) == "BCDE") {
+  		and substr("ABCDEF", 2, 5) == "BCDE"
+  		and instr("abcdefghchijklmnopq", "chi") == 9
+  		and instr("abcdefghchijklmnopq", "abc") == 1
+  		and instr("abcdefghchijklmnopq", "opq") == 17
+  		and instr("abcdefghchijklmnopq", "pqz") == 0
+  		and instr("abcdefghchijklmnopq", "chui") == 0
+  		) {
 
     sys print(cnt + " - Integrated functions:OK");
   }else{

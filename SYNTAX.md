@@ -169,6 +169,7 @@ Maximum of functions in one file is limited by FUNCTION_TABLE_L define. Return c
 
 ### Built-in functions
 SVS has a few built-in functions that can help you accomplish mainly type conversions and type checking. Conversion to string is not included, because is provided as a basic expression by SVS. If you define function with a same name as one of the built-in functions, then every call after the function definition will execute your function instead of the built-in one.
+
 #### Type of
 Function *typeof()* returns type of its parameter.
 
@@ -176,22 +177,30 @@ Function *typeof()* returns type of its parameter.
 	  print("88 is a number")
     }
 You can use defines *TYPE_NUM*, *TYPE_STR* and *TYPE_FLOAT*, to identify the type of data.
+
 #### Num
 Function *num()* accepts string or float and tries to convert it to the type *num*.
+
 #### Float
 Function *float()* accepts string or num and tries to convert it to the type *float*.
+
 #### Is Num
 Function isnum() takes a string and returns non-zero value if the string can be converted to num. Returns 1 if string can be converted to num, 2 if it can be converted to float. It also can take num or float type argument, in that case it returns 1 for num or 2 for float.
+
 #### Len
 Function *len()* returns length of given string.
 
     return len("abcd");
 Result of this will be 4. Since v. 1.4 this function also returns lenght of given array.
+
 #### Get char at posiotion (getcp)
 Function *getcp(string, position)* returns new string containing only one char that is at given position in a given string. If the position is invalid, then it returns empty string.
 
 #### Get substring (substr)
 Function *substr(string, [num]begin, [num]end)* returns new string containing portion of a given string begining at index *begin* and ending at index *end*, both included. If the position is invalid, then it returns empty string.
+
+#### Get if string contains string (instr)
+Function *instr(string, sub_string)*. If substring is contained in the string, 1 + sub_str position in the string is returned, otherwise zero.
 
 #### Print
 Function *print* prints its parameter on standard output. Since SVS version 1.1 print support second optional string argument that is used instead of the default newline character at the end of the printed string.
@@ -234,9 +243,6 @@ Function *[float]sqrt([float]x)* returns the square root of x.
 #### Rnd
 Function *rnd()* returns random number.
 Note: depends on implememtation of SVS_RND_FUNCTION
-
-#### Ver
-Function *ver()* returns SVS interpreter version.
 
 #### Dbg
 Function *dbg([num] level)* enables expression and command debug output.
