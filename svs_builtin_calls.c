@@ -539,7 +539,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
         }
 
         if (!breaked) {
-          result->value = (varType)(1 + res);
+          result->value = (varType)(uint32_t)(1 + res);
           result->type = SVS_TYPE_NUM;
           return 1;
         }
@@ -547,7 +547,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       x++;
     }
     // to get just the characters, without end of string
-    result->value = (varType)(0);
+    result->value = (varType)((uint32_t)0);
     result->type = SVS_TYPE_NUM;
     return 1;
   }
