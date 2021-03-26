@@ -756,7 +756,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
 
     s->globalDebug = args[1].val_u;
 
-    result->value = (varType)(0);
+    result->value = (varType)((uint32_t)0);
     result->type = SVS_TYPE_FLT;
     return 1;
   }
@@ -775,7 +775,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
 
     s->profilerEnabled = args[1].val_u;
 
-    result->value = (varType)(0);
+    result->value = (varType)((uint32_t)0);
     result->type = SVS_TYPE_FLT;
     return 1;
   }
@@ -794,7 +794,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
 
     garbageCollect(args[1].val_u,s);
 
-    result->value = (varType)(0);
+    result->value = (varType)((uint32_t)0);
     result->type = SVS_TYPE_FLT;
     return 1;
   }
