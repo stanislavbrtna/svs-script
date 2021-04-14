@@ -22,14 +22,14 @@ SOFTWARE.
 
 #include "svs_load.h"
 
-uint8_t filename[64];
+uint8_t filename[SVS_FILENAME_L];
 uint8_t ldinit;
 uint8_t ldmode;
 uint8_t fclosed;
 
 void setFName(uint8_t * name) {
   uint16_t x;
-  for(x = 0; x < 64; x++) {
+  for(x = 0; x < sizeof(filename); x++) {
     filename[x] = name[x];
   }
 }

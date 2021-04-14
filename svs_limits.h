@@ -85,6 +85,10 @@ This file contains the main defines and limits of SVS.
   #define FUNCTION_ARGS_MAX 10 // max number of arguments, do not change
 #endif
 
+#ifndef SVS_FILENAME_L
+  #define SVS_FILENAME_L 128 // max number of arguments, do not change
+#endif
+
 #define LOCAL_VARIABLES_ENABLED // enable local statement
 #define USE_FLOAT // enable floating point math
 #define SVS_USE_ADV_MATH // enable sin, cos, tan, arctg, log, exp, pwr, pi, sqrt, float must be enabled
