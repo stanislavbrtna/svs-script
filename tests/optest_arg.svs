@@ -81,7 +81,9 @@ function main {
   
   arr[1] = "a";
   arr[2] = "b";
-   
+  
+  result = arrtest(arr);
+  
   if (result[3] != "ab") {
     FAIL = 1;
     print("test no. " + n + " failed");
