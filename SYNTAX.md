@@ -202,6 +202,12 @@ Function *substr(string, [num]begin, [num]end)* returns new string containing po
 #### Get if string contains string (instr)
 Function *instr(string, sub_string)*. If substring is contained in the string, 1 + sub_str position in the string is returned, otherwise zero.
 
+#### Get upper case string (upper)
+Function *upper( [str]string)* converts strings to upper case.
+
+#### Get lower case string (lower)
+Function *lower( [str]string)* converts strings to lower case.
+
 #### Print
 Function *print* prints its parameter on standard output. Since SVS version 1.1 print support second optional string argument that is used instead of the default newline character at the end of the printed string.
 

@@ -203,6 +203,8 @@ function main {
   		and instr("abcdefghchijklmnopq", "opq") == 17
   		and instr("abcdefghchijklmnopq", "pqz") == 0
   		and instr("abcdefghchijklmnopq", "chui") == 0
+  		and lower("aBcDeFgH") == "abcdefgh"
+  		and upper("aBcDeFgH") == "ABCDEFGH"
   		) {
 
     sys print(cnt + " - Integrated functions:OK");

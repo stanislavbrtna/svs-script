@@ -33,10 +33,13 @@ svsBuiltInCallsTableType svsBuiltInCallsTable[] = {
   {"print", PRINT},
   {"isnum", ISNUM},
   {"typeof", TYPEOF},
+  // strings
   {"getcp", GETCP},
   {"len", LEN},
   {"substr", SUBSTR},
   {"instr", INSTR},
+  {"lower", LOWER},
+  {"upper", UPPER},
   // advanced math
   {"sin", SIN},
   {"cos", COS},
@@ -549,6 +552,66 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     // to get just the characters, without end of string
     result->value = (varType)((uint32_t)0);
     result->type = SVS_TYPE_NUM;
+    return 1;
+  }
+
+  // str2 = lower(str);
+  if (callId == LOWER) {
+    uint16_t x = 0;
+
+    if (count != 1) {
+      simpleError((uint8_t *)"lower(): wrong argument count!", s);
+      return 0;
+    }
+
+    if (argType[1] != SVS_TYPE_STR) {
+      simpleError((uint8_t *)"lower(): wrong type of argument!", s);
+      return 0;
+    }
+
+    strNewStreamInit(s);
+
+    while (s->stringField[args[1].val_str + x] != 0) {
+        if (s->stringField[args[1].val_str + x] >= 'A' && s->stringField[args[1].val_str + x] <= 'Z') {
+          strNewStreamPush((s->stringField[args[1].val_str + x]) + 32, s);
+        } else {
+          strNewStreamPush((s->stringField[args[1].val_str + x]), s);
+        }
+      x++;
+    }
+
+    result->value = (varType)(strNewStreamEnd(s));
+    result->type = SVS_TYPE_STR;
+    return 1;
+  }
+
+  // str2 = upper(str);
+  if (callId == UPPER) {
+    uint16_t x = 0;
+
+    if (count != 1) {
+      simpleError((uint8_t *)"upper(): wrong argument count!", s);
+      return 0;
+    }
+
+    if (argType[1] != SVS_TYPE_STR) {
+      simpleError((uint8_t *)"upper(): wrong type of argument!", s);
+      return 0;
+    }
+
+    strNewStreamInit(s);
+
+    while (s->stringField[args[1].val_str + x] != 0) {
+        if (s->stringField[args[1].val_str + x] >= 'a' && s->stringField[args[1].val_str + x] <= 'z') {
+          strNewStreamPush((s->stringField[args[1].val_str + x]) - 32, s);
+        } else {
+          strNewStreamPush((s->stringField[args[1].val_str + x]), s);
+        }
+      x++;
+    }
+
+    result->value = (varType)(strNewStreamEnd(s));
+    result->type = SVS_TYPE_STR;
     return 1;
   }
 
