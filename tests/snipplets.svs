@@ -1,0 +1,132 @@
+#*
+  Test for SVS code snipplets
+  -> rnd_string
+  -> array print
+  -> array_sort_str
+*#
+
+function rnd_string #*lenght*# {
+  arg1 = "";
+  for(arg2 = 0; x < arg0; arg2++;) {
+    arg1 = arg1 + getcp("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMOPQRSTUVWXYZ0123456789_!@$%&*",
+                    rnd() % len("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMOPQRSTUVWXYZ0123456789_!@$%&*"));
+  }
+  return arg1;
+}
+
+ # array print
+function array_print #* array *# {
+  print("Array:");
+  for (arg1 = 0; arg1 < len(arg0); arg1++;) {
+    print("  " + arg1 + ": " + arg0[arg1]);
+  }
+}
+
+ # extension for array print that actually replaces print with array print
+function _print {
+  print(arg0);
+}
+
+function print {
+  if (typeof(arg0) == TYPE_ARRAY) {
+    array_print(arg0);
+    return;
+  }
+
+  if (typeof(arg0) == TYPE_NUM) {
+    _print(""+arg0);
+    return;
+  }
+
+  _print(arg0);
+}
+
+ # alphabetical sorter for ararys of strings
+
+function array_sort_str #* array, optional: sortstring *# {
+  if(arg1 == 0) {
+    arg1 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  }
+  arg2 = 0;
+  for(arg3 = 1; arg3 < len(arg1); arg3++;) {
+    arg4 = getcp(arg1, arg3);
+    for(arg5 = arg2; arg5 < len(arg0); arg5++;){
+      if (getcp(arg0[arg5], 1) == arg4) {
+        arg6 = arg0[arg5];
+        arg0[arg5] = arg0[arg2];
+        arg0[arg2] = arg6;
+        arg2++;
+      }
+    }
+  }
+}
+
+ # main test function
+function main {
+  array test[30];
+  array n[20];
+  array correct[20];
+
+  # test for print array, sadly result cannot be tested automatically, but should throw error otherwise
+  for (a = 0; a < 30; a++;) {
+    test[a] = rnd()%100;
+  }
+
+  print(test);
+  print(88);
+
+  n[0] = "karel";
+  n[1] = "milan";
+  n[2] = "standa";
+  n[3] = "martin";
+  n[4] = "franta";
+  n[5] = "anička";
+  n[6] = "pepa";
+  n[7] = "honza";
+  n[8] = "ferda";
+  n[9] = "jožka";
+  n[10] = "nina";
+  n[11] = "týna";
+  n[12] = "jana";
+  n[13] = "gábuše";
+  n[14] = "filip";
+  n[15] = "tomáš";
+  n[16] = "ivan";
+  n[17] = "marek";
+  n[18] = "martin";
+  n[19] = "albert";
+
+  correct[0] = "anička";
+  correct[1] = "albert";
+  correct[2] = "franta";
+  correct[3] = "ferda";
+  correct[4] = "filip";
+  correct[5] = "gábuše";
+  correct[6] = "honza";
+  correct[7] = "ivan";
+  correct[8] = "jožka";
+  correct[9] = "jana";
+  correct[10] = "karel";
+  correct[11] = "martin";
+  correct[12] = "marek";
+  correct[13] = "martin";
+  correct[14] = "milan";
+  correct[15] = "nina";
+  correct[16] = "pepa";
+  correct[17] = "standa";
+  correct[18] = "tomáš";
+  correct[19] = "týna";
+
+  print(n);
+  array_sort_str(n);
+  print(n);
+
+  for (x = 0; x < len(n); x++;) {
+    if (correct[x] != n[x]) {
+      print("Fail: " + n[x] + " is not " + correct[x]);
+      return 1;
+    }
+  }
+
+  return 0;
+}

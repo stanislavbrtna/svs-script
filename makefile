@@ -17,4 +17,5 @@ test: svs
 	./bin/svs tests/gctest.svs
 	./bin/svs tests/optest.svs
 	./bin/svs tests/optest_arg.svs
+	./bin/svs tests/snipplets.svs
 	@echo "All tests PASSED"
