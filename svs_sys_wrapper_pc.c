@@ -29,6 +29,8 @@ svsConstType pcBasicWrapConsts[]={
   {"TYPE_NUM", 0},
   {"TYPE_STR", 1},
   {"TYPE_FLOAT", 3},
+  {"TYPE_ARRAY", 4},
+  {"TYPE_UNDEF", 5},
 
   {"end", 0}
 };

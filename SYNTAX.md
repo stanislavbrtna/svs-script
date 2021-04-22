@@ -174,9 +174,9 @@ SVS has a few built-in functions that can help you accomplish mainly type conver
 Function *typeof()* returns type of its parameter.
 
     if (typeof(88) == TYPE_NUM) {
-	  print("88 is a number")
+	    print("88 is a number")
     }
-You can use defines *TYPE_NUM*, *TYPE_STR* and *TYPE_FLOAT*, to identify the type of data.
+You can use defines *TYPE_NUM*, *TYPE_STR*, *TYPE_FLOAT* and *TYPE_ARRAY*, to identify the type of data.
 
 #### Num
 Function *num()* accepts string or float and tries to convert it to the type *num*.
