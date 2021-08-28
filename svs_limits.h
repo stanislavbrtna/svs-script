@@ -86,7 +86,7 @@ This file contains the main defines and limits of SVS.
 #endif
 
 #ifndef SVS_FILENAME_L
-  #define SVS_FILENAME_L 128 // max number of arguments, do not change
+  #define SVS_FILENAME_L 128
 #endif
 
 #define LOCAL_VARIABLES_ENABLED // enable local statement
