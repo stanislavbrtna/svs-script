@@ -105,6 +105,9 @@ uint16_t processBuiltInCall(uint16_t index, varRetVal *result, svsVM *s) {
       }
       index++;
       exprExec(index, &pracVar, s);
+      if (errCheck(s)) {
+        return 0;
+      }
       args[x] = pracVar.value;
       argType[x] = pracVar.type;
       index = pracVar.tokenId;
