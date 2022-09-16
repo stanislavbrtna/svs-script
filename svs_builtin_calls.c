@@ -25,6 +25,10 @@ SOFTWARE.
 #include <math.h>
 #endif
 
+#ifdef SVS_RND_FUNCTION
+  uint32_t SVS_RND_FUNCTION;
+#endif
+
 uint16_t callToken; // used to precisely locate errors
 
 svsBuiltInCallsTableType svsBuiltInCallsTable[] = {

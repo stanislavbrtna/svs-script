@@ -113,9 +113,9 @@ uint8_t gcRemoveString(uint16_t strId, svsVM *s) {
 
   #ifndef CMDLINE
     pscg_garbage_walkaround(
-                       (uint32_t)((uint32_t)strId + (uint32_t)(s->stringField)),
+                       (void *)((uint32_t)strId + (uint32_t)(s->stringField)),
                        str_len,
-                       (uint32_t)((uint32_t)s->stringField + (uint32_t)s->stringFieldLen)
+                       (void *)((uint32_t)s->stringField + (uint32_t)s->stringFieldLen)
     );
   #endif
 

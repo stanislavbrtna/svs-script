@@ -92,11 +92,11 @@ void errMsgS(uint8_t *str) {
 }
 
 #ifdef PC
-void hardErrHandler_default(){
+void hardErrHandler_default() {
   getchar();
 }
 #else
-void hardErrHandler_default(){
+void hardErrHandler_default() {
   while(1);
 }
 #endif
