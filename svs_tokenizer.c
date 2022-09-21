@@ -307,6 +307,10 @@ uint8_t getKeywordExt(uint8_t *out_buffer, uint16_t *posText) {
   uint8_t specChar = 0;
   uint8_t buffer[NAME_LENGTH*2];
 
+  for(int i = 0; i < sizeof(buffer); i++) {
+    buffer[i] = 0;
+  }
+
   // first char
   buffer[pracStrInd] = tokenInput(posText, 0);
 
