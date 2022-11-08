@@ -313,7 +313,11 @@ Since SVS version 1.0 implementation of arrays moved from sys warpper to the cor
 Arrays can be defined by array keyword:
 
     array a[50];
-This will create array named *a* with 50 cells. For now arrays can't be destroyed. When the array memory does not allow creation of new array an error is thrown.
+This will create an array named *a* with 50 cells.
+
+    array b = ["alpha", "beta", "gama"];
+This will create an array named *b* with three cells initialized with string values "alpha", "beta" and "gama".
+For now arrays can't be destroyed. When the array memory does not allow creation of new array an error is thrown.
 You can assign values to the cells of an array:
 
     a[7] = 123;

@@ -256,6 +256,7 @@ function main {
 
   array A[100];
   array B[100];
+  array C = [1,2,3,4,5];
   for(x = 0; x < 100; x++;) {
     A[x] = "a"+x;
   }
@@ -268,6 +269,10 @@ function main {
     if(B[x] != "b"+x or A[x] != "a"+x){
       arr_fail = 1;
     }
+  }
+  
+  if (C[0] != 1 or C[1]!=2 or C[2]!=3 or C[3]!=4 or C[4]!=5) {
+    arr_fail = 1;
   }
 
   if (not arr_fail) {
