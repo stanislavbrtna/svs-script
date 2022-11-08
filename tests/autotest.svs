@@ -29,8 +29,7 @@ function main {
   a = 5;
   b = 10;
   {
-  	local a;
-    a = 15;
+  	local a = 15;
     b = a;
   }
 

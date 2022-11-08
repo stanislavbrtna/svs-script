@@ -154,12 +154,26 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
       errSoftSetToken(currToken, s);
       return 0;
     } else {
-      varAddLocal(getTokenData(currToken, s), s); //přidáme lokální promněnnou / adds a local variable
+      varType id;
+      id = getTokenData(currToken, s);
+      varAddLocal(id, s); //přidáme lokální promněnnou / adds a local variable
 
       if (errCheck(s)) { //kontrola a obsluha možné chyby v předchozím volání / error check
         return 0;
       }
       currToken++;
+
+      if (getTokenType(currToken, s) == SVS_TOKEN_ASSIGN) {
+        currToken++;
+        exprExec(currToken, &varPrac, s);
+        if (errCheck(s)) {
+          return 0;
+        }
+
+        currToken = varPrac.tokenId;
+        varSetVal(id, varPrac.value, s);
+        varSetType(id, varPrac.type, s);
+      }
 
       if (getTokenType(currToken, s) != SVS_TOKEN_SCOL) { //zkontrolujeme středník / semicolon check
         errSoft((uint8_t *)"commEx: Syntax error, missing ; .", s);
@@ -266,6 +280,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
           return 0;
         }
 
+        //TODO: make macro/function for array access, this is ugly
         s->varArray[1 + x + tmp.val_s] = varPrac.value;
         s->varArrayType[1 + x + tmp.val_s] = varPrac.type;
         
