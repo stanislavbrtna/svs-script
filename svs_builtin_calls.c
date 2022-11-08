@@ -159,7 +159,7 @@ static void simpleError(uint8_t * text, svsVM *s) {
 }
 
 uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argType, uint16_t count, varRetVal *result, svsVM *s) {
-  // real
+  // num
   if (callId == NUM) {
     varType prac;
     uint8_t negative = 0;
@@ -167,7 +167,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     prac.val_s = 0;
 
     if (count != 1) {
-      simpleError((uint8_t *)"real(): wrong argument count!", s);
+      simpleError((uint8_t *)"num(): wrong argument count!", s);
       return 0;
     }
 
