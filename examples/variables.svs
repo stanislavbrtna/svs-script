@@ -4,8 +4,8 @@ function main {
     local a;
     a = 8;
     {
-      local a;
-      a = "Some text";
+      # another local variable initialized inside a block
+      local a = "Some text";
       print("a = " + a);
     }
     print("a = " + a);

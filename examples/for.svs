@@ -1,6 +1,5 @@
 function main {
-
-	for(a = 10; a > 0; a = a - 1;){
-		print("loop");
-	}
+  for(a = 10; a > 0; a = a - 1;) {
+    print("loop, a = " + a);
+  }
 }

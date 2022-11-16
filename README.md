@@ -28,4 +28,4 @@ After succesfull compilation you will end up with *svs* binary in the bin folder
 
     ./svs somescript.svs
 
-You can start with example scripts from the *examples* directory or you can look at [language documentation](SYNTAX.md) and write your own.
+You can start with example scripts from the *examples* directory or you can look at [language documentation](docs/syntax.md) and write your own.
