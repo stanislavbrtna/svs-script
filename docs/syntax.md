@@ -3,7 +3,7 @@ Well, there is not much documentation at the moment. I hope that this document a
 
 ### Quick access
 * [Builtin functions](builtins.md)
-* [Code examples](../examples)
+* [Code examples](examples.md)
 
 
 ### Hello world
@@ -22,7 +22,7 @@ Or simply:
       print("Hello world!");
     }
 
-You can find more examples [here](examples.md) or in the [Examples folder](../examples).
+You can find more examples [here](examples.md) or as .svs files in the [Examples folder](../examples).
 
 ### Keywords
 All keywords, variables and functions are case sensitive. Here is a table of all keywords (in alphabetical order).
@@ -62,7 +62,7 @@ All keywords, variables and functions are case sensitive. Here is a table of all
 
 | Operator | Meaning |
 |--|--|
-| + | Addition for strings and numbers. If there is addition between string and number, the number is converted to string and the two strings are added together. |
+| + | Addition for strings and numbers.|
 | - | subtract |
 | * | multiply |
 | / | division |
@@ -74,6 +74,8 @@ All keywords, variables and functions are case sensitive. Here is a table of all
 | < | lower |
 | >= | greater or equal |
 | > | greater |
+
+Note: If there is addition *+* between string and number, the number is converted to string and the two strings are added together.
 
 Operators +, -, *, /, % can also be used in an variable assignment:
 
@@ -275,9 +277,11 @@ Maximum of functions in one file is limited by FUNCTION_TABLE_L define. Return c
 ### Built-in functions
 SVS has a few built-in functions that can help you accomplish mainly type conversions and type checking. Conversion to string is not included, because is provided as a basic expression by SVS. If you define function with a same name as one of the built-in functions, then every call after the function definition will execute your function instead of the built-in one.
 
-Full description of all the built-in fuctions is [here](builtins.md)
-
 **List of builtin functions:**
+
+[Full description of all the built-in fuctions](builtins.md)
+
+
     typeof(expression);
     num(expression);
     float(expr);
