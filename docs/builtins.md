@@ -80,52 +80,63 @@ Since version 0.8.6 SVS contains optional built-in math functions. These functio
 #### Sin
     sin([float]angle_in_radians);
 Return: [float] result
+
 Function *sin* returns the sine of given angle.
 
 #### Cos
     cos([float]angle_in_radians);
 Return: [float] result
+
 Function ** returns the cosine of given angle.
 
 #### Tan
     tan([float]angle_in_radians);
 Return: [float] result
+
 Function *tan* returns the tangent of given angle.
 
 #### Atan
     atan([float]angle_in_radians);
 Return: [float] result
+
 Function *atan* returns the arc tangent of given angle.
 
 #### Log
     log([float]x);
 Return: [float] result
+
 Function *log* returns the natural logarithm of x.
 
 #### Exp
     exp([float]x);
 Return: [float] result
+
 Function *exp* returns e^x.
 
 #### Pow
     pow([float]x, [float]y);
 Return: [float] result
+
 Function *pow* returns x^y.
 
 #### Pi
     pi();
 Return: [float] result
+
 Function *[float]pi()* returns the value of pi.
 
 #### Sqrt
     sqrt([float]x);
 Return: [float] result
+
 Function *sqrt* returns the square root of x.
 
 #### Rnd
     rnd();
 Return: [num] result
+
 Function *rnd()* returns random number.
+
 Note: depends on implememtation of SVS_RND_FUNCTION
 
 ### Built-in system functions
@@ -133,11 +144,13 @@ Note: depends on implememtation of SVS_RND_FUNCTION
 #### Dbg
     dbg([num] level);
 Result: none
+
 Function *dbg* enables expression and command debug output.
 
 #### GC
     gc([num] to_free);
 Result: none
+
 Function *gc([num] to_free)* performs garbage collection of unused strings. Argument to_free specifies how many chars will be collected, if zero is passed, full garbage collection occurs.
 
     gc([num] to_free);
