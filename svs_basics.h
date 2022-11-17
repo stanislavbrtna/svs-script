@@ -43,12 +43,12 @@ This is the main include file.
 #error "USE_FLOAT required for SVS_USE_ADV_MATH"
 #endif
 
-#include "svs_token_cache.h"
+#include "tokenizer/svs_token_cache.h"
 #include "svs_misc.h"
 #include "svs_misc_str.h"
 #include "svs_sys_exec.h"
 #include "svs_builtin_calls.h"
-#include "svs_tokenizer.h"
+#include "tokenizer/svs_tokenizer.h"
 #include "svs_expr_exec2.h"
 #include "comm_exec/svs_comm_exec.h"
 #include "svs_garbage_collector.h"

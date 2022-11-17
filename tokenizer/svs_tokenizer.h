@@ -23,7 +23,7 @@ SOFTWARE.
 #define SVS_TOKENIZER_H
 #define SVS_TOK_STR_BUFFLEN 64
 
-#include "svs_basics.h"
+#include "../svs_basics.h"
 
 uint8_t tokenGetch();
 uint8_t tokenPreprocessor();

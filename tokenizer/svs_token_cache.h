@@ -22,7 +22,7 @@ SOFTWARE.
 #ifndef SVS_TOKEN_CACHE_H
 #define SVS_TOKEN_CACHE_H
 
-#include "svs_basics.h"
+#include "../svs_basics.h"
 
 uint8_t getTokenType(uint16_t tokenId, svsVM *s);
 uint8_t setTokenType(uint16_t tokenId, uint8_t val, svsVM *s);
