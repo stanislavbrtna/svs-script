@@ -528,26 +528,27 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
 
       if (len >= (args[2].val_u) && (len <= args[3].val_s)) {
         strNewStreamPush(s->stringField[args[1].val_str + x], s);
-      }
-      if (x > args[3].val_s - 1) {
-        break;
-      }
 
-      if ((s->stringField[args[1].val_str + x] >= 0xC3) \
-        && (s->stringField[args[1].val_str + x] <= 0xC5)) {
-        x++;
+        if ((s->stringField[args[1].val_str + x] >= 0xC3) \
+            && (s->stringField[args[1].val_str + x] <= 0xC5)) {
+          x++;
+          strNewStreamPush(s->stringField[args[1].val_str + x], s);
+        }
+      } else {
+        if ((s->stringField[args[1].val_str + x] >= 0xC3) \
+            && (s->stringField[args[1].val_str + x] <= 0xC5)) {
+          x++;
+        }
       }
+      
       len++;
       x++;
+
+      if (len > args[3].val_s) {
+        break;
+      }
     }
     x -= 2;
-    
-    // fix for UTF8 czech chars at the end of string
-    if ((s->stringField[args[1].val_str + x] >= 0xC3) \
-        && (s->stringField[args[1].val_str + x] <= 0xC5)) {
-      x++;
-      strNewStreamPush(s->stringField[args[1].val_str + x], s);
-    }
     
     // to get just the characters, without end of string
     result->value = (varType)(strNewStreamEnd(s));

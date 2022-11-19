@@ -199,6 +199,7 @@ function main {
   		and getcp("abcd", 2) == "b"
   		and getcp("žžgře", 4) == "ř"
   		and substr("ABCDEF", 2, 5) == "BCDE"
+      and substr("abcšdefčghř123", 8, 12) == "čghř1"
   		and instr("abcdefghchijklmnopq", "chi") == 9
   		and instr("abcdefghchijklmnopq", "abc") == 1
   		and instr("abcdefghchijklmnopq", "opq") == 17
