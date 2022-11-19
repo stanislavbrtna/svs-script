@@ -26,10 +26,14 @@ Function isnum() takes a string and returns non-zero value if the string can be 
 
 #### Len
     len(expr);
-Function *len()* returns length of given string or an array.
+Function *len* returns length of given string in number of characters or an array in number of elements.
 
     return len("abcd");
 Result of this will be 4. Since v. 1.4 this function also returns lenght of given array.
+
+#### RLen
+    rlen([str]string);
+Function *rlen* returns length of given string in bytes. Lenght might differ from value given by *len*, when processing strings with utf8 characters.
 
 #### Get char at posiotion (getcp)
     getcp([str]string, [num]pos);

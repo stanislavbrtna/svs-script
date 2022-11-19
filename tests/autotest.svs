@@ -195,7 +195,9 @@ function main {
   		and isnum(1) == 1
   		and isnum(1.1) == 2
   		and len("abcd") == 4
+  		and rlen("aščf") == 6
   		and getcp("abcd", 2) == "b"
+  		and getcp("žžgře", 4) == "ř"
   		and substr("ABCDEF", 2, 5) == "BCDE"
   		and instr("abcdefghchijklmnopq", "chi") == 9
   		and instr("abcdefghchijklmnopq", "abc") == 1

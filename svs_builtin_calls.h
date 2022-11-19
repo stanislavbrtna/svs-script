@@ -51,7 +51,8 @@ typedef enum {
 	GC = 22,
 	INSTR = 23,
 	LOWER = 24,
-	UPPER = 25
+	UPPER = 25,
+	RLEN = 26
 } builtinCallEnum;
 
 typedef struct {

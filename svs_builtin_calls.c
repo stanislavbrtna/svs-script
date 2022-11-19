@@ -40,6 +40,7 @@ svsBuiltInCallsTableType svsBuiltInCallsTable[] = {
   // strings
   {"getcp", GETCP},
   {"len", LEN},
+  {"rlen", RLEN},
   {"substr", SUBSTR},
   {"instr", INSTR},
   {"lower", LOWER},
@@ -377,8 +378,8 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
 
   // getcp
   if (callId == GETCP) {
-    uint16_t len = 1; // we start indexing strings from 1
-    uint16_t x = 0;
+    int32_t len = 1; // we start indexing strings from 1
+    int32_t x = 0;
     uint8_t tmpChar[4];
 
     tmpChar[0] = 0;
@@ -405,15 +406,19 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
           tmpChar[0] = s->stringField[args[1].val_str + x];
           tmpChar[1] = s->stringField[args[1].val_str + x + 1];
           tmpChar[2] = 0;
+        } else if ((x > 1) && (s->stringField[args[1].val_str + x - 1] >= 0xC3) \
+              && (s->stringField[args[1].val_str + x - 1] <= 0xC5)) {
+          tmpChar[0] = s->stringField[args[1].val_str + x - 1];
+          tmpChar[1] = s->stringField[args[1].val_str + x];
+          tmpChar[2] = 0;
         } else {
           tmpChar[0] = s->stringField[args[1].val_str + x];
           tmpChar[1] = 0;
         }
         break;
       }
-
       if ((s->stringField[args[1].val_str + x] >= 0xC3) \
-          &&(s->stringField[args[1].val_str + x] <= 0xC5)) {
+            && (s->stringField[args[1].val_str + x] <= 0xC5)) {
         x++;
       }
       len++;
@@ -466,10 +471,36 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     }
   }
 
+
+  // real len
+  if (callId == RLEN) {
+    int32_t x = 0;
+
+    if (count != 1) {
+      simpleError((uint8_t *)"rlen(): wrong argument count!", s);
+      return 0;
+    }
+
+    if (argType[1] != SVS_TYPE_STR) {
+      simpleError((uint8_t *)"rlen(): wrong type of argument!", s);
+      return 0;
+    }
+
+    if (argType[1] == SVS_TYPE_STR) {
+      while (s->stringField[args[1].val_str + x] != 0) {
+        x++;
+      }
+      // to get just the characters, without end of string
+      result->value = (varType)((int32_t)x);
+      result->type = 0;
+      return 1;
+    }
+  }
+  
   // str2 = substr(str, begin, end);
   if (callId == SUBSTR) {
-    uint16_t len = 0;
-    uint16_t x = 0;
+    int32_t x = 0;
+    int32_t len = 1;
 
     if (count != 3) {
       simpleError((uint8_t *)"substr(): wrong argument count!", s);
@@ -495,17 +526,29 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
 
     while (s->stringField[args[1].val_str + x] != 0) {
 
-      if (len >= (args[2].val_u - 1) && (len <= args[3].val_s - 1)) {
+      if (len >= (args[2].val_u) && (len <= args[3].val_s)) {
         strNewStreamPush(s->stringField[args[1].val_str + x], s);
+      }
+      if (x > args[3].val_s - 1) {
+        break;
       }
 
       if ((s->stringField[args[1].val_str + x] >= 0xC3) \
-          && (s->stringField[args[1].val_str + x] <= 0xC5)) {
+        && (s->stringField[args[1].val_str + x] <= 0xC5)) {
         x++;
       }
       len++;
       x++;
     }
+    x -= 2;
+    
+    // fix for UTF8 czech chars at the end of string
+    if ((s->stringField[args[1].val_str + x] >= 0xC3) \
+        && (s->stringField[args[1].val_str + x] <= 0xC5)) {
+      x++;
+      strNewStreamPush(s->stringField[args[1].val_str + x], s);
+    }
+    
     // to get just the characters, without end of string
     result->value = (varType)(strNewStreamEnd(s));
     result->type = SVS_TYPE_STR;
