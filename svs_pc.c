@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     retval = -1;
     errSoftPrint(&s);
     printf("\n");
-  } else {
+  } else if (s.commRetFlag == 1) {
     if (s.commRetType == 0) {
       printf("Returned: %i\n", getRetValInt(&s));
       retval = (int)getRetValInt(&s);

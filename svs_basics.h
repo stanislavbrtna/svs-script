@@ -44,6 +44,7 @@ This is the main include file.
 #endif
 
 #include "tokenizer/svs_token_cache.h"
+#include "variables/svs_variables.h"
 #include "svs_misc.h"
 #include "svs_misc_str.h"
 #include "svs_sys_exec.h"

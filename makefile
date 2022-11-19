@@ -5,7 +5,7 @@ CFLAGS = -std=c99
 
 DEFINES = -std=c99 -lm -DPC -DCMDLINE -DTOKEN_CACHE_DISABLED
 
-SRCS = svs_pc.c svs_misc.c comm_exec/*.c tokenizer/*.c svs_errors.c svs_expr_exec2.c svs_garbage_collector.c svs_sys_exec.c svs_sys_wrapper_pc.c svs_load.c svs_misc_str.c svs_builtin_calls.c svs_debug.c
+SRCS = svs_pc.c svs_misc.c comm_exec/*.c tokenizer/*.c variables/*.c svs_errors.c svs_expr_exec2.c svs_garbage_collector.c svs_sys_exec.c svs_sys_wrapper_pc.c svs_load.c svs_misc_str.c svs_builtin_calls.c svs_debug.c
 
 all: svs test
 
