@@ -526,7 +526,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
 
     while (s->stringField[args[1].val_str + x] != 0) {
 
-      if (len >= (args[2].val_u) && (len <= args[3].val_s)) {
+      if (len >= ((int32_t)args[2].val_u) && (len <= args[3].val_s)) {
         strNewStreamPush(s->stringField[args[1].val_str + x], s);
 
         if ((s->stringField[args[1].val_str + x] >= 0xC3) \
@@ -843,7 +843,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   // [num] rnd()
   if (callId == RND) {
     if (count != 0) {
-      simpleError("rnd(): wrong argument count!", s);
+      simpleError((uint8_t *)"rnd(): wrong argument count!", s);
       return 0;
     }
 #ifdef SVS_RND_FUNCTION
@@ -851,7 +851,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     result->type = SVS_TYPE_NUM;
     return 1;
 #else
-    simpleError("rnd(): Hook not presented!", s);
+    simpleError((uint8_t *)"rnd(): Hook not presented!", s);
     return 0;
 #endif
   }
