@@ -140,7 +140,7 @@ uint8_t tokenGetch() {
       return x;
     }
   } else {
-    puts("Reading file while fclosed!");
+    printf("Reading file while fclosed!\n%s\n", filename);
     return 0;
   }
 }
