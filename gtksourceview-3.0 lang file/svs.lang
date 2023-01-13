@@ -526,242 +526,589 @@
       <keyword>sys.sxClearArea</keyword>
       <keyword>sys.pDrawPPM</keyword>
 
-      <!-- To be removed -->
-      <keyword>sys num</keyword>
-      <keyword>sys float</keyword>
-      <keyword>sys isnum</keyword>
-      <keyword>sys typeof</keyword>
-      <keyword>sys getcp</keyword>
-      <keyword>sys len</keyword>
-      <keyword>sys substr</keyword>
-      <keyword>sys print</keyword>
+      <!-- integrated SVS functions -->
 
-      <keyword>sys real</keyword>
-      <keyword>sys arrayNew</keyword>
-      <keyword>sys arrayGet</keyword>
-      <keyword>sys arraySet</keyword>
-      <keyword>sys dbg</keyword>
-      <keyword>sys GC</keyword>
-      <keyword>sys info</keyword>
-      <keyword>sys profiler</keyword>
+      <keyword>typeof</keyword>
+      <keyword>num</keyword>
+      <keyword>float</keyword>
+      <keyword>isnum</keyword>
 
-      <!-- GR2 -->
-      <keyword>sys pAddScreen</keyword>
-      <keyword>sys pAddFrame</keyword>
+      <keyword>print</keyword>
+      <keyword>len</keyword>
+      <keyword>getcp</keyword>
+      <keyword>substr</keyword>
+      <keyword>instr</keyword>
+      <keyword>upper</keyword>
+      <keyword>lower</keyword>
 
-      <keyword>sys pAddText</keyword>
-      <keyword>sys pAddButton</keyword>
-      <keyword>sys pAddCButton</keyword>
-      <keyword>sys pAddCheckBox</keyword>
-      <keyword>sys pAddImage</keyword>
-      <keyword>sys pAddSliderV</keyword>
-      <keyword>sys pAddSliderH</keyword>
-      <keyword>sys pAddBar</keyword>
+      <keyword>sin</keyword>
+      <keyword>cos</keyword>
+      <keyword>tan</keyword>
+      <keyword>atan</keyword>
+      <keyword>log</keyword>
+      <keyword>exp</keyword>
+      <keyword>pow</keyword>
+      <keyword>pi</keyword>
+      <keyword>sqrt</keyword>
+      <keyword>rnd</keyword>
 
-      <keyword>sys pDestroy</keyword>
-      <keyword>sys pDestroyScr</keyword>
+      <keyword>gc</keyword>
+      <keyword>ver</keyword>
+      <keyword>dbg</keyword>
 
-      <keyword>sys pGetValue</keyword>
-      <keyword>sys pSetValue</keyword>
-      <keyword>sys pSetModif</keyword>
 
-      <keyword>sys pGetParam</keyword>
-      <keyword>sys pSetParam</keyword>
+      <!-- Automated grep -R "sys\." | sed 's/(.*//' | sed 's/.*[\ :]//' | sed 's/^/<keyword>/' | sed 's/$/<\/keyword>/' | grep "sys\." | sed '$!N; /^\(.*\)\n\1$/!P; D' -->
 
-      <keyword>sys pGetEvent</keyword>
-      <keyword>sys pGetEventC</keyword>
-      <keyword>sys pSetEvent</keyword>
-
-      <keyword>sys pClrScrEv</keyword>
-
-      <keyword>sys pSetScreen</keyword>
-
-      <keyword>sys pGetGrayout</keyword>
-      <keyword>sys pSetGrayout</keyword>
-
-      <keyword>sys pGetVisible</keyword>
-      <keyword>sys pSetVisible</keyword>
-
-      <keyword>sys pGetStr</keyword>
-      <keyword>sys pSetStr</keyword>
-      <keyword>sys pSetTxtSize</keyword>
-
-			<keyword>sys pSetRelInit</keyword>
-      <keyword>sys pSetXYXY</keyword>
-      <keyword>sys pGetXcell</keyword>
-      <keyword>sys pSetXcell</keyword>
-      <keyword>sys pGetYcell</keyword>
-      <keyword>sys pSetYcell</keyword>
-
-      <keyword>sys pGetXscroll</keyword>
-      <keyword>sys pSetXscroll</keyword>
-
-      <keyword>sys pGetYscroll</keyword>
-      <keyword>sys pSetYscroll</keyword>
-
-      <keyword>sys pSetDFont</keyword>
-
-      <keyword>sys pGetTexAct</keyword>
-      <keyword>sys pSetTexAct</keyword>
-
-      <keyword>sys pSetTexFit</keyword>
-
-      <keyword>sys pSetTexEd</keyword>
-
-      <keyword>sys pSetColor</keyword>
-      <keyword>sys pGetColor</keyword>
-
-      <!-- SDA-OS -->
-
-      <!-- SDA Main -->
-      <keyword>sys pSetMainScr</keyword>
-      <keyword>sys pGetMainScr</keyword>
-
-      <keyword>sys pGetRedraw</keyword>
-      <keyword>sys pSetRedraw</keyword>
-
-      <keyword>sys error</keyword>
-
-      <keyword>sys cntSet</keyword>
-      <keyword>sys cntGet</keyword>
-
-      <keyword>sys btnGetEv</keyword>
-      <keyword>sys btnClrEv</keyword>
-
-      <keyword>sys pHandleText</keyword>
-
-      <keyword>sys keybHide</keyword>
-      <keyword>sys keybShow</keyword>
-
-      <keyword>sys rnd</keyword>
-
-      <keyword>sys getMute</keyword>
-
-      <keyword>sys wCalInit</keyword>
-      <keyword>sys wCalSelect</keyword>
-      <keyword>sys wCalUpdate</keyword>
-      <keyword>sys wCalMark</keyword>
-      <keyword>sys wCalGetDay</keyword>
-
-      <keyword>sys sleepLock</keyword>
-      <keyword>sys lcdWake</keyword>
-      <keyword>sys getLcdState</keyword>
-      <keyword>sys exit</keyword>
-      <keyword>sys checkSVSVer</keyword>
-      <keyword>sys sdaGetLang</keyword>
-
-      <keyword>sys crUnLock</keyword>
-      <keyword>sys crLock</keyword>
-      <keyword>sys crEncrypt</keyword>
-      <keyword>sys crDecrypt</keyword>
-
-      <keyword>sys setSingular</keyword>
-      <keyword>sys subProcess</keyword>
-      <keyword>sys subRetval</keyword>
-
-			<keyword>sys beep</keyword>
-      <keyword>sys beepDef</keyword>
-      <keyword>sys beepT</keyword>
-      <keyword>sys beepF</keyword>
-
-			<keyword>sys serialTrs</keyword>
-			<keyword>sys srlTrsQAdd</keyword>
-			<keyword>sys srlTrsQClr</keyword>
-			<keyword>sys srlTrsQ</keyword>
-			<keyword>sys serialRcv</keyword>
-
-			<keyword>sys sdaSetLed</keyword>
-
-      <!-- SDA Files -->
-
-      <keyword>sys pFrOpen</keyword>
-      <keyword>sys fReadChars</keyword>
-      <keyword>sys pFrSize</keyword>
-      <keyword>sys pFrExists</keyword>
-      <keyword>sys pFrSeek</keyword>
-      <keyword>sys pFrClose</keyword>
-
-      <keyword>sys fDelete</keyword>
-
-			<keyword>sys cOpen</keyword>
-      <keyword>sys cClose</keyword>
-      <keyword>sys cKeyExists</keyword>
-      <keyword>sys cKeyRead</keyword>
-      <keyword>sys cKeyReadInt</keyword>
-      <keyword>sys cKeyWrite</keyword>
-      <keyword>sys cKeyRemove</keyword>
-
-      <keyword>sys fFind</keyword>
-      <keyword>sys fFindNext</keyword>
-
-      <keyword>sys fReadStr</keyword>
-      <keyword>sys fWriteStr</keyword>
-
-      <!-- SDA Overlays -->
-
-      <keyword>sys pSetOvrScr</keyword>
-
-      <keyword>sys pGetOvrId</keyword>
-      <keyword>sys pOvrDestroy</keyword>
-      <keyword>sys pOvrSetXYXY</keyword>
-      <keyword>sys pSetOvrY</keyword>
-
-      <keyword>sys oDateAdd</keyword>
-      <keyword>sys oDateUpd</keyword>
-      <keyword>sys oDateGetOk</keyword>
-      <keyword>sys oDateClrOk</keyword>
-      <keyword>sys oDateGetYr</keyword>
-      <keyword>sys oDateGetDay</keyword>
-      <keyword>sys oDateGetMon</keyword>
-
-      <keyword>sys oTimAdd</keyword>
-      <keyword>sys oTimSet</keyword>
-      <keyword>sys oTimUpd</keyword>
-      <keyword>sys oTimGetOk</keyword>
-      <keyword>sys oTimGetMin</keyword>
-      <keyword>sys oTimGetHr</keyword>
-      <keyword>sys oTimClrOk</keyword>
-
-      <!-- SDA Time -->
-
-			<keyword>sys getTime</keyword>
-      <keyword>sys getTimeUpd</keyword>
-      <keyword>sys getTimeSec</keyword>
-      <keyword>sys getTimeMin</keyword>
-      <keyword>sys getTimeHr</keyword>
-      <keyword>sys getTimeDay</keyword>
-      <keyword>sys getTimeMonth</keyword>
-      <keyword>sys getTimeYear</keyword>
-      <keyword>sys getUptime</keyword>
-
-			<keyword>sys setTs</keyword>
-			<keyword>sys getTsSec</keyword>
-			<keyword>sys getTsMin</keyword>
-			<keyword>sys getTsHr</keyword>
-			<keyword>sys getTsDay</keyword>
-			<keyword>sys getTsWkDay</keyword>
-			<keyword>sys getTsMonth</keyword>
-			<keyword>sys getTsYear</keyword>
-			<keyword>sys alarmSetFixed</keyword>
-			<keyword>sys alarmSetRep</keyword>
-			<keyword>sys alarmDestroy</keyword>
-			<keyword>sys alarmGetFlag</keyword>
-			<keyword>sys alarmClrFlag</keyword>
-			<keyword>sys alarmGetId</keyword>
-			<keyword>sys alarmGetPar</keyword>
-
-      <!-- DirectS -->
-      <keyword>sys sxMixColor</keyword>
-      <keyword>sys sxSetArea</keyword>
-      <keyword>sys sxDrawRect</keyword>
-      <keyword>sys sxFillRect</keyword>
-      <keyword>sys sxDrawCircle</keyword>
-      <keyword>sys sxFillCircle</keyword>
-      <keyword>sys sxDrawLine</keyword>
-      <keyword>sys sxDrawText</keyword>
-      <keyword>sys sxClearArea</keyword>
-      <keyword>sys pDrawPPM</keyword>
-
+<keyword>sys.w.cal.init</keyword>
+<keyword>sys.w.cal.select</keyword>
+<keyword>sys.w.cal.update</keyword>
+<keyword>sys.w.cal.mark</keyword>
+<keyword>sys.w.cal.highlight</keyword>
+<keyword>sys.w.cal.getDay</keyword>
+<keyword>sys.cnt.set</keyword>
+<keyword>sys.cnt.get</keyword>
+<keyword>sys.gui.addScreen</keyword>
+<keyword>sys.gui.addFrame</keyword>
+<keyword>sys.gui.addText</keyword>
+<keyword>sys.gui.addButton</keyword>
+<keyword>sys.gui.addCButton</keyword>
+<keyword>sys.gui.addCheckBox</keyword>
+<keyword>sys.gui.addIcon</keyword>
+<keyword>sys.gui.setIcon</keyword>
+<keyword>sys.gui.addImage</keyword>
+<keyword>sys.gui.addSliderV</keyword>
+<keyword>sys.gui.addSliderH</keyword>
+<keyword>sys.gui.addBar</keyword>
+<keyword>sys.gui.destroy</keyword>
+<keyword>sys.gui.getValue</keyword>
+<keyword>sys.gui.setValue</keyword>
+<keyword>sys.gui.setModif</keyword>
+<keyword>sys.gui.getParam</keyword>
+<keyword>sys.gui.setParam</keyword>
+<keyword>sys.gui.getEvent</keyword>
+<keyword>sys.gui.getEventC</keyword>
+<keyword>sys.gui.setEvent</keyword>
+<keyword>sys.gui.clrScrEv</keyword>
+<keyword>sys.gui.setScreen</keyword>
+<keyword>sys.gui.getGrayout</keyword>
+<keyword>sys.gui.setGrayout</keyword>
+<keyword>sys.gui.getVisible</keyword>
+<keyword>sys.gui.setVisible</keyword>
+<keyword>sys.gui.getGhost</keyword>
+<keyword>sys.gui.setGhost</keyword>
+<keyword>sys.gui.getSelect</keyword>
+<keyword>sys.gui.setSelect</keyword>
+<keyword>sys.gui.getStr</keyword>
+<keyword>sys.gui.setStr</keyword>
+<keyword>sys.gui.setTxtSize</keyword>
+<keyword>sys.gui.setRelInit</keyword>
+<keyword>sys.gui.setXYXY</keyword>
+<keyword>sys.gui.setX1</keyword>
+<keyword>sys.gui.setX2</keyword>
+<keyword>sys.gui.setY1</keyword>
+<keyword>sys.gui.setY2</keyword>
+<keyword>sys.gui.getX1</keyword>
+<keyword>sys.gui.getX2</keyword>
+<keyword>sys.gui.getY1</keyword>
+<keyword>sys.gui.getY2</keyword>
+<keyword>sys.gui.setSpacing</keyword>
+<keyword>sys.gui.getXcell</keyword>
+<keyword>sys.gui.setXcell</keyword>
+<keyword>sys.gui.getYcell</keyword>
+<keyword>sys.gui.setYcell</keyword>
+<keyword>sys.gui.getXscroll</keyword>
+<keyword>sys.gui.setXscroll</keyword>
+<keyword>sys.gui.getYscroll</keyword>
+<keyword>sys.gui.setYscroll</keyword>
+<keyword>sys.gui.setDefFont</keyword>
+<keyword>sys.gui.getTexAct</keyword>
+<keyword>sys.gui.setTexAct</keyword>
+<keyword>sys.gui.texDeact</keyword>
+<keyword>sys.gui.setTexFit</keyword>
+<keyword>sys.gui.setTexEd</keyword>
+<keyword>sys.gui.setTexPwd</keyword>
+<keyword>sys.gui.getTexPwd</keyword>
+<keyword>sys.gui.setTexAlign</keyword>
+<keyword>sys.gui.getTexAlign</keyword>
+<keyword>sys.gui.setColor</keyword>
+<keyword>sys.gui.getColor</keyword>
+<keyword>sys.o.setScr</keyword>
+<keyword>sys.o.getId</keyword>
+<keyword>sys.o.destroy</keyword>
+<keyword>sys.o.setXYXY</keyword>
+<keyword>sys.o.setY</keyword>
+<keyword>sys.o.date.add</keyword>
+<keyword>sys.o.date.update</keyword>
+<keyword>sys.o.date.getOk</keyword>
+<keyword>sys.o.date.clrOk</keyword>
+<keyword>sys.o.date.getYr</keyword>
+<keyword>sys.o.date.getDay</keyword>
+<keyword>sys.o.date.getMon</keyword>
+<keyword>sys.o.time.add</keyword>
+<keyword>sys.o.time.set</keyword>
+<keyword>sys.o.time.update</keyword>
+<keyword>sys.o.time.getOk</keyword>
+<keyword>sys.o.time.getMin</keyword>
+<keyword>sys.o.time.getHr</keyword>
+<keyword>sys.oTimClrOk</keyword>
+<keyword>sys.snd.beep</keyword>
+<keyword>sys.snd.beepC</keyword>
+<keyword>sys.snd.beep</keyword>
+<keyword>sys.snd.beepDef</keyword>
+<keyword>sys.snd.beepTime</keyword>
+<keyword>sys.snd.beepFreq</keyword>
+<keyword>sys.snd.getMute</keyword>
+<keyword>sys.hw.lockSleep</keyword>
+<keyword>sys.hw.wakeLcd</keyword>
+<keyword>sys.hw.getLcdState</keyword>
+<keyword>sys.hw.getUsbState</keyword>
+<keyword>sys.hw.setLed</keyword>
+<keyword>sys.iPinDef</keyword>
+<keyword>sys.iPinSet</keyword>
+<keyword>sys.iPinGet</keyword>
+<keyword>sys.ePinDef</keyword>
+<keyword>sys.ePinSet</keyword>
+<keyword>sys.ePinGet</keyword>
+<keyword>sys.eADCRead</keyword>
+<keyword>sys.hw.btn.getEvent</keyword>
+<keyword>sys.hw.btn.clrEvent</keyword>
+<keyword>sys.hw.btn.stdbyEn</keyword>
+<keyword>sys.com.qAdd</keyword>
+<keyword>sys.com.qClr</keyword>
+<keyword>sys.com.usbTrs</keyword>
+<keyword>sys.com.usbTrsQ</keyword>
+<keyword>sys.srlTrsQClr.</keyword>
+<keyword>sys.com.usbRcv</keyword>
+<keyword>sys.com.usbRcvIT</keyword>
+<keyword>sys.com.usbGetRd</keyword>
+<keyword>sys.com.usbGetStr</keyword>
+<keyword>sys.com.usbGetBytes</keyword>
+<keyword>sys.com.usbGetByte</keyword>
+<keyword>sys.hw.iPinDef</keyword>
+<keyword>sys.hw.ePinDef</keyword>
+<keyword>sys.com.uartTrs</keyword>
+<keyword>sys.com.uartTrsQ</keyword>
+<keyword>sys.com.uartRcv</keyword>
+<keyword>sys.com.uartRcvIT</keyword>
+<keyword>sys.com.uartGetRd</keyword>
+<keyword>sys.com.uartGetStr</keyword>
+<keyword>sys.com.uartGetBytes</keyword>
+<keyword>sys.com.uartGetByte</keyword>
+<keyword>sys.gui.addScreen</keyword>
+<keyword>sys.gui.addFrame</keyword>
+<keyword>sys.gui.addText</keyword>
+<keyword>sys.gui.addButton</keyword>
+<keyword>sys.gui.addCButton</keyword>
+<keyword>sys.gui.addCheckBox</keyword>
+<keyword>sys.gui.addImage</keyword>
+<keyword>sys.gui.addSliderV</keyword>
+<keyword>sys.gui.addSliderH</keyword>
+<keyword>sys.gui.addBar</keyword>
+<keyword>sys.gui.destroy</keyword>
+<keyword>sys.gui.getValue</keyword>
+<keyword>sys.gui.setValue</keyword>
+<keyword>sys.gui.setModif</keyword>
+<keyword>sys.gui.getParam</keyword>
+<keyword>sys.gui.setParam</keyword>
+<keyword>sys.gui.getEvent</keyword>
+<keyword>sys.gui.getEventC</keyword>
+<keyword>sys.gui.setEvent</keyword>
+<keyword>sys.gui.clrScrEv</keyword>
+<keyword>sys.gui.setScreen</keyword>
+<keyword>sys.gui.getGrayout</keyword>
+<keyword>sys.gui.setGrayout</keyword>
+<keyword>sys.gui.getVisible</keyword>
+<keyword>sys.gui.setVisible</keyword>
+<keyword>sys.gui.getGhost</keyword>
+<keyword>sys.gui.setGhost</keyword>
+<keyword>sys.gui.getSelect</keyword>
+<keyword>sys.gui.setSelect</keyword>
+<keyword>sys.gui.getStr</keyword>
+<keyword>sys.gui.setStr</keyword>
+<keyword>sys.gui.setTxtSize</keyword>
+<keyword>sys.gui.setRelInit</keyword>
+<keyword>sys.gui.setXYXY</keyword>
+<keyword>sys.gui.setSpacing</keyword>
+<keyword>sys.gui.getXcell</keyword>
+<keyword>sys.gui.setXcell</keyword>
+<keyword>sys.gui.getYcell</keyword>
+<keyword>sys.gui.setYcell</keyword>
+<keyword>sys.gui.getXscroll</keyword>
+<keyword>sys.gui.setXscroll</keyword>
+<keyword>sys.gui.getYscroll</keyword>
+<keyword>sys.gui.setYscroll</keyword>
+<keyword>sys.gui.setDefFont</keyword>
+<keyword>sys.gui.getTexAct</keyword>
+<keyword>sys.gui.setTexAct</keyword>
+<keyword>sys.gui.setTexFit</keyword>
+<keyword>sys.gui.setTexEd</keyword>
+<keyword>sys.gui.setColor</keyword>
+<keyword>sys.fs.open</keyword>
+<keyword>sys.fs.readChars</keyword>
+<keyword>sys.fs.writeChars</keyword>
+<keyword>sys.fs.readByte</keyword>
+<keyword>sys.fs.writeByte</keyword>
+<keyword>sys.fs.seek</keyword>
+<keyword>sys.fs.truncate</keyword>
+<keyword>sys.fs.isDir</keyword>
+<keyword>sys.fs.mkDir</keyword>
+<keyword>sys.fs.chDir</keyword>
+<keyword>sys.fs.copySource</keyword>
+<keyword>sys.fs.copyStart</keyword>
+<keyword>sys.fs.copyStat</keyword>
+<keyword>sys.fs.copyStop</keyword>
+<keyword>sys.fs.tell</keyword>
+<keyword>sys.fs.size</keyword>
+<keyword>sys.fs.exists</keyword>
+<keyword>sys.fs.seekFill</keyword>
+<keyword>sys.fs.close</keyword>
+<keyword>sys.fs.delete</keyword>
+<keyword>sys.fs.rename</keyword>
+<keyword>sys.fs.find</keyword>
+<keyword>sys.fs.FindNext</keyword>
+<keyword>sys.fs.readStr</keyword>
+<keyword>sys.fs.writeStr</keyword>
+<keyword>sys.fs.csv.open</keyword>
+<keyword>sys.fs.csv.close</keyword>
+<keyword>sys.fs.csv.newLine</keyword>
+<keyword>sys.fs.csv.getCell</keyword>
+<keyword>sys.fs.csv.setCell</keyword>
+<keyword>sys.fs.csv.lineFeed</keyword>
+<keyword>sys.fs.csv.removeLine</keyword>
+<keyword>sys.fs.csv.rewind</keyword>
+<keyword>sys.fs.conf.open</keyword>
+<keyword>sys.fs.conf.close</keyword>
+<keyword>sys.fs.conf.exists</keyword>
+<keyword>sys.fs.conf.read</keyword>
+<keyword>sys.fs.conf.readInt</keyword>
+<keyword>sys.fs.conf.write</keyword>
+<keyword>sys.fs.conf.remove</keyword>
+<keyword>sys.snd.beep</keyword>
+<keyword>sys.snd.beepDef</keyword>
+<keyword>sys.snd.beepTime</keyword>
+<keyword>sys.snd.beepFreq</keyword>
+<keyword>sys.snd.getMute</keyword>
+<keyword>sys.os.gui.setMainScr</keyword>
+<keyword>sys.os.gui.getMainScr</keyword>
+<keyword>sys.os.gui.handleText</keyword>
+<keyword>sys.cr.unLock</keyword>
+<keyword>sys.cr.lock</keyword>
+<keyword>sys.cr.encrypt</keyword>
+<keyword>sys.cr.decrypt</keyword>
+<keyword>sys.cnt.set</keyword>
+<keyword>sys.cnt.get</keyword>
+<keyword>sys.os.getRedraw</keyword>
+<keyword>sys.os.setRedraw</keyword>
+<keyword>sys.os.error</keyword>
+<keyword>sys.os.hideKbd</keyword>
+<keyword>sys.os.showKbd</keyword>
+<keyword>sys.os.rnd</keyword>
+<keyword>sys.os.exit</keyword>
+<keyword>sys.os.checkVer</keyword>
+<keyword>sys.os.getVer</keyword>
+<keyword>sys.os.getLang</keyword>
+<keyword>sys.os.setSingular</keyword>
+<keyword>sys.os.subProcess</keyword>
+<keyword>sys.os.subProcCWD</keyword>
+<keyword>sys.os.subRetval</keyword>
+<keyword>sys.os.wake</keyword>
+<keyword>sys.hw.lockSleep</keyword>
+<keyword>sys.hw.wakeLcd</keyword>
+<keyword>sys.hw.getLcdState</keyword>
+<keyword>sys.hw.getUsbState</keyword>
+<keyword>sys.hw.setLed</keyword>
+<keyword>sys.hw.iPinDef</keyword>
+<keyword>sys.hw.iPinSet</keyword>
+<keyword>sys.hw.iPinGet</keyword>
+<keyword>sys.hw.ePinDef</keyword>
+<keyword>sys.hw.ePinSet</keyword>
+<keyword>sys.hw.ePinGet</keyword>
+<keyword>sys.hw.eADCRead</keyword>
+<keyword>sys.hw.btn.getEvent</keyword>
+<keyword>sys.hw.btn.clrEvent</keyword>
+<keyword>sys.hw.btn.stdbyEn</keyword>
+<keyword>sys.com.qAdd</keyword>
+<keyword>sys.com.qClr</keyword>
+<keyword>sys.com.usbTrs</keyword>
+<keyword>sys.com.usbTrsQ</keyword>
+<keyword>sys.com.usbRcv</keyword>
+<keyword>sys.com.uartTrsQ</keyword>
+<keyword>sys.com.uartTrs</keyword>
+<keyword>sys.com.uartRcv</keyword>
+<keyword>sys.time.get</keyword>
+<keyword>sys.time.getUpd</keyword>
+<keyword>sys.time.getSec</keyword>
+<keyword>sys.time.getMin</keyword>
+<keyword>sys.time.getHr</keyword>
+<keyword>sys.time.getDay</keyword>
+<keyword>sys.time.getMonth</keyword>
+<keyword>sys.time.getYear</keyword>
+<keyword>sys.time.getUptime</keyword>
+<keyword>sys.time.setTs</keyword>
+<keyword>sys.time.getTsSec</keyword>
+<keyword>sys.time.getTsMin</keyword>
+<keyword>sys.time.getTsHr</keyword>
+<keyword>sys.time.getTsDay</keyword>
+<keyword>sys.time.getTsWkDay</keyword>
+<keyword>sys.time.getTsMonth</keyword>
+<keyword>sys.time.getTsYear</keyword>
+<keyword>sys.alarm.setFixed</keyword>
+<keyword>sys.alarm.setRep</keyword>
+<keyword>sys.alarm.destroy</keyword>
+<keyword>sys.alarm.getFlag</keyword>
+<keyword>sys.alarm.clrFlag</keyword>
+<keyword>sys.alarm.getId</keyword>
+<keyword>sys.alarm.getPar</keyword>
+<keyword>sys.o.setScr</keyword>
+<keyword>sys.o.getId</keyword>
+<keyword>sys.o.destroy</keyword>
+<keyword>sys.o.setXYXY</keyword>
+<keyword>sys.o.setY</keyword>
+<keyword>sys.o.date.add</keyword>
+<keyword>sys.o.date.update</keyword>
+<keyword>sys.o.date.getOk</keyword>
+<keyword>sys.o.date.clrOk</keyword>
+<keyword>sys.o.date.getYr</keyword>
+<keyword>sys.o.date.getDay</keyword>
+<keyword>sys.o.date.getMon</keyword>
+<keyword>sys.o.time.add</keyword>
+<keyword>sys.o.time.set</keyword>
+<keyword>sys.o.time.update</keyword>
+<keyword>sys.o.time.getOk</keyword>
+<keyword>sys.o.time.getMin</keyword>
+<keyword>sys.o.time.getHr</keyword>
+<keyword>sys.o.time.clrOk</keyword>
+<keyword>sys.w.cal.init</keyword>
+<keyword>sys.w.cal.select</keyword>
+<keyword>sys.w.cal.update</keyword>
+<keyword>sys.w.cal.mark</keyword>
+<keyword>sys.w.cal.getDay</keyword>
+<keyword>sys.ds.mixColor</keyword>
+<keyword>sys.ds.setArea</keyword>
+<keyword>sys.ds.drawRect</keyword>
+<keyword>sys.ds.fillRect</keyword>
+<keyword>sys.ds.drawCircle</keyword>
+<keyword>sys.ds.fillCircle</keyword>
+<keyword>sys.ds.drawLine</keyword>
+<keyword>sys.ds.drawText</keyword>
+<keyword>sys.ds.setTextFit</keyword>
+<keyword>sys.ds.clearArea</keyword>
+<keyword>sys.ds.drawPPM</keyword>
+<keyword>sys.ds.touchEv</keyword>
+<keyword>sys.ds.touchClr</keyword>
+<keyword>sys.ds.touchY</keyword>
+<keyword>sys.ds.touchX</keyword>
+<keyword>sys.time.get</keyword>
+<keyword>sys.time.getUpd</keyword>
+<keyword>sys.time.getSec</keyword>
+<keyword>sys.time.getMin</keyword>
+<keyword>sys.time.getHr</keyword>
+<keyword>sys.time.getDay</keyword>
+<keyword>sys.time.getMonth</keyword>
+<keyword>sys.time.getYear</keyword>
+<keyword>sys.time.getUptime</keyword>
+<keyword>sys.time.getAppUptime</keyword>
+<keyword>sys.time.setTs</keyword>
+<keyword>sys.time.getTsSec</keyword>
+<keyword>sys.time.getTsMin</keyword>
+<keyword>sys.time.getTsHr</keyword>
+<keyword>sys.time.getTsDay</keyword>
+<keyword>sys.time.getTsWkDay</keyword>
+<keyword>sys.time.getTsMonth</keyword>
+<keyword>sys.time.getTsYear</keyword>
+<keyword>sys.os.arise</keyword>
+<keyword>sys.time.setTimer</keyword>
+<keyword>sys.time.clearTimer</keyword>
+<keyword>sys.alarm.setFixed</keyword>
+<keyword>sys.alarm.setRep</keyword>
+<keyword>sys.alarm.destroy</keyword>
+<keyword>sys.alarm.getFlag</keyword>
+<keyword>sys.alarm.clrFlag</keyword>
+<keyword>sys.alarm.getId</keyword>
+<keyword>sys.alarm.getPar</keyword>
+<keyword>sys.cr.unLockInit</keyword>
+<keyword>sys.cr.update</keyword>
+<keyword>sys.cr.getOk</keyword>
+<keyword>sys.cr.clrOk</keyword>
+<keyword>sys.cr.getLock</keyword>
+<keyword>sys.cr.loadPass</keyword>
+<keyword>sys.cr.loadStr</keyword>
+<keyword>sys.cr.loadKey</keyword>
+<keyword>sys.cr.loadOSKey</keyword>
+<keyword>sys.cr.genKey</keyword>
+<keyword>sys.cr.lock</keyword>
+<keyword>sys.cr.encrypt</keyword>
+<keyword>sys.cr.decrypt</keyword>
+<keyword>sys.os.gui.setMainScr</keyword>
+<keyword>sys.os.gui.getMainScr</keyword>
+<keyword>sys.os.gui.btnCtrl</keyword>
+<keyword>sys.os.gui.handleText</keyword>
+<keyword>sys.os.gui.getCPos</keyword>
+<keyword>sys.os.gui.setCPos</keyword>
+<keyword>sys.os.gui.setLandscape</keyword>
+<keyword>sys.os.gui.getLandscape</keyword>
+<keyword>sys.ds.mixColor</keyword>
+<keyword>sys.ds.setArea</keyword>
+<keyword>sys.ds.drawRect</keyword>
+<keyword>sys.ds.fillRect</keyword>
+<keyword>sys.ds.drawCircle</keyword>
+<keyword>sys.ds.fillCircle</keyword>
+<keyword>sys.ds.drawLine</keyword>
+<keyword>sys.ds.drawText</keyword>
+<keyword>sys.ds.setTextFit</keyword>
+<keyword>sys.ds.clearArea</keyword>
+<keyword>sys.ds.drawImage</keyword>
+<keyword>sys.ds.getImageW</keyword>
+<keyword>sys.ds.getImageH</keyword>
+<keyword>sys.ds.drawPPM</keyword>
+<keyword>sys.ds.touchEv</keyword>
+<keyword>sys.ds.touchClr</keyword>
+<keyword>sys.ds.touchY</keyword>
+<keyword>sys.ds.touchX</keyword>
+<keyword>sys.os.getRedraw</keyword>
+<keyword>sys.os.setRedraw</keyword>
+<keyword>sys.os.wake</keyword>
+<keyword>sys.os.arise</keyword>
+<keyword>sys.os.error</keyword>
+<keyword>sys.os.getAppPath</keyword>
+<keyword>sys.os.hideKbd</keyword>
+<keyword>sys.os.showKbd</keyword>
+<keyword>sys.os.rnd</keyword>
+<keyword>sys.os.exit</keyword>
+<keyword>sys.os.checkVer</keyword>
+<keyword>sys.os.getVer</keyword>
+<keyword>sys.os.getLang</keyword>
+<keyword>sys.os.setSingular</keyword>
+<keyword>sys.os.subProcess</keyword>
+<keyword>sys.os.subProcCWD</keyword>
+<keyword>sys.os.subRetval</keyword>
+<keyword>sys.fs.open</keyword>
+<keyword>sys.fs.readChars</keyword>
+<keyword>sys.fs.writeChars</keyword>
+<keyword>sys.fs.readByte</keyword>
+<keyword>sys.fs.writeByte</keyword>
+<keyword>sys.fs.seek</keyword>
+<keyword>sys.fs.truncate</keyword>
+<keyword>sys.fs.isDir</keyword>
+<keyword>sys.fs.mkDir</keyword>
+<keyword>sys.fs.chDir</keyword>
+<keyword>sys.fs.copySource</keyword>
+<keyword>sys.fs.copyStart</keyword>
+<keyword>sys.fs.copyStat</keyword>
+<keyword>sys.fs.copyStop</keyword>
+<keyword>sys.fs.tell</keyword>
+<keyword>sys.fs.size</keyword>
+<keyword>sys.fs.exists</keyword>
+<keyword>sys.fs.seekFill</keyword>
+<keyword>sys.fs.close</keyword>
+<keyword>sys.fs.delete</keyword>
+<keyword>sys.fs.rename</keyword>
+<keyword>sys.fs.find</keyword>
+<keyword>sys.fs.findNext</keyword>
+<keyword>sys.fs.find</keyword>
+<keyword>sys.fs.findNext</keyword>
+<keyword>sys.fs.readStr</keyword>
+<keyword>sys.fs.writeStr</keyword>
+<keyword>sys.fs.csv.open</keyword>
+<keyword>sys.fs.csv.close</keyword>
+<keyword>sys.fs.csv.newLine</keyword>
+<keyword>sys.fs.csv.getCell</keyword>
+<keyword>sys.fs.csv.setCell</keyword>
+<keyword>sys.fs.csv.lineFeed</keyword>
+<keyword>sys.fs.csv.removeLine</keyword>
+<keyword>sys.fs.csv.rewind</keyword>
+<keyword>sys.fs.conf.open</keyword>
+<keyword>sys.fs.conf.close</keyword>
+<keyword>sys.fs.conf.exists</keyword>
+<keyword>sys.fs.conf.read</keyword>
+<keyword>sys.fs.conf.readInt</keyword>
+<keyword>sys.fs.conf.write</keyword>
+<keyword>sys.fs.conf.remove</keyword>
+<keyword>sys.gui.addScreen</keyword>
+<keyword>sys.os.gui.setMainScr</keyword>
+<keyword>sys.gui.addText</keyword>
+<keyword>sys.gui.addButton</keyword>
+<keyword>sys.os.exit</keyword>
+<keyword>sys.gui.addScreen</keyword>
+<keyword>sys.gui.addText</keyword>
+<keyword>sys.gui.addButton</keyword>
+<keyword>sys.o.destroy</keyword>
+<keyword>sys.o.setScr</keyword>
+<keyword>sys.o.setY</keyword>
+<keyword>sys.gui.addScreen</keyword>
+<keyword>sys.gui.setRelInit</keyword>
+<keyword>sys.gui.addButton</keyword>
+<keyword>sys.os.gui.setMainScr</keyword>
+<keyword>sys.os.subProcess</keyword>
+<keyword>sys.gui.setStr</keyword>
+<keyword>sys.os.arise</keyword>
+<keyword>sys.gui.addScreen</keyword>
+<keyword>sys.os.gui.setMainScr</keyword>
+<keyword>sys.gui.addText</keyword>
+<keyword>sys.gui.addButton</keyword>
+<keyword>sys.time.setTimer</keyword>
+<keyword>sys.gui.setStr</keyword>
+<keyword>sys.snd.beep</keyword>
+<keyword>sys.gui.setStr</keyword>
+<keyword>sys.os.arise</keyword>
+<keyword>sys.gui.addScreen</keyword>
+<keyword>sys.gui.addButton</keyword>
+<keyword>sys.gui.setVisible</keyword>
+<keyword>sys.gui.setGrayout</keyword>
+<keyword>sys.os.gui.setMainScr</keyword>
+<keyword>sys.o.time.add</keyword>
+<keyword>sys.o.time.set</keyword>
+<keyword>sys.o.time.update</keyword>
+<keyword>sys.gui.setStr</keyword>
+<keyword>sys.o.time.getHr</keyword>
+<keyword>sys.o.time.getMin</keyword>
+<keyword>sys.o.time.clrOk</keyword>
+<keyword>sys.alarm.getId</keyword>
+<keyword>sys.hw.wakeLcd</keyword>
+<keyword>sys.gui.setVisible</keyword>
+<keyword>sys.gui.setGrayout</keyword>
+<keyword>sys.alarm.clrFlag</keyword>
+<keyword>sys.time.setTs</keyword>
+<keyword>sys.alarm.setFixed</keyword>
+<keyword>sys.gui.setGrayout</keyword>
+<keyword>sys.alarm.setRep</keyword>
+<keyword>sys.gui.setGrayout</keyword>
+<keyword>sys.gui.setVisible</keyword>
+<keyword>sys.gui.setGrayout</keyword>
+<keyword>sys.gui.addScreen</keyword>
+<keyword>sys.gui.addButton</keyword>
+<keyword>sys.os.gui.setMainScr</keyword>
+<keyword>sys.o.date.add</keyword>
+<keyword>sys.time.getYear</keyword>
+<keyword>sys.time.getMonth</keyword>
+<keyword>sys.time.getDay</keyword>
+<keyword>sys.o.date.update</keyword>
+<keyword>sys.gui.setStr</keyword>
+<keyword>sys.o.date.getDay</keyword>
+<keyword>sys.o.date.getMon</keyword>
+<keyword>sys.o.date.getYr</keyword>
+<keyword>sys.o.date.clrOk</keyword>
+<keyword>sys.o.time.add</keyword>
+<keyword>sys.o.time.set</keyword>
+<keyword>sys.o.time.update</keyword>
+<keyword>sys.gui.setStr</keyword>
+<keyword>sys.o.time.getHr</keyword>
+<keyword>sys.o.time.clrOk</keyword>
+<keyword>sys.gui.addScreen</keyword>
+<keyword>sys.gui.addButton</keyword>
+<keyword>sys.os.gui.setMainScr</keyword>
+<keyword>sys.hw.eADCRead</keyword>
+<keyword>sys.gui.setStr</keyword>
+<keyword>sys.gui.addScreen</keyword>
+<keyword>sys.gui.addButton</keyword>
+<keyword>sys.gui.addText</keyword>
+<keyword>sys.os.gui.setMainScr</keyword>
+<keyword>sys.hw.ePinDef</keyword>
+<keyword>sys.com.uartTrs</keyword>
+<keyword>sys.com.uartRcvIT</keyword>
+<keyword>sys.gui.setStr</keyword>
+<keyword>sys.com.uartGetStr</keyword>
+<keyword>sys.gui.setStr</keyword>
     </context>
 
     <context id="svscript" class="no-spell-check">
