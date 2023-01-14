@@ -1,16 +1,32 @@
 CC = gcc
+MKDIR_P ?= mkdir -p
+RM = rm
 
 # define any compile-time flags
 CFLAGS = -std=c99
 
-DEFINES = -std=c99 -lm -DPC -DCMDLINE -DTOKEN_CACHE_DISABLED
+LIBS = -lm
 
-SRCS = svs_pc.c svs_misc.c comm_exec/*.c tokenizer/*.c variables/*.c svs_errors.c svs_expr_exec2.c svs_garbage_collector.c svs_sys_exec.c svs_sys_wrapper_pc.c svs_load.c svs_misc_str.c svs_builtin_calls.c svs_debug.c
+DEFINES = -std=c99 -DPC -DCMDLINE -DTOKEN_CACHE_DISABLED
+
+SRCS = $(shell find "." -name "*.c")
+
+BUILD_DIR ?= ./build
+
+OBJS := $(addprefix $(BUILD_DIR),$(addprefix /, $(addsuffix .o,$(basename $(SRCS)))))
 
 all: svs test
 
-svs:
-	$(CC) $(CFLAGS) $(SRCS) $(DEFINES) -DLANG_CZ -o bin/svs
+$(BUILD_DIR)/%.o: %.c
+	$(MKDIR_P) $(dir $@)
+	$(CC) $(CFLAGS) $(DEFINES) -c $< -o $@
+
+svs: $(OBJS)
+	$(CC) $(OBJS) $(LIBS) -o bin/svs
+
+.PHONY: clean
+clean:
+	$(RM) $(TARGET) $(OBJS) $(DEPS)
 
 test: svs
 	./bin/svs tests/autotest.svs
