@@ -255,7 +255,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         }
         
         //create new aray
-        tmp = newArray(id, (uint16_t) 0, s);
+        tmp = newArray(id, (uint16_t) 1, s);
         if (errCheck(s)) {
           return 0;
         }

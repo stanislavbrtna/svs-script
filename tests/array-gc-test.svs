@@ -1,0 +1,67 @@
+function main {
+  #This will test all the arg operators
+  FAIL = 0;
+  print("Array GC Test:");
+  #================== test body =================
+  
+  for(k=0; k<5; k++;) {
+    array q[4];
+    
+    for(i=0; i < len(q); i++;) {
+      q[i] = 500 + i;
+    } 
+  }
+  
+  array x[50];
+  
+  for(i=0; i < len(x); i++;) {
+    if (i < 25) 
+      x[i] = 100 - i;
+    else 
+      x[i] = "hundred - " + i;
+  }
+   
+  for(k=0; k<25; k++;) {
+    array a[rnd()%30 + 5];
+    
+    for(i=0; i < len(a); i++;) {
+      a[i] = 500 + i;
+    } 
+  }
+  
+  for(i=0; i < len(x); i++;) {
+  
+    if (i < 25) {
+      if(x[i] != 100 - i) {
+        array_print(x);
+        FAIL = 1;
+        break;
+      }
+    } else {
+      if(x[i] != "hundred - " + i) {
+        array_print(x);
+        FAIL = 1;
+        break;
+      }
+    }
+  }
+  
+  #================== /test body ================
+  print("");
+  print("Final ARRAY GC Test result: ", "");
+  if(FAIL == 0) {
+    print("PASSED");
+  } else {
+    print("FAIL");
+  }
+  return FAIL;
+}
+
+function array_print #* array *# {
+  print("Array:");
+  for (arg1 = 0; arg1 < len(arg0); arg1++;) {
+    print("  " + arg1 + ": " + arg0[arg1]);
+  }
+}
+
+

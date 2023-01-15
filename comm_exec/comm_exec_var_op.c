@@ -469,15 +469,12 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
 
       currToken = varPrac.tokenId;
 
-      if (index.val_s + varGetVal(getTokenData(x, s), s).val_s > SVS_ARRAY_LEN) {
-        errSoft((uint8_t *)"commEx: Array out of range!", s);
+      if (arraySet(varGetVal(getTokenData(x, s), s), index, varPrac.value, varPrac.type, s)) {
         errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
         return 0;
-      } else {
-        s->varArray[1 + index.val_s + varGetVal(getTokenData(x, s), s).val_s] = varPrac.value;
-        s->varArrayType[1 + index.val_s + varGetVal(getTokenData(x, s), s).val_s] = varPrac.type;
       }
+
 
     } else { //očekáváme "=" / expecting "="
       errSoft((uint8_t *)"commEx: Syntax error next to VAR (missing \"=\", \"++\", \"--\" or \"[\").", s);

@@ -367,7 +367,7 @@ uint8_t comm_exec_arg_op(uint16_t *token, svsVM * s) {
       }
 
     } else if (getTokenType(currToken, s) == SVS_TOKEN_LSQB) { // []
-      varType index;
+      varType array_index;
 
       if (arg_type != SVS_TYPE_ARR) {
         errSoft((uint8_t *)"commEx: Only array type can be indexed.", s);
@@ -390,7 +390,7 @@ uint8_t comm_exec_arg_op(uint16_t *token, svsVM * s) {
         return 0;
       }
       currToken = varPrac.tokenId;
-      index = varPrac.value;
+      array_index = varPrac.value;
 
       if (getTokenType(currToken, s) != SVS_TOKEN_RSQB) {
         errSoft((uint8_t *)"commEx: Syntax error, missing ].", s);
@@ -418,14 +418,10 @@ uint8_t comm_exec_arg_op(uint16_t *token, svsVM * s) {
 
       currToken = varPrac.tokenId;
 
-      if (index.val_s + arg_value.val_s > SVS_ARRAY_LEN) {
-        errSoft((uint8_t *)"commEx: Array out of range!", s);
+      if (arraySet(arg_value, array_index, varPrac.value, varPrac.type, s)) {
         errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
         return 0;
-      } else {
-        s->varArray[1 + index.val_s + arg_value.val_s] = varPrac.value;
-        s->varArrayType[1 + index.val_s + arg_value.val_s] = varPrac.type;
       }
 
     } else { //očekáváme "=" / expecting "="

@@ -34,6 +34,12 @@ uint8_t varSetVal(VARTYPE id, VARTYPE val, svsVM *s);
 
 // arrays
 varType newArray(varType Id, uint16_t len, svsVM *s);
+uint8_t arraySet(varType id, varType index, varType value, uint8_t type, svsVM *s);
+
+// array garbage collection
+void gcCollectArrays(svsVM *s);
+uint8_t gcGetValidArray(int32_t id, svsVM *s);
+uint8_t gcRemoveArray(int32_t id, svsVM *s);
 
 // undef warning
 uint8_t getUndefWarning();

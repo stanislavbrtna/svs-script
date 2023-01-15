@@ -104,9 +104,21 @@ void varAddLocal(varType Id, svsVM *s) {
 
 #endif
 
-varType newArray(varType Id, uint16_t len, svsVM *s) {
+varType newArray(varType id, uint16_t len, svsVM *s) {
   varType retval;
-  (void)(Id);
+  (void)(id);
+
+  if (len == 0) {
+    errSoft((uint8_t *)"newArray: Array lenght must be gerater than zero!", s);
+    return (varType)((uint16_t)0);
+  }
+
+  // try garbage collector
+  if (len > (SVS_ARRAY_LEN - s->varArrayLen)) {
+    gcCollectArrays(s);  
+  }
+  
+  // throw error
   if (len > (SVS_ARRAY_LEN - s->varArrayLen)) {
     errSoft((uint8_t *)"newArray: Array field full!", s);
     return (varType)((uint16_t)0);
@@ -118,6 +130,91 @@ varType newArray(varType Id, uint16_t len, svsVM *s) {
   s->varArrayLen += len;
 
   return retval;
+}
+
+uint8_t arraySet(varType id, varType index, varType value, uint8_t type, svsVM *s) {
+  //printf("array set: id %u, index %u, len %u\n", id.val_s, index.val_s, s->varArray[id.val_s].val_s);
+  if (index.val_s < s->varArray[id.val_s].val_s) {
+    s->varArray[1 + id.val_s + index.val_s] = value;
+    s->varArrayType[1 + id.val_s + index.val_s] = type;
+    return 0;
+  } else {
+    errSoft((uint8_t *)"commEx: Array out of range!", s);
+    return 1;
+  }
+}
+
+uint8_t gcGetValidArray(int32_t id, svsVM *s) {
+  uint16_t x = 0;
+
+  for(x = 1; x <= s->varTableLen; x++) {
+    if (s->varTable[x].type == SVS_TYPE_ARR) {
+      if (s->varTable[x].value.val_s == id) {
+        return 1;
+      }
+    }
+  }
+
+  // arrays
+  for(x = 1; x <= s->varArrayLen; x++) {
+    if (s->varArrayType[x] == SVS_TYPE_ARR) {
+      if (s->varArray[x].val_s == id) {
+        return 1;
+      }
+    }
+  }
+  
+  return 0; // not valid, returning zero
+}
+
+uint8_t gcRemoveArray(int32_t id, svsVM *s) {
+  uint16_t x = 0;
+  uint16_t step = 0;
+
+  step = s->varArray[id].val_s;
+
+  for (x = id; x < s->varArrayLen; x++) {
+    s->varArray[x] = s->varArray[x + step + 1];
+    s->varArrayType[x] = s->varArrayType[x + step + 1];
+  }
+
+  for(x = 1; x <= s->varTableLen; x++) {
+    if (s->varTable[x].type == SVS_TYPE_ARR) {
+      if (s->varTable[x].value.val_s > id) {
+        s->varTable[x].value.val_s -= step + 1;
+      }
+    }
+  }
+
+  // arrays
+  for(x = 1; x <= s->varArrayLen; x++) {
+    if (s->varArrayType[x] == SVS_TYPE_ARR) {
+      if (s->varArray[x].val_s > id) {
+        s->varArray[x].val_s -= step + 1;
+      }
+    }
+  }
+
+  s->varArrayLen -= step + 1;
+}
+
+void gcCollectArrays(svsVM *s) {
+  for(int32_t x = 1; x <= s->varArrayLen; x++) {
+    if(gcGetValidArray(x, s)) {
+      x += s->varArray[x].val_s;
+    } else {
+      gcRemoveArray(x, s);
+      x--;
+    }
+  }
+}
+
+void printArrays(svsVM *s) {
+  puts("Arrays:");
+  for(int32_t x = 1; x <= s->varArrayLen; x++) {
+    printf("%u : %u \n", x, s->varArray[x].val_s);
+  }
+  puts("End");
 }
 
 VARTYPE varGetId(uint8_t *name, svsVM *s) {
