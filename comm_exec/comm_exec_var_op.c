@@ -35,13 +35,6 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
     currToken++;
     if (getTokenType(currToken, s) == SVS_TOKEN_ASSIGN) { // =
       commExDMSG("commExecLoop: = statement", currToken, s);
-      if (varGetType(getTokenData(x, s), s) == SVS_TYPE_ARR) {
-        errSoft((uint8_t *)"commEx: Assign on array is not supported.", s);
-        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-        errSoftSetToken(currToken, s);
-        return 0;
-      }
-
       currToken++;
 
       exprExec(currToken, &varPrac, s); //vykonáme výraz za = / executing expression after =

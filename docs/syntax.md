@@ -171,7 +171,8 @@ Variables are by default all global (accessible across different functions), and
 Maximum number of variables is also limited (VAR_TABLE_L define).
 
 ### Arrays
-Since SVS version 1.0 implementation of arrays moved from sys warpper to the core language. There were no changes to the inner workings of SVS arrays, so they are still quite limited, but now the syntax is quite simple.
+Since SVS version 1.0 implementation of arrays moved from sys warpper to the core language. Since version 1.5.0 arrays are internally garbage collected.
+
 Arrays can be defined by array keyword:
 
     array a[50];
@@ -179,13 +180,18 @@ This will create an array named *a* with 50 cells.
 
     array b = ["alpha", "beta", "gama"];
 This will create an array named *b* with three cells initialized with string values "alpha", "beta" and "gama".
-For now arrays can't be destroyed. When the array memory does not allow creation of new array an error is thrown.
+When the array memory does not allow creation of new array an error is thrown.
 You can assign values to the cells of an array:
 
     a[7] = 123;
 Or you can read value of cells in an expression:
 
     print("value: " + a[7]);
+
+Local arrays can be defined like this:
+
+    local a;
+    array a[32];
 
 String identificator a (in this example), can be (since v.1.4) passed in expressions. In every case only identificator is passed, array is never duplicated.
 Multidimensional arrays are not supported. String functions does not work on arrays because strings in SVS are not internally stored as arrays.
