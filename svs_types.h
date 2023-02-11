@@ -87,23 +87,23 @@ typedef struct {
 } fTableType;
 
 typedef union {
-   int32_t val_s; //signed const
-   uint16_t val_str; //variable Id
-   uint32_t val_u; //variable Id
-   float val_f; //float value
+   int32_t  val_s;   // signed type, used for SVS_TYPE_NUM
+   uint16_t val_str; // position in string field, used for SVS_TYPE_STR
+   uint32_t val_u;   // Used for system call ids
+   float val_f;      // float value for SVS_TYPE_FLT
 } varType;
 
 typedef struct {
   uint8_t *name;
-  uint32_t maskId; // maskovací id lokální proměnné
-  varType value; //num - hodnota, str-nultý charakter v tabulce, string je ukončen \0
-  uint8_t type; //0-num (int32) 1-string 3-float
+  uint32_t maskId; // maskovací id lokální proměnné/mask-id used for loacal variables
+  varType value;   // num - hodnota, str-nultý charakter v tabulce, string je ukončen \0 / value of the variable
+  uint8_t type;    // variable type defined in SVS_TYPE_*
 } varTableType;
 
-typedef struct { //struktura kterou vrací funkce výsledek
-  varType value; //num - hodnota, str-nultý charakter v tabulce, string je ukončen \0
-  uint8_t type; //0-num 1-string
-  uint16_t tokenId; //pokud funkce vrací i návratovou adresu
+typedef struct {    // return structure for a function call
+  varType value;   
+  uint8_t type;     // var type
+  uint16_t tokenId; // token to return to
 } varRetVal;
 
 typedef struct {
@@ -122,41 +122,48 @@ typedef struct {
 
 
 typedef struct {
-  VARTYPE arg[FUNCTION_ARGS_MAX+1];      //hodnoty argumentů
-  uint8_t argType[FUNCTION_ARGS_MAX+1];  //typy agrumentů
-  uint8_t usedup;       //počet použitých argumentů
+  VARTYPE arg[FUNCTION_ARGS_MAX+1];      // argument values
+  uint8_t argType[FUNCTION_ARGS_MAX+1];  // types
+  uint8_t usedup;                        // count of used arguments
 } comExArgs;
 
 
 typedef struct {
-  uint8_t vmName[NAME_LENGTH+1]; //název svsVM
+  uint8_t vmName[NAME_LENGTH+1];  // vm name
+  uint8_t fName[SVS_FILE_NAME_L]; // .svs file name
 
-  uint8_t fName[SVS_FILE_NAME_L]; //název svs souboru
-
-#ifdef PC //chache file, odlišné pro pc a fatfs
+#ifdef PC //chache file, different for pc and umc
   FILE *vmCache;
 #else
   FIL vmCache;
   FRESULT cacheFr;
 #endif
+  // token cache
   uint8_t vmCacheUsed;
   uint16_t cacheStart;
   uint16_t tokenMax;
+  tokenCacheStruct tokenCache[TOKEN_LENGTH+1]; 
 
-  fTableType funcTable[FUNCTION_TABLE_L+1]; //indexace od jedničky
-  uint16_t	funcTableLen; //počet funkcí
+  fTableType funcTable[FUNCTION_TABLE_L+1]; // indexed from 1
+  uint16_t	funcTableLen; // number of functions in a script
 
-  sysCall syscallTable[SYSCALL_TABLE_L+1]; //indexace od jedničky
-  uint16_t  syscallTableLen; //počet volání
+  sysCall syscallTable[SYSCALL_TABLE_L+1]; // indexed from 1
+  uint16_t  syscallTableLen; // number of sys.* calls
 
-  varTableType varTable[VAR_TABLE_L+1]; //indexace od jedničky
-  uint16_t varTableLen; //pročet promněných
+  varTableType varTable[VAR_TABLE_L+1]; // indexed from 1
+  uint16_t varTableLen; // number of variables
 
-  uint8_t stringField[STRING_FIELD_L+1]; //indexace od nuly
+  uint8_t stringField[STRING_FIELD_L+1]; // indexed from 0
+  
   // number of used chars, always points to the next free char
   uint16_t stringFieldLen;
+  
+  // position where string constants ends in a string field, so garbage collector doesnt throw them away
   uint16_t stringConstMax;
+  // string garbage collection safe point 
   uint16_t gcSafePoint;
+  // string garbage collection profiler status
+  uint8_t profilerEnabled;
 
   comExArgs commArgs;
 
@@ -165,16 +172,14 @@ typedef struct {
   uint8_t commRetType;
   uint8_t commRetFlag;
   uint16_t progLine;
-  uint8_t globalDebug; //povoluje ladící režim
-  uint8_t handbrake; //pokud 1, zastavuje virtuální stroj
+  uint8_t globalDebug; // debug mode
+  // pokud 1, zastavuje virtuální stroj/if 1, vm tries to halt the execution
+  uint8_t handbrake;
 
-  tokenCacheStruct tokenCache[TOKEN_LENGTH+1]; //cache tokenů
-
+  // array field
   varType varArray[SVS_ARRAY_LEN+1];
   uint8_t varArrayType[SVS_ARRAY_LEN+1];
   uint16_t varArrayLen;
-
-  uint8_t profilerEnabled;
 
   //soft errors
   uint8_t err;
