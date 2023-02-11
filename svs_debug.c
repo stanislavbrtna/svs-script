@@ -66,3 +66,22 @@ void strTablePrint(svsVM *s) {
     x++;
   }
 }
+
+void svsPrintUsedUp(svsVM *s) {
+  printf("SVS vm %s, (%u): \n", s->vmName, (uint32_t) s);
+  printf("    fname:           %s\n", s->fName);
+  printf("Functions:\n");
+  printf("    funcTableLen:    %u of %u\n", s->funcTableLen, FUNCTION_TABLE_L);
+  printf("    syscallTableLen: %u of %u\n", s->syscallTableLen, SYSCALL_TABLE_L);
+  printf("Variables & Arrays:\n");
+  printf("    varTableLen:     %u of %u\n", s->varTableLen, VAR_TABLE_L);
+  printf("    varArrayLen:     %u of %u\n", s->varArrayLen, SVS_ARRAY_LEN);
+  printf("Strings:\n");
+  printf("    stringFieldLen:  %u of %u\n", s->stringFieldLen, STRING_FIELD_L);
+  printf("    stringConstMax:  %u\n", s->stringConstMax);
+  printf("    gcSafePoint:     %u\n", s->gcSafePoint);
+  printf("Caching:\n");
+  printf("    vmCacheUsed:     %u\n", s->vmCacheUsed);
+  printf("    cacheStart:      %u\n", s->cacheStart);
+  printf("    tokenMax:        %u\n", s->tokenMax);
+}

@@ -868,7 +868,12 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       return 0;
     }
 
-    s->globalDebug = args[1].val_u;
+    if (args[1].val_s != -1) {
+      s->globalDebug = args[1].val_s;
+    } else {
+      svsPrintUsedUp(s);
+    }
+    
 
     result->value = (varType)((uint32_t)0);
     result->type = SVS_TYPE_NUM;

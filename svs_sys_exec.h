@@ -26,10 +26,10 @@ SOFTWARE.
 #include "svs_basics.h"
 
 typedef struct {
-  VARTYPE callId;       //id systémového volání
-  VARTYPE arg[FUNCTION_ARGS_MAX+1];      //hodnoty argumentů
-  uint8_t argType[FUNCTION_ARGS_MAX+1];  //typy agrumentů
-  uint8_t usedup;       //počet použitých argumentů
+  VARTYPE callId;                        // id of a sys call
+  VARTYPE arg[FUNCTION_ARGS_MAX+1];      // argument values
+  uint8_t argType[FUNCTION_ARGS_MAX+1];  // argument types
+  uint8_t usedup;                        // count of used up arguments
 } argStruct;
 
 typedef struct {
