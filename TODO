@@ -1,3 +1,2 @@
-Add del or rm builtin call to handle destroying arrays. naah, make arrays garbage collected
 Move array functions to one place.
 Standard library would be nice.
