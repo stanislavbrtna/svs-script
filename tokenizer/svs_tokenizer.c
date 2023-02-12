@@ -1359,8 +1359,10 @@ uint8_t tokenParse(svsVM *s) {
         }
 
         // error occured in imported file (for debug print line)
-        if(tokenizer_exact_token <= posToken - 1) {
-          return 0;
+        if (tokenizer_exact_debug == 1) {
+          if(tokenizer_exact_token <= posToken - 1) {
+            return 0;
+          }
         }
 
         // load state back
@@ -1507,7 +1509,7 @@ uint8_t tokenParse(svsVM *s) {
                   getTokenType(posToken,s), \
                   posText \
                 );
-      printf("Tokenizer Done, %u of %u tokens used.\n", s->tokenMax, getTokenMax(s));
+      printf("%s: Tokenizer Done, %u of %u tokens used.\n", import_dbg_fname, s->tokenMax, getTokenMax(s));
       if (tokenEofCheck(brCount1, brCount2)) {
         return 1;
       } else {

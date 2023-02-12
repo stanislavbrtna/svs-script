@@ -175,6 +175,7 @@ FILE * tokenGetchGetFP() {
 
 void tokenGetchSetFP(FILE * f) {
   fp = f;
+  fclosed = 0;
 }
 
 #endif
