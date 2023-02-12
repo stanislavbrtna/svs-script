@@ -43,6 +43,12 @@ static uint16_t tokenizer_exact_line;
 uint8_t debug_buffer[101];
 uint8_t debug_buffer_pos;
 
+static svsVM *local_svm;
+
+static uint16_t posToken;
+
+static uint8_t import_dbg_fname[128];
+
 void setTokenizerDebug(uint8_t level) {
   tokenizerDebug = level;
 }
@@ -51,27 +57,31 @@ void setTokenizerFerrFlag() {
   tokenizerFerrFlag = 1;
 }
 
-uint8_t tokenGetch();
-
-void tokenizerReset() {
+void tokenizerReset(svsVM *s) {
   tokenizerInit = 0;
   tokenizer_exact_debug = 0;
   tokenizerStringFlag = 0;
   prevChar = 0;
   prevChar2 = 0;
+  local_svm = s;
+  posToken = 0;
+
+  for(int i=0; i<sizeof(import_dbg_fname); i++) {
+    import_dbg_fname[i] = s->fName[i];
+  }
 }
 
-void token_line_print() {
+void token_line_print(svsVM *s) {
   uint16_t x;
   uint8_t c = 0;
   debug_buffer[100] = 0;
   printf("near line %u :\n %s", tokenizer_exact_line, debug_buffer);
 
   x = 0;
-  c = tokenGetch();
+  c = tokenGetch(s);
   while ((c != '\n') && (c != 0) && (x < 100)) {
     printf("%c", c);
-    c = tokenGetch();
+    c = tokenGetch(s);
     x++;
   }
 }
@@ -89,11 +99,15 @@ void tokenzer_print_token_line(uint16_t token, svsVM *s) {
   tokenizer_exact_line = 1;
   debug_buffer_pos = 0;
 
-  printf("File: %s\n", s->fName);
-
+  if (strCmp(import_dbg_fname, s->fName)) {
+    printf("Error occured in file: %s\n", import_dbg_fname);
+  } else {
+    printf("Error occured in file: %s\nImported from:         %s.\n", import_dbg_fname, s->fName);
+  }
+  
   tokenGetchSetup(s->fName, 0);
 
-  tokenizerReset();
+  tokenizerReset(s);
   tokenizer_exact_debug = 1;
 
   // reset some tokenizer variables
@@ -106,13 +120,13 @@ void tokenzer_print_token_line(uint16_t token, svsVM *s) {
 
   tokenParse(s);
   printf("Token %u, ", token);
-  token_line_print();
+  token_line_print(s);
 }
 
 void tokenizerErrorPrint(uint8_t *str) {
   printf("Tokenizer Error: %s\n", str);
   tokenizer_exact_line++;
-  token_line_print();
+  token_line_print(local_svm);
   printf("\n");
 }
 
@@ -131,11 +145,19 @@ void tokenDMSG(char *text, uint16_t tokenId, VARTYPE data, uint8_t type, uint16_
 #endif
 }
 
-uint8_t tokenGetchDbg() {
+void tokenDMSG_str(char *text, uint16_t tokenId, char *msg) {
+#ifndef DBG_DISABLED
+  if(tokenizerDebug == 1) {
+    printf("TokenDMSG: %s \nmessage: %s\ntokenId: %u\n", text, msg, tokenId);
+  }
+#endif
+}
+
+uint8_t tokenGetchDbg(svsVM *s) {
   uint8_t x;
   uint8_t c = 0;
 
-  c = tokenGetch();
+  c = tokenGetch(s);
 
   if (c == '\n') {
     tokenizer_exact_line++;
@@ -160,7 +182,7 @@ uint8_t tokenGetchDbg() {
 uint8_t tokenPreprocessor() {
   uint8_t c = 0;
 
-  c = tokenGetchDbg();
+  c = tokenGetchDbg(local_svm);
 
   if ((c == '\"' && prevChar!='\\') || (prevChar2 == '\\' && prevChar == '\\' && c == '\"')) {
     tokenizerStringFlag = 1 - tokenizerStringFlag;
@@ -168,15 +190,15 @@ uint8_t tokenPreprocessor() {
 
   if (!tokenizerStringFlag) {
     if (c == '#') {
-      c = tokenGetchDbg();
+      c = tokenGetchDbg(local_svm);
       if (c == '*') {
         // multiline comment
         while (1) {
-          c = tokenGetchDbg();
+          c = tokenGetchDbg(local_svm);
           if (c == '*') {
-            c = tokenGetchDbg();
+            c = tokenGetchDbg(local_svm);
             if (c == '#') {
-              c = tokenGetchDbg();
+              c = tokenGetchDbg(local_svm);
               break;
             }
           }
@@ -184,7 +206,7 @@ uint8_t tokenPreprocessor() {
       } else {
         // single line comment
         while (c != '\n') {
-          c = tokenGetchDbg();
+          c = tokenGetchDbg(local_svm);
         }
       }
     }
@@ -195,10 +217,11 @@ uint8_t tokenPreprocessor() {
   return c;
 }
 
+static uint8_t peek;
+static uint8_t strBuff[SVS_TOK_STR_BUFFLEN + 1];
+static uint16_t vTextPos;
+
 uint8_t tokenInput(uint16_t *index, uint8_t inc) {
-  static uint8_t peek;
-  static uint8_t strBuff[SVS_TOK_STR_BUFFLEN + 1];
-  static uint16_t vTextPos;
   uint16_t x;
 
   strBuff[SVS_TOK_STR_BUFFLEN] = 0; // for easy debug print
@@ -405,7 +428,6 @@ uint8_t getKeyword(uint8_t *buffer, uint16_t *posText) {
 
 uint8_t tokenParse(svsVM *s) {
   uint16_t posText = 0;
-  uint16_t posToken = 0;
   uint8_t  pracName[NAME_LENGTH];
   uint8_t  pracName2[NAME_LENGTH];
   uint8_t  Lock = 1;
@@ -1249,6 +1271,116 @@ uint8_t tokenParse(svsVM *s) {
                   getTokenData(posToken, s),
                   getTokenType(posToken, s),
                   posText);
+      }
+
+      if (strCmp(pracName, (uint8_t *)"import")) {
+        uint8_t filename[128];
+        uint16_t i = 0;
+
+        Lock = 0;
+
+        while(1) {
+          if (tokenInput(&posText, 0) == '\"') {
+            break;
+          } else {
+            if (tokenInput(&posText, 0) != ' ') {
+              tokenizerErrorPrint((uint8_t *)"tokenParse: Undefined symbol after import statement!");
+              return 1;
+            }
+          }
+          tokenInput(&posText, 1);
+        }
+
+        tokenInput(&posText, 1);
+
+        while((tokenInput(&posText, 0) != '\"') && (tokenInput(&posText, 0) != 0)) {
+          filename[i] = tokenInput(&posText, 0);
+          
+          tokenInput(&posText, 1);
+          i++;
+        }
+        filename[i] = 0;
+
+        tokenInput(&posText, 1);
+        tokenDMSG_str("import statement, importing:",
+                  posToken, filename);
+
+        // now the hard part
+
+        // store tokenInput state
+        uint8_t peek_local;
+        uint8_t strBuff_local[SVS_TOK_STR_BUFFLEN + 1];
+        uint16_t vTextPos_local;
+        uint16_t tokenizer_exact_line_local;
+
+        uint8_t import_dbg_fname_local[128];
+
+        for(int i=0; i<sizeof(import_dbg_fname); i++) {
+          import_dbg_fname_local[i] = import_dbg_fname[i];
+        }
+
+        peek_local = peek;
+        vTextPos_local = vTextPos;
+        tokenizer_exact_line_local = tokenizer_exact_line;
+
+        for(int i=0; i<sizeof(strBuff_local); i++) {
+          strBuff_local[i] = strBuff[i];
+        }
+
+        printf("Importing: %s\n", filename);
+
+        // open new file
+        #ifndef PC
+          FIL fp_local;
+        #else
+          FILE *fp_local;
+        #endif
+
+        fp_local = tokenGetchGetFP();
+
+
+        if(!tokenGetchOpen(filename, s)) {
+          tokenizerErrorPrint((uint8_t *)"tokenParse: Error occured while openning imported file!");
+          return 1;
+        }
+
+        for(int i=0; i<sizeof(import_dbg_fname); i++) {
+          import_dbg_fname[i] = filename[i];
+        }
+
+        tokenizer_exact_line = 0;
+        vTextPos = 0;
+        strBuff[0] = tokenPreprocessor();
+
+        // tokenize new file
+        if (tokenParse(s) != 0) {
+          tokenizerErrorPrint((uint8_t *)"tokenParse: Error importing file!");
+          return 1;
+        }
+
+        // error occured in imported file (for debug print line)
+        if(tokenizer_exact_token <= posToken - 1) {
+          return 0;
+        }
+
+        // load state back
+        peek = peek_local;
+        vTextPos = vTextPos_local;
+
+        for(int i=0; i<sizeof(strBuff_local); i++) {
+          strBuff[i] = strBuff_local[i];
+        }
+
+        for(int i=0; i<sizeof(import_dbg_fname); i++) {
+          import_dbg_fname[i] = import_dbg_fname_local[i];
+        }
+        
+        tokenizer_exact_line = tokenizer_exact_line_local;
+        
+        tokenGetchSetFP(fp_local);
+
+        //fin
+
       }
 
       if (Lock) {

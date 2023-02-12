@@ -30,7 +30,7 @@ uint8_t tokenPreprocessor();
 uint8_t tokenInput(uint16_t *index, uint8_t inc);
 uint8_t tokenParse(svsVM *s);
 void setTokenizerDebug(uint8_t level);
-void tokenizerReset();
+void tokenizerReset(svsVM *s);
 void setTokenizerFerrFlag();
 
 void tokenzer_print_token_line(uint16_t token, svsVM *s);

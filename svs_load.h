@@ -27,5 +27,15 @@ SOFTWARE.
 uint8_t loadApp(uint8_t * fname, uint8_t * name, svsVM *s, uint8_t mode);
 
 void tokenGetchSetup(uint8_t * fname, uint8_t mode);
+uint8_t tokenGetch(svsVM *s);
+uint8_t tokenGetchOpen(uint8_t *fname, svsVM *s);
+
+#ifndef PC
+FIL tokenGetchGetFP();
+void tokenGetchSetFP(FIL f);
+#else
+FILE * tokenGetchGetFP();
+void tokenGetchSetFP(FILE * f);
+#endif
 
 #endif
