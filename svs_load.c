@@ -65,6 +65,8 @@ uint8_t loadApp(uint8_t *fname, uint8_t *name, svsVM *s, uint8_t mode) {
 
 static FIL fp;
 
+static FIL *fpp;
+
 uint8_t tokenGetch(svsVM *s) {
   uint8_t x = 0;
   uint32_t br;
@@ -73,22 +75,28 @@ uint8_t tokenGetch(svsVM *s) {
     if (ldinit == 0) {
       if (f_open(&fp, (char *)s->fName, FA_READ) != FR_OK) {
         printf("tokenGetch: Opening file: %s\n", s->fName);
-        errMsgS((uint8_t *)"tokenGetch: Error while opening file!");
+        //errMsgS((uint8_t *)"tokenGetch: Error while opening file!");
+        sda_show_error_message((uint8_t *)"tokenGetch: Error while opening file!");
         return 0;
       }
+      fpp = &fp;
       ldinit = 1;
     }
 
     if (fclosed == 0) {
-      if (f_read(&fp, &x, sizeof(x), &br) != FR_OK) {
-        errMsgS((uint8_t *)"tokenGetch: Error while reading from file!");
+      if (f_read(fpp, &x, sizeof(x), &br) != FR_OK) {
+        //errMsgS((uint8_t *)"tokenGetch: Error while reading from file!");
+        sda_show_error_message((uint8_t *)"tokenGetch: Error while reading from file!");
       }
 
-      if (f_eof(&fp)) {
-        f_close(&fp);
+      if (f_eof(fpp)) {
+        //printf("fpp: %u\n", (uint32_t) fpp);
+        //printf("FEOF!!!\n");
+        f_close(fpp);
         fclosed = 1;
         return 0;
       } else {
+        //printf("reading: %c\n", x);
         return x;
       }
     } else {
@@ -100,22 +108,26 @@ uint8_t tokenGetch(svsVM *s) {
   }
 }
 
-uint8_t tokenGetchOpen(uint8_t *fname, svsVM *s) {
-  if (f_open(&fp, (char *)fname, FA_READ) != FR_OK) {
+uint8_t tokenGetchOpen(uint8_t *fname, FIL *f, svsVM *s) {
+  //printf("openning: %s\n", fname);
+  if (f_open(f, (char *)fname, FA_READ) != FR_OK) {
     puts("tokenGetch: Error while opening file!");
-    errMsgS((uint8_t *)"tokenGetch: Error while opening file!");
+    //errMsgS((uint8_t *)"tokenGetch: Error while opening file!");
+    sda_show_error_message((uint8_t *)"tokenGetch: Error while opening file!");
     return(0);
   }
-
+  fpp = f;
+  //printf("fpp: %u\n", (uint32_t) fpp);
   return 1;
 }
 
-FIL tokenGetchGetFP() {
-  return fp;
+FIL * tokenGetchGetFP() {
+  return fpp;
 }
 
-void tokenGetchSetFP(FIL f) {
-  fp = f;
+void tokenGetchSetFP(FIL * f) {
+  fpp = f;
+  fclosed = 0;
 }
 
 #else

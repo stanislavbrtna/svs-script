@@ -1331,15 +1331,19 @@ uint8_t tokenParse(svsVM *s) {
 
         // open new file
         #ifndef PC
-          FIL fp_local;
+          FIL fp;
+          FIL *fp_local;
         #else
           FILE *fp_local;
         #endif
 
         fp_local = tokenGetchGetFP();
 
-
+        #ifndef PC
+        if(!tokenGetchOpen(filename, &fp, s)) {
+        #else
         if(!tokenGetchOpen(filename, s)) {
+        #endif
           tokenizerErrorPrint((uint8_t *)"tokenParse: Error occured while openning imported file!");
           return 1;
         }
