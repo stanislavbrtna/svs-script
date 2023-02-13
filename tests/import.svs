@@ -1,0 +1,32 @@
+import "~imp1.svs"
+
+
+function main {
+  TEST_NAME = "Import test";
+  #This will test import statement
+  FAIL = 0;
+  print(TEST_NAME+":");
+  #================== test body =================
+  
+  behind();
+  
+  if (imp1() != "imp1" and imp2() != "imp2" and behind != 1) {
+    FAIL += 1;
+  }
+  
+  #================== /test body ================
+  print("");
+  print("Final " + TEST_NAME + " Test result: ", "");
+  if(FAIL == 0) {
+    print("PASSED");
+  } else {
+    print("FAIL");
+  }
+  return FAIL;
+}
+
+import "~imp2.svs"
+
+function behind {
+  behind = 1;
+}

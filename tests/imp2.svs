@@ -1,0 +1,3 @@
+function imp2 {
+  return "imp2";
+}
