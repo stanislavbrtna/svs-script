@@ -68,7 +68,6 @@ uint8_t * resolveLocalFiles(uint8_t *name, svsVM *s) {
 
 
 uint8_t loadApp(uint8_t *fname, uint8_t *name, svsVM *s, uint8_t mode) {
-  //static uint8_t fsloaded;
   svsReset(s);
   svsSetName(name,s);
   svsSetFileName(fname, s);
@@ -172,7 +171,6 @@ uint8_t tokenGetch(svsVM *s) {
 
   if (ldinit == 0) {
     if(ldmode == 0) {
-      
       fp = fopen(s->fName, "r");
       if(fp == NULL) {
         printf("tokenGetch: Opening file: %s\n", s->fName);
@@ -210,7 +208,6 @@ uint8_t tokenGetchOpen(uint8_t *fname, svsVM *s) {
     puts("tokenGetch: Error while opening file!");
     return(0);
   }
-
   return 1;
 }
 

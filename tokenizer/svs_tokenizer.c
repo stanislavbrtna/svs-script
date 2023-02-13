@@ -1305,8 +1305,6 @@ uint8_t tokenParse(svsVM *s) {
         tokenDMSG_str("import statement, importing:",
                   posToken, filename);
 
-        // now the hard part
-
         // store tokenInput state
         uint8_t peek_local;
         uint8_t strBuff_local[SVS_TOK_STR_BUFFLEN + 1];
@@ -1384,9 +1382,6 @@ uint8_t tokenParse(svsVM *s) {
         tokenizer_exact_line = tokenizer_exact_line_local;
         
         tokenGetchSetFP(fp_local);
-
-        //fin
-
       }
 
       if (Lock) {
