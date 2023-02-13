@@ -37,6 +37,7 @@ All keywords, variables and functions are case sensitive. Here is a table of all
 | for | For loop. |
 | function | Defines new function. |
 | if, else | If and else, standard conditional branching. |
+| import | Imports contents of an .svs file |
 | local | Specifies local variable. |
 | not | Logical negation. |
 | or | Logical or. |
@@ -279,6 +280,41 @@ Examples of minimal valid functions:
 
 
 Maximum of functions in one file is limited by FUNCTION_TABLE_L define. Return command and return value are both optional.
+
+###  Imports
+The import command allows you to insert additional source files into the root file. The file path is derived from the cwd interpreter. If the filename starts with the ~ character, the file will be loaded from the root directory.
+The import of the file is done when the script is loaded.
+Imported files share a namespace with the root file. Nested imports are also supported.
+
+**For example:**
+
+main.svs:
+
+    import "~hello.svs"
+
+    function main {
+      hello();
+    }
+
+
+hello.svs:
+
+    function hello {
+      print("Hello");
+      return;
+    }
+
+
+Final script file, that will be executed:
+
+    function hello {
+      print("Hello");
+      return;
+    }
+    
+    function main {
+      hello();
+    }
 
 ### Built-in functions
 SVS has a few built-in functions that can help you accomplish mainly type conversions and type checking. Conversion to string is not included, because is provided as a basic expression by SVS. If you define function with a same name as one of the built-in functions, then every call after the function definition will execute your function instead of the built-in one.
