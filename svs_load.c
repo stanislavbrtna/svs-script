@@ -25,7 +25,7 @@ SOFTWARE.
 uint8_t ldinit;
 uint8_t ldmode;
 uint8_t fclosed;
-
+uint8_t fullPathName[SVS_FILENAME_L];
 
 void tokenGetchSetup(uint8_t * fname, uint8_t mode) {
   ldinit = 0;
@@ -33,35 +33,6 @@ void tokenGetchSetup(uint8_t * fname, uint8_t mode) {
   fclosed = 0;
 }
 
-
-uint8_t loadApp(uint8_t *fname, uint8_t *name, svsVM *s, uint8_t mode) {
-  //static uint8_t fsloaded;
-  svsReset(s);
-  svsSetName(name,s);
-  svsSetFileName(fname, s);
-  printf("SVS loadApp: loading: %s\n", fname);
-  ldinit = 0;
-  ldmode = mode; //0=file 1=uart
-
-  fclosed = 0;
-  tokenizerReset(s);
-
-  if(mode == 1) {
-    setTokenType(0, 0, s);
-    printf("Serial loading Ready!\n");
-  }
-
-  if (tokenParse(s) != 0) {
-    return 1;
-  }
-  #ifndef PC
-  f_sync(&(s->vmCache));
-  #endif
-  printf("Program loaded!\n");
-  return 0;
-}
-
-uint8_t fullPathName[128];
 
 uint8_t * resolveLocalFiles(uint8_t *name, svsVM *s) {
   if (name[0] == '~') {
@@ -93,6 +64,34 @@ uint8_t * resolveLocalFiles(uint8_t *name, svsVM *s) {
   } else {
     return name;
   }
+}
+
+
+uint8_t loadApp(uint8_t *fname, uint8_t *name, svsVM *s, uint8_t mode) {
+  //static uint8_t fsloaded;
+  svsReset(s);
+  svsSetName(name,s);
+  svsSetFileName(fname, s);
+  printf("SVS loadApp: loading: %s\n", fname);
+  ldinit = 0;
+  ldmode = mode; //0=file 1=uart
+
+  fclosed = 0;
+  tokenizerReset(s);
+
+  if(mode == 1) {
+    setTokenType(0, 0, s);
+    printf("Serial loading Ready!\n");
+  }
+
+  if (tokenParse(s) != 0) {
+    return 1;
+  }
+  #ifndef PC
+  f_sync(&(s->vmCache));
+  #endif
+  printf("Program loaded!\n");
+  return 0;
 }
 
 #ifndef PC

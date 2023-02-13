@@ -47,7 +47,7 @@ static svsVM *local_svm;
 
 static uint16_t posToken;
 
-static uint8_t import_dbg_fname[128];
+static uint8_t import_dbg_fname[SVS_FILENAME_L];
 
 void setTokenizerDebug(uint8_t level) {
   tokenizerDebug = level;
@@ -1274,7 +1274,7 @@ uint8_t tokenParse(svsVM *s) {
       }
 
       if (strCmp(pracName, (uint8_t *)"import")) {
-        uint8_t filename[128];
+        uint8_t filename[SVS_FILENAME_L];
         uint16_t i = 0;
 
         Lock = 0;
@@ -1313,7 +1313,7 @@ uint8_t tokenParse(svsVM *s) {
         uint16_t vTextPos_local;
         uint16_t tokenizer_exact_line_local;
 
-        uint8_t import_dbg_fname_local[128];
+        uint8_t import_dbg_fname_local[SVS_FILENAME_L];
 
         for(int i=0; i<sizeof(import_dbg_fname); i++) {
           import_dbg_fname_local[i] = import_dbg_fname[i];
