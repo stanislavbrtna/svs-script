@@ -66,11 +66,11 @@ This file contains the main defines and limits of SVS.
 #endif
 
 #ifndef STRING_FIELD_L
-  #define STRING_FIELD_L 20000 // počet znaků stringové pamněti / max number of characters in string memory
+  #define STRING_FIELD_L 30000 // počet znaků stringové pamněti / max number of characters in string memory
 #endif
 
 #ifndef GC_THRESHOLD
-  #define GC_THRESHOLD 18000 // threshold for garbage collection of strings
+  #define GC_THRESHOLD 25000 // threshold for garbage collection of strings
 #endif
 
 #ifndef SYSCALL_TABLE_L
