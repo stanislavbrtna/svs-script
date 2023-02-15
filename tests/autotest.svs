@@ -263,6 +263,19 @@ function main {
     A[x] = "a"+x;
   }
 
+  if (1) {
+    local array A[100];
+    for(x = 0; x < 100; x++;) {
+      A[x] = "l_a"+x;
+    }
+
+    for(x = 0; x < 100; x++;) {
+      if (A[x] != "l_a"+x) {
+        arr_fail = 1;
+      }
+    }
+  }
+
   for(x = 0; x < 100; x++;) {
     B[x] = "b"+x;
   }

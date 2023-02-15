@@ -148,13 +148,26 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
     commExDMSG("commExecLoop: LOCAL statement", currToken, s);
     currToken++;
 
-    if (getTokenType(currToken, s) != SVS_TOKEN_VAR) { // expecting VAR
+    if (getTokenType(currToken, s) != SVS_TOKEN_VAR && getTokenType(currToken, s) != SVS_TOKEN_ARRAY) { // expecting VAR or ARRAY
       errSoft((uint8_t *)"commEx: Syntax error next to LOCAL: Expected VAR after LOCAL.", s);
       errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
       errSoftSetToken(currToken, s);
       return 0;
     } else {
       varType id;
+
+      // local array x case - just add local x
+      if (getTokenType(currToken, s) == SVS_TOKEN_ARRAY) {
+        commExDMSG("commExecLoop: LOCAL ARRAY statement", currToken, s);
+        id = getTokenData(currToken + 1, s);
+        varAddLocal(id, s);
+
+        if (errCheck(s)) {
+          return 0;
+        }
+        return currToken - 1;
+      }
+
       id = getTokenData(currToken, s);
       varAddLocal(id, s); //přidáme lokální promněnnou / adds a local variable
 

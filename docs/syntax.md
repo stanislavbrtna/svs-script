@@ -191,8 +191,7 @@ Or you can read value of cells in an expression:
 
 Local arrays can be defined like this:
 
-    local a;
-    array a[32];
+    local array a[32];
 
 String identificator a (in this example), can be (since v.1.4) passed in expressions. In every case only identificator is passed, array is never duplicated.
 Multidimensional arrays are not supported. String functions does not work on arrays because strings in SVS are not internally stored as arrays.
