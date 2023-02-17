@@ -44,6 +44,7 @@ uint16_t strNew(uint8_t *index, svsVM *s) {
   return retval;
 }
 
+// returns c pointer to the new string
 uint8_t *strNewP(uint8_t *index, svsVM *s) {
   uint16_t x = 0;
   uint8_t *retval;
