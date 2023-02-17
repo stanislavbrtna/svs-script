@@ -515,11 +515,11 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     }
 
     if (args[2].val_s <= 0) {
-      args[2].val_s = 1;
+      args[2].val_s = 0;
     }
 
     if (args[3].val_s <= 0) {
-      args[3].val_s = 1;
+      args[3].val_s = 0;
     }
 
     strNewStreamInit(s);
