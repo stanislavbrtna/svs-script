@@ -60,6 +60,7 @@ void setTokenizerFerrFlag() {
 void tokenizerReset(svsVM *s) {
   tokenizerInit = 0;
   tokenizer_exact_debug = 0;
+  tokenizer_exact_line = 0;
   tokenizerStringFlag = 0;
   prevChar = 0;
   prevChar2 = 0;
@@ -597,6 +598,11 @@ uint8_t tokenParse(svsVM *s) {
       if(tokenizerDebug){
         printf("\n->Now proccesing line %u:\n", tokenizer_exact_line);
       }
+      
+      #ifdef SVS_DBG_HEATMAP
+      svs_heatmap_set_break(posToken, tokenizer_exact_line, s);
+      #endif
+      
       currLine++;
       tokenInput(&posText, 1);
     }

@@ -140,6 +140,50 @@ uint8_t pcBasicsWrap(varRetVal *result, argStruct *argS, svsVM *s){
     return 1;
   }
 
+  //sys.heatmapStart();
+  if (sysFuncMatch(argS->callId,"heatmapStart",s)){
+    if (sysExecTypeCheck(argS, argType, 0,s)){
+      return 0;
+    }
+
+    #ifdef SVS_DBG_HEATMAP
+    svs_heatmap_start(s);
+    #else
+    puts("sys.heatmapStart(): Disabled in this build.");
+    #endif
+    return 1;
+  }
+
+  //sys.heatmapStop();
+  if (sysFuncMatch(argS->callId,"heatmapStop",s)){
+    if (sysExecTypeCheck(argS, argType, 0,s)){
+      return 0;
+    }
+
+    #ifdef SVS_DBG_HEATMAP
+    svs_heatmap_stop();
+    #else
+    puts("sys.heatmapStop(): Disabled in this build.");
+    #endif
+
+    return 1;
+  }
+
+  //sys.heatmapPrint();
+  if (sysFuncMatch(argS->callId,"heatmapPrint",s)){
+    if (sysExecTypeCheck(argS, argType, 0,s)){
+      return 0;
+    }
+
+    #ifdef SVS_DBG_HEATMAP
+    svs_heatmap_print(s);
+    #else
+    puts("sys.heatmapPrint(): Disabled in this build.");
+    #endif
+
+    return 1;
+  }
+
   //sys print(str);
   if (sysFuncMatch(argS->callId,"print",s)){
     argType[1]=1;

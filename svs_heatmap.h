@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2016 Stanislav Brtna
+Copyright (c) 2023 Stanislav Brtna
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,43 +18,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-This is the main include file.
 */
 
-#ifndef SVS_BASICS
-#define SVS_BASICS
+#ifndef SVS_HEATMAP_H
+#define SVS_HEATMAP_H
 
-#ifdef PC
- #include <stdio.h>
- #include <stdint.h>
-#else
- #include <stdint.h>
- #ifdef SVS_USE_PLATFORM_SPECIFIC
- #include "platform_specific.h"
- #endif
+#include "svs.h"
+
+#ifdef SVS_DBG_HEATMAP
+void svs_heatmap_start(svsVM *s);
+void svs_heatmap_mark(uint16_t token, svsVM *s);
+void svs_heatmap_stop();
+void svs_heatmap_print(svsVM *s);
+void svs_heatmap_set_break(uint16_t token, uint16_t line, svsVM *s);
 #endif
-
-#include "svs_limits.h"
-#include "svs_types.h"
-#include "svs_errors.h"
-
-#if !defined(USE_FLOAT) && defined(SVS_USE_ADV_MATH)
-#error "USE_FLOAT required for SVS_USE_ADV_MATH"
-#endif
-
-#include "tokenizer/svs_token_cache.h"
-#include "variables/svs_variables.h"
-#include "svs_misc.h"
-#include "svs_misc_str.h"
-#include "svs_sys_exec.h"
-#include "svs_builtin_calls.h"
-#include "tokenizer/svs_tokenizer.h"
-#include "svs_expr_exec2.h"
-#include "comm_exec/svs_comm_exec.h"
-#include "svs_garbage_collector.h"
-#include "svs_load.h"
-#include "svs_debug.h"
-#include "svs_heatmap.h"
 
 #endif

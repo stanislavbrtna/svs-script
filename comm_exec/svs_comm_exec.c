@@ -129,6 +129,10 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
     return 0;
   }
 
+  #ifdef SVS_DBG_HEATMAP
+  svs_heatmap_mark(currToken, s);
+  #endif
+
   commExDMSG("commExecLoop", currToken, s);
 
   // garbage collection is called each exec loop, but it might do nothing
@@ -497,7 +501,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
       }
       x = varPrac.value.val_s; //výsledek ifu
       currToken = varPrac.tokenId;
-      if (getTokenType(currToken,s) != 6) {
+      if (getTokenType(currToken, s) != 6) {
         errSoft((uint8_t *)"commEx: Syntax error in if statement, missing \")\"", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);

@@ -99,4 +99,6 @@ This file contains the main defines and limits of SVS.
 //#define DBG_DISABLED // enable additional debug
 //#define CACHE_SIMPLE // disable advanced caching
 
+#define SVS_DBG_HEATMAP
+
 #endif
