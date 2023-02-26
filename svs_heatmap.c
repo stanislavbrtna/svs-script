@@ -72,10 +72,7 @@ void svs_heatmap_print(svsVM *s) {
     if(heatmap[i] > maxHeat) {
       maxHeat = heatmap[i];
     }
-
-    
-      //printf("token: %05d line %03d: %u \n", i, line, heatmap[i]);
-      
+    //printf("token: %05d line %03d: %u \n", i, line, heatmap[i]);
   }
 }
 
