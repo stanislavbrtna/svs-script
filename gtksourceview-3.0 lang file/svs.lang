@@ -205,6 +205,20 @@
       <keyword>EV_PRESSED</keyword>
       <keyword>EV_HOLD</keyword>
       <keyword>EV_RELEASED</keyword>
+      
+      <keyword>EV_NONE</keyword>
+      <keyword>EV_PRESSED</keyword>
+      <keyword>EV_HOLD</keyword>
+      <keyword>EV_RELEASED</keyword>
+      
+      <keyword>COL_BORDER</keyword>
+      <keyword>COL_TEXT</keyword>
+      <keyword>COL_BACKGROUND</keyword>
+      <keyword>COL_FILL</keyword>
+      <keyword>COL_ACTIVE</keyword>
+      <keyword>ALIGN_LEFT</keyword>
+      <keyword>ALIGN_RIGHT</keyword>
+      <keyword>ALIGN_CENTER</keyword>
 
       <keyword>SVP_LANG_CZ</keyword>
       <keyword>SVP_LANG_ENG</keyword>
@@ -558,7 +572,6 @@
 
 
       <!-- Automated grep -R "sys\." | sed 's/(.*//' | sed 's/.*[\ :]//' | sed 's/^/<keyword>/' | sed 's/$/<\/keyword>/' | grep "sys\." | sed '$!N; /^\(.*\)\n\1$/!P; D' -->
-
 <keyword>sys.w.cal.init</keyword>
 <keyword>sys.w.cal.select</keyword>
 <keyword>sys.w.cal.update</keyword>
@@ -626,6 +639,10 @@
 <keyword>sys.gui.texDeact</keyword>
 <keyword>sys.gui.setTexFit</keyword>
 <keyword>sys.gui.setTexEd</keyword>
+<keyword>sys.gui.setBlk</keyword>
+<keyword>sys.gui.getBlkStart</keyword>
+<keyword>sys.gui.getBlkEnd</keyword>
+<keyword>sys.gui.setTexBlk</keyword>
 <keyword>sys.gui.setTexPwd</keyword>
 <keyword>sys.gui.getTexPwd</keyword>
 <keyword>sys.gui.setTexAlign</keyword>
@@ -943,6 +960,8 @@
 <keyword>sys.os.gui.getMainScr</keyword>
 <keyword>sys.os.gui.btnCtrl</keyword>
 <keyword>sys.os.gui.handleText</keyword>
+<keyword>sys.os.gui.setKbdStr</keyword>
+<keyword>sys.os.gui.pasteClipboard</keyword>
 <keyword>sys.os.gui.getCPos</keyword>
 <keyword>sys.os.gui.setCPos</keyword>
 <keyword>sys.os.gui.setLandscape</keyword>
@@ -956,6 +975,7 @@
 <keyword>sys.ds.drawLine</keyword>
 <keyword>sys.ds.drawText</keyword>
 <keyword>sys.ds.setTextFit</keyword>
+<keyword>sys.ds.getTextWidth</keyword>
 <keyword>sys.ds.clearArea</keyword>
 <keyword>sys.ds.drawImage</keyword>
 <keyword>sys.ds.getImageW</keyword>
@@ -982,6 +1002,12 @@
 <keyword>sys.os.subProcess</keyword>
 <keyword>sys.os.subProcCWD</keyword>
 <keyword>sys.os.subRetval</keyword>
+<keyword>sys.os.setClipboard</keyword>
+<keyword>sys.os.getClipboard</keyword>
+<keyword>sys.os.settings.rqAuth</keyword>
+<keyword>'sys.os.settings.getAuth</keyword>
+<keyword>sys.os.settings.getAuth</keyword>
+<keyword>sys.os.settings.setTime</keyword>
 <keyword>sys.fs.open</keyword>
 <keyword>sys.fs.readChars</keyword>
 <keyword>sys.fs.writeChars</keyword>
@@ -989,6 +1015,9 @@
 <keyword>sys.fs.writeByte</keyword>
 <keyword>sys.fs.seek</keyword>
 <keyword>sys.fs.truncate</keyword>
+<keyword>sys.fs.tell</keyword>
+<keyword>sys.fs.size</keyword>
+<keyword>sys.fs.close</keyword>
 <keyword>sys.fs.isDir</keyword>
 <keyword>sys.fs.mkDir</keyword>
 <keyword>sys.fs.chDir</keyword>
@@ -996,11 +1025,7 @@
 <keyword>sys.fs.copyStart</keyword>
 <keyword>sys.fs.copyStat</keyword>
 <keyword>sys.fs.copyStop</keyword>
-<keyword>sys.fs.tell</keyword>
-<keyword>sys.fs.size</keyword>
 <keyword>sys.fs.exists</keyword>
-<keyword>sys.fs.seekFill</keyword>
-<keyword>sys.fs.close</keyword>
 <keyword>sys.fs.delete</keyword>
 <keyword>sys.fs.rename</keyword>
 <keyword>sys.fs.find</keyword>
