@@ -548,7 +548,6 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
         break;
       }
     }
-    x -= 2;
     
     // to get just the characters, without end of string
     result->value = (varType)(strNewStreamEnd(s));
