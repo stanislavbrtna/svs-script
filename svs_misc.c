@@ -60,15 +60,13 @@ void svsReset(svsVM *s){
   for (x = 0; x < VAR_TABLE_L; x++) {
     s->varTable[x].value.val_u = 0;
     s->varTable[x].maskId = 0;
+    s->varTable[x].type = SVS_TYPE_UNDEF;
   }
 
   s->varArrayLen = 1;
   for (x = 0; x < SVS_ARRAY_LEN; x++) {
     s->varArray[x].val_u = 0;
-  }
-
-  for (x = 0; x < SVS_ARRAY_LEN; x++) {
-    s->varArrayType[x] = 0;
+    s->varArrayType[x] = SVS_TYPE_UNDEF;
   }
 
   svsSetName((uint8_t *)"def.b", s);
