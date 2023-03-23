@@ -113,7 +113,7 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
       if (result->type == SVS_TYPE_UNDEF) {
         if (getUndefWarning()) {
           printf("WARNING: argument \"arg%u\" on token %d was used in an expression without initialization.\n",
-            getTokenData(index - 1, s).val_u,
+            getTokenData(index, s).val_u,
             result->tokenId
           );
         }
