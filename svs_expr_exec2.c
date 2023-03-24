@@ -141,8 +141,35 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
         }
         index = result->tokenId;
         arrayIndex = result->value;
+
+        if (arrayIndex.val_s < 0) {
+          errSoft((uint8_t *)"ExprExecLvl5 ARRAY: Negative array index!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
+          errSoftSetToken(index, s);
+          return;
+        }
+
+        if (arrayIndex.val_s > s->varArray[arrayBase.val_s].val_s) {
+          errSoft((uint8_t *)"ExprExecLvl5 ARRAY: Array out of bounds!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
+          errSoftSetToken(index, s);
+          return;
+        }
+
         result->value = s->varArray[1 + arrayIndex.val_s + arrayBase.val_s];
         result->type = s->varArrayType[1 + arrayIndex.val_s + arrayBase.val_s];
+
+        if (result->type == SVS_TYPE_UNDEF) {
+          exprExecDMSG("ExprExecLvl5 ARRAY element type UNDEF", result->value.val_s, result->tokenId, s);
+          if (getUndefWarning()) {
+            printf("WARNING: array element %u on token %d was used in an expression without initialization.\n\
+This will produce errors in future releases.\n",
+              arrayIndex.val_u,
+              result->tokenId
+            );
+          }
+          result->type = SVS_TYPE_NUM;
+        }
 
         if (getTokenType(index, s) != SVS_TOKEN_RSQB) {
           errSoft((uint8_t *)"ExprExecLvl5 ARRAY: Missing \"]\")!", s);
