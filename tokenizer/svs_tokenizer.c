@@ -231,6 +231,10 @@ uint8_t tokenInput(uint16_t *index, uint8_t inc) {
     tokenizerFerrFlag = 0;
     vTextPos = 0;
     tokenizerInit = 1;
+
+    for(uint16_t i = 0; i < sizeof(strBuff); i++) {
+      strBuff[i] = 0;
+    }
     strBuff[0] = tokenPreprocessor();
   }
 
@@ -250,9 +254,11 @@ uint8_t tokenInput(uint16_t *index, uint8_t inc) {
       }
       strBuff[0] = tokenPreprocessor();
     }
+    
     if (peek == 1) {
       peek = 0;
     }
+    
     //printf("r1: wat: %s\n", strBuff);
     return 0;
   }
@@ -1245,6 +1251,7 @@ uint8_t tokenParse(svsVM *s) {
           } else {
             if (tokenInput(&posText, 0) != ' ') {
               tokenizerErrorPrint((uint8_t *)"tokenParse: Undefined symbol after function statement!");
+              //printf("symbol: %c %u\n", tokenInput(&posText, 0), tokenInput(&posText, 0));
               return 1;
             }
           }
