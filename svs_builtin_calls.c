@@ -57,7 +57,8 @@ svsBuiltInCallsTableType svsBuiltInCallsTable[] = {
   {"sqrt", SQRT},
   {"ver", VER},
   {"rnd", RND},
-  // debug
+  // system calls
+  {"call", CALL},
   {"dbg", DBG},
   {"gcprof", GCP},
   {"gc", GC},
@@ -853,6 +854,62 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     simpleError((uint8_t *)"rnd(): Hook not presented!", s);
     return 0;
 #endif
+  }
+
+  // call([str] function_name, arguments 0 - 8);
+  if (callId == CALL) {
+    if (count == 0) {
+      simpleError((uint8_t *)"call(): wrong argument count!", s);
+      return 0;
+    }
+
+    if (argType[1] != SVS_TYPE_STR) {
+      simpleError((uint8_t *)"call(): function name must be passed as string!", s);
+      return 0;
+    }
+
+    varRetVal pracVar;
+    comExArgs pracArgs;
+    comExArgs myArgs;
+    uint16_t usedUpOld = 0;
+    uint8_t retFlagOld = s->commRetFlag;
+
+    commArgNull(&myArgs);
+
+    for(uint16_t i = 2; i < count + 1; i++) {
+      myArgs.arg[i - 1] = args[i];
+      myArgs.argType[i - 1] = argType[i];
+    }
+
+    myArgs.usedup = count;
+
+    // storing current arg field
+    commArgCopy(&(s->commArgs), &pracArgs);
+    commArgNull(&(s->commArgs));
+    commArgCopy(&myArgs, &(s->commArgs));
+    varRetValZero(&pracVar);
+
+    //commExec
+    commExec((uint8_t *)(s->stringField + args[1].val_str), s);
+
+    if (errCheck(s)) {
+      return 0;
+    }
+
+    // get results    
+    if (s->commRetFlag) {
+      result->value = s->commRetVal;
+      result->type = s->commRetType;
+    } else {
+      result->value = (varType)((uint32_t)0);
+      result->type = SVS_TYPE_NUM;
+    }
+
+    // put args back
+    commArgCopy(&pracArgs, &s->commArgs);
+    s->commArgs.usedup = usedUpOld;
+    s->commRetFlag = retFlagOld;
+    return 1;
   }
 
   // dbg([num] level)

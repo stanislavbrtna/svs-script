@@ -145,6 +145,12 @@ Note: depends on implememtation of SVS_RND_FUNCTION
 
 ### Built-in system functions
 
+#### Call
+    call([str] function_name, arguments 0 - 8);
+Return: [n/a] function_result
+
+Function *call* calls given function name, ideally passed with & operator. Only 9 arguments (arg0 - arg8) can be used.
+
 #### Dbg
     dbg([num] level);
 Result: none

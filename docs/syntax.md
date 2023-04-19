@@ -347,6 +347,7 @@ SVS has a few built-in functions that can help you accomplish mainly type conver
     sqrt([float]x);
     rnd();
 
+    call([str] function_name, arguments 0 - 8);
     gc([num] to_free);
     ver();
     dbg([num] level);
