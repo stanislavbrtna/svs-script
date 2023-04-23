@@ -171,6 +171,11 @@ uint8_t gcRemoveArray(int32_t id, svsVM *s) {
   uint16_t x = 0;
   uint16_t step = 0;
 
+  if (id >= s->varArrayLen) {
+    printf("removing invalid string!\n");
+    return 1;
+  }
+
   step = s->varArray[id].val_s;
 
   for (x = id; x < s->varArrayLen; x++) {
@@ -196,6 +201,8 @@ uint8_t gcRemoveArray(int32_t id, svsVM *s) {
   }
 
   s->varArrayLen -= step + 1;
+
+  return 0;
 }
 
 void gcCollectArrays(svsVM *s) {
@@ -203,8 +210,11 @@ void gcCollectArrays(svsVM *s) {
     if(gcGetValidArray(x, s)) {
       x += s->varArray[x].val_s;
     } else {
-      gcRemoveArray(x, s);
-      x--;
+      if (gcRemoveArray(x, s)){
+        return;
+      } else {
+        x--;
+      }
     }
   }
 }
