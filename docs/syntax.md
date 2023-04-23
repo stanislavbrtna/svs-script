@@ -185,6 +185,12 @@ When the array memory does not allow creation of new array an error is thrown.
 You can assign values to the cells of an array:
 
     a[7] = 123;
+
+    a[7]++;
+    a[7] += 456;
+    a[7] /= 4;
+
+Since 1.6.4 all types of assignment oparators (also increment and decrement ops) can be used with arrays.
 Or you can read value of cells in an expression:
 
     print("value: " + a[7]);

@@ -197,6 +197,92 @@ function main {
   } else {
     print("FAIL");
   }
+  array a[10];
+  
+  a[5] = 1;
+  a[5]++;
+  if (a[5] != 2) {
+    FAIL = 1;
+    print("++ FAIL 1");
+  }
+  
+  a[5] = 7;
+  a[5]--;
+  if (a[5] != 6) {
+    FAIL = 1;
+    print("-- FAIL 1");
+  }
+  
+  a[5] = 1;
+  a[5] += 4;
+  if (a[5] != 5) {
+    FAIL = 1;
+    print("+= FAIL 1");
+  }
+  
+  a[5] = 1.0;
+  a[5] += 4.0;
+  if (a[5] != 5.0) {
+    FAIL = 1;
+    print("+= FAIL 1");
+  }
+  
+  a[5] = 5;
+  a[5] -= 2;
+  if (a[5] != 3) {
+    FAIL = 1;
+    print("-= FAIL 1");
+  }
+  
+  a[5] = 5.0;
+  a[5] -= 2.0;
+  if (a[5] != 3.0) {
+    FAIL = 1;
+    print("-= FAIL 1");
+  }
+  
+  a[5] = 2;
+  a[5] *= 4;
+  if (a[5] != 8) {
+    FAIL = 1;
+    print("*= FAIL 1");
+  }
+  
+  a[5] = 2.0;
+  a[5] *= 4.0;
+  if (a[5] != 8.0) {
+    FAIL = 1;
+    print("*= FAIL 1");
+  }
+  
+  a[5] = 8;
+  a[5] /= 4;
+  if (a[5] != 2) {
+    FAIL = 1;
+    print("*= FAIL 1");
+  }
+  
+  a[5] = 8.0;
+  a[5] /= 4.0;
+  if (a[5] != 2.0) {
+    FAIL = 1;
+    print("/= FAIL 1");
+  }
+  
+  a[5] = 8;
+  a[5] %= 3;
+  if (a[5] != 2) {
+    FAIL = 1;
+    print("%= FAIL 1");
+  }
+  
+  print("ARRAY inline type ops: ", "");
+  if(FAIL == 0) {
+    print("PASSED");
+  } else {
+    print("FAIL");
+  }
+  
   print("");
   print("Final OP Test result: ", "");
   if(FAIL == 0) {

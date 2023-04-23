@@ -445,7 +445,19 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
 
       currToken++;
 
-      if (getTokenType(currToken, s) != SVS_TOKEN_ASSIGN) {
+      uint8_t signToken  = getTokenType(currToken, s);
+      uint8_t signToken2 = getTokenType(currToken + 1, s);
+
+      if (signToken != SVS_TOKEN_ASSIGN
+          && (signToken != SVS_TOKEN_ADD && signToken2 != SVS_TOKEN_ASSIGN)
+          && (signToken != SVS_TOKEN_SUBT && signToken2 != SVS_TOKEN_ASSIGN)
+          && (signToken != SVS_TOKEN_MUL && signToken2 != SVS_TOKEN_ASSIGN)
+          && (signToken != SVS_TOKEN_DIV && signToken2 != SVS_TOKEN_ASSIGN)
+          && (signToken != SVS_TOKEN_MOD && signToken2 != SVS_TOKEN_ASSIGN)
+
+          && (signToken != SVS_TOKEN_ADD && signToken2 != SVS_TOKEN_ADD)
+          && (signToken != SVS_TOKEN_SUBT && signToken2 != SVS_TOKEN_SUBT)          
+      ) {
         errSoft((uint8_t *)"commEx: Syntax error, missing =.", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
         errSoftSetToken(currToken, s);
@@ -454,20 +466,130 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
 
       currToken++;
 
-      // exec
-      exprExec(currToken, &varPrac, s);
-      if (errCheck(s)) {
-        return 0;
+      uint8_t currentArrayType = s->varArrayType[1 + varGetVal(getTokenData(x, s), s).val_s +  index.val_s];
+      varType currentArrayValue = s->varArray[1 + varGetVal(getTokenData(x, s), s).val_s +  index.val_s];
+
+
+      // ++ --
+      if (signToken == SVS_TOKEN_ADD && signToken2 == SVS_TOKEN_ADD && currentArrayType == SVS_TYPE_NUM) {
+        if (arraySet(varGetVal(getTokenData(x, s), s), index, (varType)(currentArrayValue.val_s + 1), varPrac.type, s)) {
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+          errSoftSetToken(currToken, s);
+          return 0;
+        }
+        currToken++;
+      } else if (signToken == SVS_TOKEN_SUBT && signToken2 == SVS_TOKEN_SUBT && currentArrayType == SVS_TYPE_NUM) {
+        if (arraySet(varGetVal(getTokenData(x, s), s), index, (varType)(currentArrayValue.val_s - 1), varPrac.type, s)) {
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+          errSoftSetToken(currToken, s);
+          return 0;
+        }
+        currToken++;
+      } else {
+
+        if (signToken != SVS_TOKEN_ASSIGN) {
+          currToken++;
+        }
+        // exec
+        exprExec(currToken, &varPrac, s);
+        if (errCheck(s)) {
+          return 0;
+        }
+
+        currToken = varPrac.tokenId;
+
+        uint8_t typesCheck = 0;
+
+
+        if (currentArrayType == varPrac.type) {
+          typesCheck = 1;
+        }
+
+        if (signToken == SVS_TOKEN_ASSIGN) { // =
+          if (arraySet(varGetVal(getTokenData(x, s), s), index, varPrac.value, varPrac.type, s)) {
+            errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+            errSoftSetToken(currToken, s);
+            return 0;
+          }
+        } else if (typesCheck == 0) { // type missmatch error
+          errSoft((uint8_t *)"commEx: ARRAY inline op: Type mismatch", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+          errSoftSetToken(currToken, s);
+          return 0;
+        } else if (signToken == SVS_TOKEN_ADD && signToken2 == SVS_TOKEN_ASSIGN) { // +=
+          if (currentArrayType == SVS_TYPE_NUM) {
+            if (arraySet(varGetVal(getTokenData(x, s), s), index, (varType)(currentArrayValue.val_s + varPrac.value.val_s), varPrac.type, s)) {
+              errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+              errSoftSetToken(currToken, s);
+              return 0;
+            }
+          }
+          if (currentArrayType == SVS_TYPE_FLT) {
+            if (arraySet(varGetVal(getTokenData(x, s), s), index, (varType)(currentArrayValue.val_f + varPrac.value.val_f), varPrac.type, s)) {
+              errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+              errSoftSetToken(currToken, s);
+              return 0;
+            }
+          }
+        } else if (signToken == SVS_TOKEN_SUBT && signToken2 == SVS_TOKEN_ASSIGN) { // -=
+          if (currentArrayType == SVS_TYPE_NUM) {
+            if (arraySet(varGetVal(getTokenData(x, s), s), index, (varType)(currentArrayValue.val_s - varPrac.value.val_s), varPrac.type, s)) {
+              errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+              errSoftSetToken(currToken, s);
+              return 0;
+            }
+          }
+          if (currentArrayType == SVS_TYPE_FLT) {
+            if (arraySet(varGetVal(getTokenData(x, s), s), index, (varType)(currentArrayValue.val_f - varPrac.value.val_f), varPrac.type, s)) {
+              errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+              errSoftSetToken(currToken, s);
+              return 0;
+            }
+          }
+        } else if (signToken == SVS_TOKEN_MUL && signToken2 == SVS_TOKEN_ASSIGN) { // *=
+          if (currentArrayType == SVS_TYPE_NUM) {
+            if (arraySet(varGetVal(getTokenData(x, s), s), index, (varType)(currentArrayValue.val_s * varPrac.value.val_s), varPrac.type, s)) {
+              errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+              errSoftSetToken(currToken, s);
+              return 0;
+            }
+          }
+          if (currentArrayType == SVS_TYPE_FLT) {
+            if (arraySet(varGetVal(getTokenData(x, s), s), index, (varType)(currentArrayValue.val_f * varPrac.value.val_f), varPrac.type, s)) {
+              errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+              errSoftSetToken(currToken, s);
+              return 0;
+            }
+          }
+        } else if (signToken == SVS_TOKEN_DIV && signToken2 == SVS_TOKEN_ASSIGN) { // /=
+          if (currentArrayType == SVS_TYPE_NUM) {
+            if (arraySet(varGetVal(getTokenData(x, s), s), index, (varType)(currentArrayValue.val_s / varPrac.value.val_s), varPrac.type, s)) {
+              errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+              errSoftSetToken(currToken, s);
+              return 0;
+            }
+          }
+          if (currentArrayType == SVS_TYPE_FLT) {
+            if (arraySet(varGetVal(getTokenData(x, s), s), index, (varType)(currentArrayValue.val_f / varPrac.value.val_f), varPrac.type, s)) {
+              errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+              errSoftSetToken(currToken, s);
+              return 0;
+            }
+          }
+          
+        } else if (signToken == SVS_TOKEN_MOD && signToken2 == SVS_TOKEN_ASSIGN && currentArrayType == SVS_TYPE_NUM) { // %=
+          if (arraySet(varGetVal(getTokenData(x, s), s), index, (varType)(currentArrayValue.val_s % varPrac.value.val_s), varPrac.type, s)) {
+            errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+            errSoftSetToken(currToken, s);
+            return 0;
+          }
+        } else {
+          errSoft((uint8_t *)"commEx: ARRAY inline op: Unknown operation", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+          errSoftSetToken(currToken, s);
+          return 0;
+        }
       }
-
-      currToken = varPrac.tokenId;
-
-      if (arraySet(varGetVal(getTokenData(x, s), s), index, varPrac.value, varPrac.type, s)) {
-        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
-        errSoftSetToken(currToken, s);
-        return 0;
-      }
-
 
     } else { //očekáváme "=" / expecting "="
       errSoft((uint8_t *)"commEx: Syntax error next to VAR (missing \"=\", \"++\", \"--\" or \"[\").", s);
