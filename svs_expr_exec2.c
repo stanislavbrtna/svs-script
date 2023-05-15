@@ -510,6 +510,11 @@ void exprExecLvl2(uint16_t index, varRetVal *result, svsVM *s) {
         result->tokenId = prac.tokenId;
         exprExecDMSG("ExprExecLvl2 STR: NUM + STR", result->value.val_s, tokenId, s);
        #endif
+      } else {
+        errSoft((uint8_t *)"Wrong type of argument for an add \"+\" operation.", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)tokenId, s);
+        errSoftSetToken(tokenId, s);
+        return;
       }
     }
   }
