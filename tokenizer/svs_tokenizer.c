@@ -67,7 +67,7 @@ void tokenizerReset(svsVM *s) {
   local_svm = s;
   posToken = 0;
 
-  for(int i=0; i<sizeof(import_dbg_fname); i++) {
+  for(uint32_t i=0; i < sizeof(import_dbg_fname); i++) {
     import_dbg_fname[i] = s->fName[i];
   }
 }
@@ -337,7 +337,7 @@ uint8_t getKeywordExt(uint8_t *out_buffer, uint16_t *posText) {
   uint8_t specChar = 0;
   uint8_t buffer[NAME_LENGTH*2];
 
-  for(int i = 0; i < sizeof(buffer); i++) {
+  for(uint32_t i = 0; i < sizeof(buffer); i++) {
     buffer[i] = 0;
   }
 
@@ -1316,7 +1316,7 @@ uint8_t tokenParse(svsVM *s) {
 
         tokenInput(&posText, 1);
         tokenDMSG_str("import statement, importing:",
-                  posToken, filename);
+                  posToken, (char *) filename);
 
         // store tokenInput state
         uint8_t peek_local;
@@ -1326,7 +1326,7 @@ uint8_t tokenParse(svsVM *s) {
 
         uint8_t import_dbg_fname_local[SVS_FILENAME_L];
 
-        for(int i=0; i<sizeof(import_dbg_fname); i++) {
+        for(uint32_t i = 0; i < sizeof(import_dbg_fname); i++) {
           import_dbg_fname_local[i] = import_dbg_fname[i];
         }
 
@@ -1334,7 +1334,7 @@ uint8_t tokenParse(svsVM *s) {
         vTextPos_local = vTextPos;
         tokenizer_exact_line_local = tokenizer_exact_line;
 
-        for(int i=0; i<sizeof(strBuff_local); i++) {
+        for(uint32_t i = 0; i < sizeof(strBuff_local); i++) {
           strBuff_local[i] = strBuff[i];
         }
 
@@ -1359,7 +1359,7 @@ uint8_t tokenParse(svsVM *s) {
           return 1;
         }
 
-        for(int i=0; i<sizeof(import_dbg_fname); i++) {
+        for(uint32_t i = 0; i < sizeof(import_dbg_fname); i++) {
           import_dbg_fname[i] = filename[i];
         }
 
@@ -1384,11 +1384,11 @@ uint8_t tokenParse(svsVM *s) {
         peek = peek_local;
         vTextPos = vTextPos_local;
 
-        for(int i=0; i<sizeof(strBuff_local); i++) {
+        for(uint32_t i = 0; i < sizeof(strBuff_local); i++) {
           strBuff[i] = strBuff_local[i];
         }
 
-        for(int i=0; i<sizeof(import_dbg_fname); i++) {
+        for(uint32_t i = 0; i < sizeof(import_dbg_fname); i++) {
           import_dbg_fname[i] = import_dbg_fname_local[i];
         }
         

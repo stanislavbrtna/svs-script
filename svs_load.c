@@ -37,7 +37,7 @@ void tokenGetchSetup(uint8_t * fname, uint8_t mode) {
 uint8_t * resolveLocalFiles(uint8_t *name, svsVM *s) {
   if (name[0] == '~') {
     // get relative path to the main file
-    uint16_t len;
+    uint16_t len = 0;
     uint16_t start;
 
     for(uint16_t i=0; i < sizeof(fullPathName); i++) {

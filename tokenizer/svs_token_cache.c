@@ -291,10 +291,12 @@ uint8_t openTokenCache(svsVM *s) {
 
     if (s->cacheFr != FR_OK){
     errMsgS((uint8_t *)"setTokenData: Error while opening cache file!");
+    return 1;
   }
 #endif
     s->vmCacheUsed = 1;
   }
+  return 0;
 }
 
 uint8_t setTokenType(uint16_t tokenId, uint8_t val,  svsVM *s){
