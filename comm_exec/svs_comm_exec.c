@@ -96,6 +96,7 @@ uint16_t commExec(uint8_t * name, svsVM *s) {
     return commExecById(functionGetId(name, s), s);
   } else {
     errSoft((uint8_t *)"commExecById: Function does not exist.", s);
+    printf("Missing function:%s\nFunction table len: %u\n", name, s->funcTableLen);
     return 0;
   }
 }
