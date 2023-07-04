@@ -147,12 +147,18 @@ void garbageCollect(uint16_t count, svsVM *s) {
     return;
   }
 
-  for(x = s->gcSafePoint; x < s->stringFieldLen - 1; x++) {
+  if (s->stringConstMax > s->gcSafePoint) {
+    x = s->stringConstMax;
+  } else {
+    x = s->gcSafePoint;
+  }
+
+  for(; x < s->stringFieldLen - 1; x++) {
     if (0 == s->stringField[x]) { // on the end of previous string
       valid = gcGetValidString(x + 1, s); // check validity of the next one
       if (0 == valid) {
-        //cgDMSG("Non-valid string removed.");
-        //printf("stringRM: %s\n",s->stringField+x+1 );
+        cgDMSG("Non-valid string removed.");
+        //printf("stringRM:(%u) %s\n", x + 1, s->stringField+x+1 );
         gcRemoveString(x + 1, s);
 
         if (count != 0) {
