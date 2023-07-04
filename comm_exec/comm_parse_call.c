@@ -58,8 +58,6 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
   uint16_t usedUp = 0;
   uint16_t usedUpOld = 0;
 
-  uint16_t gcSafePointOld = s->gcSafePoint;
-
   callName = s->stringField + getTokenData(index, s).val_u;
 
   index++;
@@ -112,16 +110,6 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
     commArgCopy(&pracArgs2, &s->commArgs);
 
     s->commArgs.usedup = usedUp;
-
-    //TODO: this seeems to not work as expected...
-    for(uint16_t i = 0; i < s->commArgs.usedup; i++) {
-      if(s->commArgs.argType[i] == SVS_TYPE_STR) {
-        if (s->commArgs.arg[i].val_s > s->gcSafePoint) {
-          s->gcSafePoint = s->commArgs.arg[i].val_u + 1;
-        }
-      }
-    }
-
     index++;
     varRetValZero(&pracVar);
 
@@ -140,8 +128,6 @@ uint16_t commParseCall(uint16_t index, svsVM *s) {
     //navrácení argumentů zpět
     commArgCopy(&pracArgs, &s->commArgs);
     s->commArgs.usedup = usedUpOld;
-
-    s->gcSafePoint =  gcSafePointOld;
 
     return index;
 

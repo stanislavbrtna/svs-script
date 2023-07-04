@@ -36,6 +36,8 @@ uint16_t strNewStreamEnd(svsVM *s);
 
 uint8_t strCmp(uint8_t *a, uint8_t *b);
 
+uint16_t strLenId(uint16_t id, svsVM *s);
+
 VARTYPE i16toString(VARTYPE num, svsVM *s);
 varType floatToString(varType num, svsVM *s);
 #endif

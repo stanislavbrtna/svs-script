@@ -187,6 +187,17 @@ uint8_t strCmp(uint8_t *a, uint8_t *b) {
   return 0;
 }
 
+
+uint16_t strLenId(uint16_t id, svsVM *s) {
+  uint16_t i = 0;
+  while(s->stringField[i + id] == 0 && i < s->stringFieldLen) {
+    i++;
+  }
+
+  return i;
+}
+
+
 VARTYPE i16toString(VARTYPE num, svsVM *s) {
   errStruct err;
   err.errString = "";

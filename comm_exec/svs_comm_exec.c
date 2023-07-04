@@ -93,7 +93,22 @@ uint16_t commExecFromStart(svsVM *s) {
 
 uint16_t commExec(uint8_t * name, svsVM *s) {
   if (functionExists(name, s)) {
-    return commExecById(functionGetId(name, s), s);
+    uint16_t gcSafePointOld = s->gcSafePoint;
+
+    for(uint16_t i = 0; i <= s->commArgs.usedup; i++) {
+      if(s->commArgs.argType[i] == SVS_TYPE_STR) {
+        uint16_t len = strLenId(s->commArgs.arg[i].val_u, s);
+        if (s->commArgs.arg[i].val_u + len > s->gcSafePoint) {
+          //printf("MOVING SAFEPOINT: from: %u to: %u param:%u str:%s\n", s->gcSafePoint, s->commArgs.arg[i].val_u + len + 1, i, (uint8_t*)((uint32_t)s->stringField+s->commArgs.arg[i].val_u));
+          s->gcSafePoint = s->commArgs.arg[i].val_u + 1 + len;
+        }
+      }
+    }
+
+    uint16_t res = commExecById(functionGetId(name, s), s);
+    s->gcSafePoint = gcSafePointOld;
+
+    return res;
   } else {
     errSoft((uint8_t *)"commExecById: Function does not exist.", s);
     printf("Missing function:%s\nFunction table len: %u\n", name, s->funcTableLen);
