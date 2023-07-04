@@ -924,11 +924,22 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       return 0;
     }
 
-    if (args[1].val_s != -1) {
+    if (args[1].val_s == 1) {
       s->globalDebug = args[1].val_s;
-    } else {
+    }
+    
+    if (args[1].val_s == -1) {
       svsPrintUsedUp(s);
     }
+
+    if (args[1].val_s == -2) {
+      varTablePrint(s);
+    }
+
+    if (args[1].val_s == -3) {
+      strTablePrint(s);
+    }
+    
     
 
     result->value = (varType)((uint32_t)0);

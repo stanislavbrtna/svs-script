@@ -55,7 +55,7 @@ void varTablePrint(svsVM *s) {
 
 void strTablePrint(svsVM *s) {
   int x = 0;
-  puts("stringTable:");
+  puts("StringTable:");
   printf("%u: ", x);
   while (x < s->stringFieldLen) {
     if (s->stringField[x] != 0) {
@@ -65,6 +65,7 @@ void strTablePrint(svsVM *s) {
     }
     x++;
   }
+  printf("\n--------\n");
 }
 
 void svsPrintUsedUp(svsVM *s) {
