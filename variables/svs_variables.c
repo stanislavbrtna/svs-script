@@ -172,7 +172,7 @@ uint8_t gcRemoveArray(int32_t id, svsVM *s) {
   uint16_t step = 0;
 
   if (id >= s->varArrayLen) {
-    printf("removing invalid string!\n");
+    printf("%s: trying to remove invalid array!\n", __FUNCTION__);
     return 1;
   }
 
