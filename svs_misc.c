@@ -96,7 +96,7 @@ void svsInfo(svsVM *s) {
 
 void svsSetName(uint8_t * name, svsVM *s) {
   uint16_t x;
-  for(x = 0; x < NAME_LENGTH; x++) {
+  for(x = 0; x < SVS_FILE_NAME_L; x++) {
     s->vmName[x] = name[x];
   }
 }
