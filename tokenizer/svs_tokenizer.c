@@ -876,7 +876,7 @@ uint8_t tokenParse(svsVM *s) {
       INCREMENT_STATIC_STRINGS
 
       while((tokenInput(&posText, 0) != '\"') && (tokenInput(&posText, 0) != 0)) {
-        if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
+        if (s->stringFieldLen >= (s->stringFieldMax - 1)) {
           tokenizerErrorPrint((uint8_t *)"Tokenizer: String field full!");
           return 1;
         }
@@ -939,7 +939,7 @@ uint8_t tokenParse(svsVM *s) {
       INCREMENT_STATIC_STRINGS
 
       while((isRegChar(tokenInput(&posText, 0)) || isNumber(tokenInput(&posText, 0))) && (tokenInput(&posText, 0) != 0)) {
-        if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
+        if (s->stringFieldLen >= (s->stringFieldMax - 1)) {
           tokenizerErrorPrint((uint8_t *)"Tokenizer: String field full!");
           return 1;
         }

@@ -22,13 +22,18 @@ SOFTWARE.
 
 #include "svs_misc.h"
 
-void svsReset(svsVM *s){
+void svsReset(svsVM *s) {
   uint32_t x;
   s->funcTableLen = 0;
   s->varTableLen = 0;
   s->stringFieldLen = 0;
   s->stringConstMax = 0;
   s->gcSafePoint = 0;
+
+#ifndef SVS_USE_SEPARATE_STRING_FIELD
+  s->stringFieldMax = STRING_FIELD_L + 1;
+#endif
+
 
 #ifdef PC
   s->vmCache = 0;
@@ -64,6 +69,7 @@ void svsReset(svsVM *s){
   }
 
   s->varArrayLen = 1;
+
   for (x = 0; x < SVS_ARRAY_LEN; x++) {
     s->varArray[x].val_u = 0;
     s->varArrayType[x] = SVS_TYPE_UNDEF;
@@ -106,6 +112,15 @@ void svsSetFileName(uint8_t * name, svsVM *s) {
   for(x = 0; x < SVS_FILE_NAME_L; x++) {
     s->fName[x] = name[x];
   }
+}
+
+void svsSetStringField(uint8_t * strirngField, uint32_t len, svsVM *s) {
+#ifdef SVS_USE_SEPARATE_STRING_FIELD
+  s->stringField    = strirngField;
+  s->stringFieldMax = len; 
+#else
+  printf("svsSetStringField: SVS_USE_SEPARATE_STRING_FIELD not enambled in this build!\n");
+#endif
 }
 
 uint8_t syscallExists(uint8_t *name, svsVM *s) {

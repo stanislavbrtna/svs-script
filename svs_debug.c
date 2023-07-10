@@ -78,7 +78,7 @@ void svsPrintUsedUp(svsVM *s) {
   printf("    varTableLen:     %u of %u\n", s->varTableLen, VAR_TABLE_L);
   printf("    varArrayLen:     %u of %u\n", s->varArrayLen, SVS_ARRAY_LEN);
   printf("Strings:\n");
-  printf("    stringFieldLen:  %u of %u\n", s->stringFieldLen, STRING_FIELD_L);
+  printf("    stringFieldLen:  %u of %u\n", s->stringFieldLen, s->stringFieldMax);
   printf("    stringConstMax:  %u\n", s->stringConstMax);
   printf("    gcSafePoint:     %u\n", s->gcSafePoint);
   printf("Caching:\n");

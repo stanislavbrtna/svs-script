@@ -34,6 +34,7 @@ void pcBasicWrapInit();
 int main(int argc, char *argv[]) {
   svsVM s;
   varRetVal result;
+  uint8_t stringField[STRING_FIELD_L];
   time_t t;
   uint8_t dbginfo = 0;
   int retval = 0;
@@ -43,6 +44,7 @@ int main(int argc, char *argv[]) {
   setCommExDebug(0);
   setExprExecDebug(0);
   pcBasicWrapInit();
+  svsSetStringField( stringField, sizeof(stringField), &s);
   progname = argv[1];
   if (argc == 1) {
   printf("Usage:\n%s <fname> [-t] [-i]\n\

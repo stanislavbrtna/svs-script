@@ -153,7 +153,14 @@ typedef struct {
   varTableType varTable[VAR_TABLE_L+1]; // indexed from 1
   uint16_t varTableLen; // number of variables
 
-  uint8_t stringField[STRING_FIELD_L+1]; // indexed from 0
+
+#ifdef SVS_USE_SEPARATE_STRING_FIELD
+  uint8_t *stringField; // indexed from 0
+  uint32_t stringFieldMax;
+#else
+  uint8_t stringField[STRING_FIELD_L + 1]; // indexed from 0
+  uint32_t stringFieldMax;
+#endif
   
   // number of used chars, always points to the next free char
   uint16_t stringFieldLen;

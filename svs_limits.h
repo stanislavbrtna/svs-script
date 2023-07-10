@@ -27,8 +27,8 @@ This file contains the main defines and limits of SVS.
 
 /*============================= Versions =====================================*/
 
-#define SVS_VERSION  "1.6.5"
-#define SVS_VERSION_NUM 1650
+#define SVS_VERSION  "1.7.0"
+#define SVS_VERSION_NUM 1700
 
 /*============================= Local Config =================================*/
 
@@ -64,6 +64,8 @@ This file contains the main defines and limits of SVS.
 #ifndef VAR_TABLE_L
   #define VAR_TABLE_L 200 // počet promněnných / max number of variables
 #endif
+
+#define SVS_USE_SEPARATE_STRING_FIELD // when defined, string field must be stored outside of the svm struct
 
 #ifndef STRING_FIELD_L
   #define STRING_FIELD_L 30000 // počet znaků stringové pamněti / max number of characters in string memory

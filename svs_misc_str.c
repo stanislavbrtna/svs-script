@@ -30,7 +30,7 @@ uint16_t strNew(uint8_t *index, svsVM *s) {
   retval = s->stringFieldLen;
 
   while(index[x] != 0) {
-    if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
+    if (s->stringFieldLen >= (s->stringFieldMax - 1)) {
       errSoft((uint8_t *)"strNew: String field full!", s);
       return 0;
     }
@@ -51,7 +51,7 @@ uint8_t *strNewP(uint8_t *index, svsVM *s) {
   retval = &(s->stringField[s->stringFieldLen]);
 
   while(index[x] != 0) {
-    if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
+    if (s->stringFieldLen >= (s->stringFieldMax - 1)) {
       errSoft((uint8_t *)"strNew: String field full!", s);
       return 0;
     }
@@ -71,7 +71,7 @@ uint16_t strAdd(uint16_t index1, uint16_t index2, svsVM *s) {
   retval = s->stringFieldLen;
 
   while (s->stringField[index1+x] != 0) {
-    if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
+    if (s->stringFieldLen >= (s->stringFieldMax - 1)) {
       errSoft((uint8_t *)"strAdd: String field full!", s);
       return 0;
     }
@@ -83,7 +83,7 @@ uint16_t strAdd(uint16_t index1, uint16_t index2, svsVM *s) {
   x = 0;
 
   while (s->stringField[index2 + x] != 0) {
-    if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
+    if (s->stringFieldLen >= (s->stringFieldMax - 1)) {
       errSoft((uint8_t *)"strAdd: String field full!", s);
       return 0;
     }
@@ -105,7 +105,7 @@ uint16_t strInsert(uint16_t index1, uint16_t index2, uint16_t pos, svsVM *s) {
 
   // fill buffer with source string upto pos
   while ((s->stringField[index1 + x] != 0) && (x != pos)) {
-    if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
+    if (s->stringFieldLen >= (s->stringFieldMax - 1)) {
       errSoft((uint8_t *)"strInsert: String field full!", s);
       return 0;
     }
@@ -120,7 +120,7 @@ uint16_t strInsert(uint16_t index1, uint16_t index2, uint16_t pos, svsVM *s) {
 
   // instert string index 2
   while (s->stringField[index2 + x] != 0) {
-    if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
+    if (s->stringFieldLen >= (s->stringFieldMax - 1)) {
       errSoft((uint8_t *)"strInsert: String field full!", s);
       return 0;
     }
@@ -133,7 +133,7 @@ uint16_t strInsert(uint16_t index1, uint16_t index2, uint16_t pos, svsVM *s) {
   x = cont;
 
   while(s->stringField[index1 + x] != 0) {
-    if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
+    if (s->stringFieldLen >= (s->stringFieldMax - 1)) {
       errSoft((uint8_t *)"strInsert: String field full!", s);
       return 0;
     }
@@ -153,7 +153,7 @@ void strNewStreamInit(svsVM *s) {
 }
 
 uint8_t strNewStreamPush(uint8_t c, svsVM *s) {
-  if (s->stringFieldLen >= (STRING_FIELD_L - 100)) {
+  if (s->stringFieldLen >= (s->stringFieldMax - 10)) {
     return 1;
   }
   s->stringField[s->stringFieldLen] = c;
@@ -233,7 +233,7 @@ VARTYPE i16toString(VARTYPE num, svsVM *s) {
 
   a = 0;
   while(i[a] != 0) {
-    if (s->stringFieldLen >= (STRING_FIELD_L - 1)) {
+    if (s->stringFieldLen >= (s->stringFieldMax - 1)) {
       err.errString = "svsMisc: i16toString: String field full!";
       err.tokenId = 0;
       errMsg(err);

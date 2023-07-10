@@ -138,8 +138,8 @@ void garbageCollect(uint16_t count, svsVM *s) {
   }
   gc_start = s->stringFieldLen;
 
-  if (STRING_FIELD_L < s->stringFieldLen) {
-    errMsgS((uint8_t *)"garbageCollect: String field invalid! (STRING_FIELD_L<stringFieldLen)");
+  if (s->stringFieldMax < s->stringFieldLen) {
+    errMsgS((uint8_t *)"garbageCollect: String field invalid! (s->stringFieldMax<stringFieldLen)");
   }
 
   if (0 == s->stringFieldLen) {
@@ -171,7 +171,7 @@ void garbageCollect(uint16_t count, svsVM *s) {
   }
 
   if (s->profilerEnabled) {
-    printf(" Collecting Done! %u/%u occupied %u freed.\n", s->stringFieldLen, STRING_FIELD_L, gc_start-s->stringFieldLen);
+    printf(" Collecting Done! %u/%u occupied %u freed.\n", s->stringFieldLen, s->stringFieldMax, gc_start-s->stringFieldLen);
   }
   if (valid == 1) {
     cgDMSG("All strings valid.");

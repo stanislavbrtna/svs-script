@@ -35,11 +35,12 @@ uint8_t functionGetId(uint8_t *name, svsVM *s);
 uint8_t isNumber(uint8_t x);
 uint8_t isRegChar(uint8_t x);
 
-
 void varRetValZero(varRetVal *x);
 void svsReset(svsVM *s);
 void svsSetName( uint8_t * name, svsVM *s);
 void svsSetFileName( uint8_t * name, svsVM *s);
+
+void svsSetStringField(uint8_t * strirngField, uint32_t len, svsVM *s);
 
 void svsInfo(svsVM *s);
 
