@@ -86,7 +86,7 @@ uint8_t sysExecTypeCheck(argStruct *argS, uint8_t *argType, uint8_t argCnt, svsV
   uint8_t x;
   if (argS->usedup == argCnt) {
     for (x = 1; x <= argCnt; x++) {
-      if ((argS->argType[x] != argType[x]) && (argType[x] != 3)) {
+      if ((argS->argType[x] != argType[x]) && (argType[x] != SVS_TYPE_UNDEF)) {
         errSoft((uint8_t *)"sysExecTypeCheck: Wrong type of argument for SYS function!", s);
         errSoftSetParam(s->syscallTable[(uint16_t)(argS->callId.val_u)].sysCallName, (varType)((uint16_t)0), s);
         errSoftSetParam((uint8_t *)"Argument number", (varType)((uint16_t)x), s);
