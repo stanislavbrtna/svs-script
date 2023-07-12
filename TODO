@@ -1,2 +1,5 @@
 Move array functions to one place.
 Standard library would be nice.
+
+Fix bugs:
+ - loading svs file with comment on the last line crashes tokenizer on umc
