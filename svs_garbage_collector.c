@@ -179,19 +179,17 @@ void garbageCollect(uint16_t count, svsVM *s) {
         //printf("stringRM:(%u) %s\n", x + 1, s->stringField+x+1 );
         remove_start = x + 1;
         chain_remove = 1;
-
-        if (count != 0) {
-          if (s->stringFieldLen < (gc_start - count)) {
-            break;
-          }
-        }
       }
 
       if (valid == 1 && chain_remove == 1) {
         gcRemoveStrIdLen(remove_start, x - remove_start + 1, s);
         chain_remove = 0;
 
-        x = remove_start; // back to the start of what was removed
+        if (count != 0) {
+          if (s->stringFieldLen < (gc_start - count)) {
+            break;
+          }
+        }
       }
     }
   }
@@ -204,6 +202,7 @@ void garbageCollect(uint16_t count, svsVM *s) {
     cgDMSG("All strings valid.");
     return;
   }
+
 }
 
 
