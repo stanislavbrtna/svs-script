@@ -939,6 +939,10 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     if (args[1].val_s == -3) {
       strTablePrint(s);
     }
+
+    if (args[1].val_s == -4) {
+      gcCheckField(s);
+    }
     
     
 
