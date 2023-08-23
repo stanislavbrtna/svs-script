@@ -76,8 +76,8 @@ uint8_t gcGetValidString(uint16_t strId, svsVM *s) {
   return 0;
 }
 
-uint32_t gcGetLen(uint32_t strId, svsVM *s) {
-  uint32_t x = 0;
+uint16_t gcGetLen(uint16_t strId, svsVM *s) {
+  uint16_t x = 0;
 
   x = strId;
   while (s->stringField[x] != 0) {
@@ -87,8 +87,8 @@ uint32_t gcGetLen(uint32_t strId, svsVM *s) {
   return x - strId + 1;
 }
 
-uint8_t gcRemoveStrIdLen(uint16_t strId, uint32_t str_len, svsVM *s) {
-  uint32_t x = 0;
+uint8_t gcRemoveStrIdLen(uint16_t strId, uint16_t str_len, svsVM *s) {
+  uint16_t x = 0;
 
   for(x = strId + str_len; x < s->stringFieldLen; x++) {
     s->stringField[x - str_len] = s->stringField[x];
@@ -100,14 +100,14 @@ uint8_t gcRemoveStrIdLen(uint16_t strId, uint32_t str_len, svsVM *s) {
     if (s->varTable[x].type == 1) {
       if (s->varTable[x].value.val_str > strId) {
         // modify reference
-        s->varTable[x].value.val_str = ((uint16_t)(varGetVal((varType)x, s).val_str - str_len));
+        s->varTable[x].value.val_str -= str_len;
       }
     }
   }
 
   //array
   for(x = 1; x <= s->varArrayLen; x++) {
-    if (s->varArrayType[x] == 1) {
+    if (s->varArrayType[x] == SVS_TYPE_STR) {
       if (s->varArray[x].val_str > strId) {
         s->varArray[x].val_str -= str_len;
       }
@@ -118,7 +118,7 @@ uint8_t gcRemoveStrIdLen(uint16_t strId, uint32_t str_len, svsVM *s) {
     pscg_garbage_walkaround(
                        (void *)((uint32_t)strId + (uint32_t)(s->stringField)),
                        str_len,
-                       (void *)((uint32_t)s->stringField + (uint32_t)s->stringFieldLen)
+                       (void *)((uint32_t)s->stringField + (uint32_t)s->stringFieldMax)
     );
   #endif
 
@@ -130,7 +130,7 @@ uint8_t gcRemoveString(uint16_t strId, svsVM *s) {
   uint16_t x = 0;
   uint16_t str_len = 0;
 
-  str_len = gcGetLen((uint32_t)strId, s);
+  str_len = gcGetLen(strId, s);
 
   gcRemoveStrIdLen(strId, str_len, s);
 }
@@ -163,12 +163,15 @@ void garbageCollect(uint16_t count, svsVM *s) {
 
   if (s->stringConstMax > s->gcSafePoint) {
     x = s->stringConstMax;
+    cgDMSG("string max used");
   } else {
     x = s->gcSafePoint;
+    cgDMSG("safepoint used");
   }
 
   uint16_t remove_start = 0;
   uint8_t chain_remove = 0;
+  uint16_t chained = 0;
 
   for(; x < s->stringFieldLen - 1; x++) {
     if (0 == s->stringField[x]) { // on the end of previous string
@@ -176,20 +179,29 @@ void garbageCollect(uint16_t count, svsVM *s) {
       if (0 == valid && chain_remove == 0) {
         all_valid = 0;
         cgDMSG("Non-valid string removed.");
-        //printf("stringRM:(%u) %s\n", x + 1, s->stringField+x+1 );
         remove_start = x + 1;
         chain_remove = 1;
+        chained = 0;
+      }
+
+      if (0 == valid && chain_remove == 1) {
+        chained ++;
       }
 
       if (valid == 1 && chain_remove == 1) {
-        gcRemoveStrIdLen(remove_start, x - remove_start + 1, s);
-        chain_remove = 0;
 
-        if (count != 0) {
-          if (s->stringFieldLen < (gc_start - count)) {
-            break;
-          }
-        }
+        //printf("Removing strings: %u, len: %u in chain: %u\n", remove_start, x - remove_start + 1, chained);
+        uint16_t len = x - remove_start + 1;
+
+        gcRemoveStrIdLen(remove_start, len, s);
+        chain_remove = 0;
+        x = remove_start; 
+
+        if (len > count) {
+          break;
+        } else {
+          count -= len;
+        }       
       }
     }
   }
@@ -202,7 +214,6 @@ void garbageCollect(uint16_t count, svsVM *s) {
     cgDMSG("All strings valid.");
     return;
   }
-
 }
 
 
@@ -228,7 +239,7 @@ void gcCheckField(svsVM *s) {
       if (valid == 0) {
         all_valid = 0;
       }
-      printf("id: %u, valid: %u\n", x + 1, valid);
+      printf("id: %u, valid: %u, len:%u\n", x + 1, valid, gcGetLen(x + 1, s));
       if(x >= s->gcSafePoint && safepoint_shown == 0) {
         printf("=== GC safepoint! ==\n");
         printf("Everything below can be safely removed.\n");

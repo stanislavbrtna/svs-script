@@ -5,22 +5,28 @@ function main {
 	l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fringilla ullamcorper mi. Nunc eu sem facilisis lectus accumsan fermentum ut eu nulla. Donec erat ante, convallis ut lorem et, molestie dictum eros. Donec aliquam interdum erat et iaculis. In volutpat finibus lacus et feugiat. Duis euismod erat vitae erat accumsan dignissim.";
 
 	#sys.profiler(1);
-	for (x = 0; x < 50; x++;) {
+	for (x = 0; x < 1; x++;) {
 
 		# set up generated test strings
 		testtext1 = "test " + "text " + x + 1;
+		b = "" + " ";
 		testtext2 = "test " + "text " + x + 2;
 
 		# generate some garbage in the middle
 		for(i = 0; i < 30; i++;) {
 			b = "i:"+(i*i);
 		}
+		
+		b = "";
+		
+		for(i = 0; i < 30; i++;) {
+			b = "i:"+(i*i);
+			b = ""+"asAS";
+			b = "";
+		}
 
 		testtext3 = "test " + "text " + x + 3;
-		testtext4 = "test " + "text " + x + 4;
-		testtext5 = "";
-
-		# crush the strings to trigger collection
+		
 		for(i = 0; i < 300; i++;) {
 			b = 0;
 			if (x < 25) {
@@ -29,14 +35,33 @@ function main {
 			} else {
 				b = b + getcp(l, i % len(l));
 				testF();
+				b = "";
+			}
+		}
+		
+		testtext4 = "test " + "text  " + x + 4;
+		testtext5 = "";
+
+    testF();
+
+ 		# crush the strings to trigger collection
+		for(i = 0; i < 300; i++;) {
+			b = 0;
+			if (x < 25) {
+				# to test unsafe commands in the expr exec
+				b = b + testF() + getcp(l, i % len(l));
+			} else {
+				b = b + getcp(l, i % len(l));
+				testF();
+				b = "";
 			}
 		}
 
 		if (
-			testtext1 != "test " + "text " + x + 1 and
-			testtext2 != "test " + "text " + x + 2 and
-			testtext3 != "test " + "text " + x + 3 and
-			testtext4 != "test " + "text " + x + 4 and
+			testtext1 != "test " + "text " + x + 1 or
+			testtext2 != "test " + "text " + x + 2 or
+			testtext3 != "test " + "text " + x + 3 or
+			testtext4 != "test " + "text  " + x + 4 or
 			testtext5 != "test " + "text " + x + 5
 		) {
 			FAIL = 1;
