@@ -25,8 +25,8 @@ This is the garbage collector for strings.
 #include "svs_garbage_collector.h"
 
 #ifndef CMDLINE
-void pscg_garbage_walkaround(uint8_t *strId, uint32_t str_len, uint8_t *max);
-uint8_t pscg_garbage_walkaround2(uint8_t *strId);
+void gr2_garbage_workaround(uint8_t *strId, uint32_t str_len, uint8_t *max);
+uint8_t gr2_garbage_workaround2(uint8_t *strId);
 #endif
 
 uint8_t gcDebug = 0;
@@ -49,7 +49,7 @@ uint8_t gcGetValidString(uint16_t strId, svsVM *s) {
   }
 
   #ifndef CMDLINE
-  if (pscg_garbage_walkaround2( (uint8_t*) ((uint32_t)strId + (uint32_t)(s->stringField)))) {
+  if (gr2_garbage_workaround2( (uint8_t*) ((uint32_t)strId + (uint32_t)(s->stringField)))) {
     return 1;
   }
   #endif
@@ -115,7 +115,7 @@ uint8_t gcRemoveStrIdLen(uint16_t strId, uint16_t str_len, svsVM *s) {
   }
 
   #ifndef CMDLINE
-    pscg_garbage_walkaround(
+    gr2_garbage_workaround(
                        (void *)((uint32_t)strId + (uint32_t)(s->stringField)),
                        str_len,
                        (void *)((uint32_t)s->stringField + (uint32_t)s->stringFieldMax)
