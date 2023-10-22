@@ -38,29 +38,31 @@ void setCacheDebug(uint8_t level){
 
 
 #if TOKEN_CACHE_DISABLED == 1
-uint8_t getTokenType(uint16_t tokenId, svsVM *s){
-  if(tokenId<TOKEN_LENGTH){
+uint8_t getTokenType(uint16_t tokenId, svsVM *s) {
+  if(tokenId < TOKEN_LENGTH) {
     return s->tokenCache[tokenId].Type;
   }else{
     errMsgS("getTokenType: Token field index invalid!");
   }
+  return 0;
 }
 
-uint8_t setTokenType(uint16_t tokenId, uint8_t val, svsVM *s){
-  if(tokenId<TOKEN_LENGTH){
-    s->tokenCache[tokenId].Type=val;
-  }else{
+uint8_t setTokenType(uint16_t tokenId, uint8_t val, svsVM *s) {
+  if(tokenId<TOKEN_LENGTH) {
+    s->tokenCache[tokenId].Type = val;
+  } else {
     errMsgS("setTokenType: Token field index invalid!");
   }
+  return 0;
 }
 
-VARTYPE getTokenData(uint16_t tokenId, svsVM *s){
-  if(tokenId<TOKEN_LENGTH){
+VARTYPE getTokenData(uint16_t tokenId, svsVM *s) {
+  if(tokenId<TOKEN_LENGTH) {
     return s->tokenCache[tokenId].Data;
-  }else{
+  } else {
     errMsgS("getTokenData: Token field index invalid!");
   }
-
+  return (varType) 0;
 }
 
 uint8_t setTokenData(uint16_t tokenId, VARTYPE val, svsVM *s){
@@ -69,6 +71,7 @@ uint8_t setTokenData(uint16_t tokenId, VARTYPE val, svsVM *s){
   }else{
     errMsgS("setTokenData: Token field index invalid!");
   }
+  return 0;
 }
 
 uint16_t getTokenMax(svsVM *s){

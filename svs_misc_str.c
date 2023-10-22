@@ -263,7 +263,7 @@ varType floatToString(varType num, svsVM *s) {
   //               -999999999999.99999
 
   if (errCheck(s)) {
-    return retval;
+    return (varType) 0;
   }
 
   if (num.val_f == 0) {

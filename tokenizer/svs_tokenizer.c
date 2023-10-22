@@ -499,7 +499,8 @@ uint8_t tokenParse(svsVM *s) {
         floatFound = 1;
         float_dp   = 1;
         tokenInput(&posText, 1);
-        numPrac.val_f = (float) numPrac.val_s;
+        float w = (float) numPrac.val_s;
+        numPrac.val_f = w;
       #else
         tokenizerErrorPrint("tokenParse: Float not supported in this build!");
         return 1;
@@ -549,7 +550,8 @@ uint8_t tokenParse(svsVM *s) {
               floatFound = 1;
               float_dp   = 1;
               tokenInput(&posText, 1);
-              numPrac.val_f = (float)numPrac.val_s;
+              float w = (float) numPrac.val_s;
+              numPrac.val_f = w;
             #else
               tokenizerErrorPrint("tokenParse: Float not supported in this build!");
               return 1;
