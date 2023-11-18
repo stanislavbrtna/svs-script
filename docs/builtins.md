@@ -161,7 +161,7 @@ Function *dbg* enables expression and command debug output.
     gc([num] to_free);
 Result: none
 
-Function *gc([num] to_free)* performs garbage collection of unused strings. Argument to_free specifies how many chars will be collected, if zero is passed, full garbage collection occurs.
+Function *gc([num] to_free)* performs garbage collection of unused strings. Argument to_free specifies how many chars will be collected. If -1 is passed, full garbage collection occurs. If zero is passed and string field empty space is smaller than GC_THRESHOLD, full garbage collection is also performed.
 
     gc([num] to_free);
 

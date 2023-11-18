@@ -982,7 +982,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       return 0;
     }
 
-    garbageCollect(args[1].val_u,s);
+    garbageCollect(args[1].val_s,s);
 
     result->value = (varType)((uint32_t)0);
     result->type = SVS_TYPE_NUM;

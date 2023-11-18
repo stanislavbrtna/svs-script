@@ -135,16 +135,23 @@ uint8_t gcRemoveString(uint16_t strId, svsVM *s) {
   gcRemoveStrIdLen(strId, str_len, s);
 }
 
-void garbageCollect(uint16_t count, svsVM *s) {
+void garbageCollect(int32_t count, svsVM *s) {
   uint16_t x = 0;
   uint8_t valid = 0;
   uint8_t all_valid = 1;
   uint16_t gc_start;
+  uint8_t full = 0;
 
-  if (s->stringFieldLen + 1 < GC_THRESHOLD) {
-    if (count == 0) {
+  if (count == 0) {
+    if (s->stringFieldLen + 1 < GC_THRESHOLD) {
       return;
+    } else {
+      full = 1;
     }
+  }
+
+  if (count == -1) {
+    full = 1;
   }
 
   if (s->profilerEnabled) {
@@ -196,12 +203,14 @@ void garbageCollect(uint16_t count, svsVM *s) {
         gcRemoveStrIdLen(remove_start, len, s);
         chain_remove = 0;
         x = remove_start; 
-
-        if (len > count) {
-          break;
-        } else {
-          count -= len;
-        }       
+        
+        if (full == 0) {
+          if (len > count) {
+            break;
+          } else {
+            count -= len;
+          }
+        }
       }
     }
   }

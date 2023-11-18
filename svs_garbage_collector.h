@@ -27,7 +27,7 @@ SOFTWARE.
 
 void setGcDebug(uint8_t level);
 uint8_t gcRemoveString(uint16_t strId, svsVM *s);
-void garbageCollect(uint16_t count, svsVM *s);
+void garbageCollect(int32_t count, svsVM *s);
 void gcCheckField(svsVM *s); // debug function to inspect string field
 
 #endif
