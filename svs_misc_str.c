@@ -45,6 +45,7 @@ uint16_t strNew(uint8_t *index, svsVM *s) {
 }
 
 // returns c pointer to the new string
+// Given pointer will not be valid after garbage collection
 uint8_t *strNewP(uint8_t *index, svsVM *s) {
   uint16_t x = 0;
   uint8_t *retval;
@@ -64,6 +65,28 @@ uint8_t *strNewP(uint8_t *index, svsVM *s) {
   s->stringFieldLen++;
   return retval;
 }
+
+// allocates new string with given lenght, returns c pointer to the new string
+// sets the str_id pointer to the svs string index of the new string
+// Given pointer will not be valid after garbage collection
+uint8_t *strNewPLen(uint32_t len, uint16_t * str_id, svsVM *s) {
+  uint16_t x = 0;
+  uint8_t *retval;
+  retval = &(s->stringField[s->stringFieldLen]);
+
+  if (s->stringFieldLen + len >= (s->stringFieldMax - 1)) {
+    errSoft((uint8_t *)"strNew: String field full!", s);
+    return 0;
+  }
+
+  *str_id = s->stringFieldLen;
+
+  s->stringFieldLen += len;
+  s->stringField[s->stringFieldLen] = 0;
+  s->stringFieldLen++;
+  return retval;
+}
+
 
 uint16_t strAdd(uint16_t index1, uint16_t index2, svsVM *s) {
   uint16_t x = 0;
