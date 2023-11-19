@@ -105,6 +105,12 @@ Return: [float] result
 
 Function *atan* returns the arc tangent of given angle.
 
+#### Atan2
+    atan2([float]y_in_radians, [float]x_in_radians);
+Return: [float] result
+
+Function *atan2* the 2-argument arctangent.
+
 #### Log
     log([float]x);
 Return: [float] result

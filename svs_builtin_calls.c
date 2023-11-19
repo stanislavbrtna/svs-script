@@ -50,6 +50,7 @@ svsBuiltInCallsTableType svsBuiltInCallsTable[] = {
   {"cos", COS},
   {"tan", TAN},
   {"atan", ATAN},
+  {"atan2", ATAN2},
   {"log", LOG},
   {"exp", EXP},
   {"pow", POW},
@@ -731,6 +732,28 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     }
 
     result->value = (varType)(atanf(args[1].val_f));
+    result->type = SVS_TYPE_FLT;
+    return 1;
+  }
+
+  // flt = atan2([flt]rad)
+  if (callId == ATAN2) {
+    if (count != 2) {
+      simpleError((uint8_t *)"atan2(): wrong argument count!", s);
+      return 0;
+    }
+
+    if (argType[1] != SVS_TYPE_FLT) {
+      simpleError((uint8_t *)"atan2(): wrong type of argument! (1)", s);
+      return 0;
+    }
+
+    if (argType[2] != SVS_TYPE_FLT) {
+      simpleError((uint8_t *)"atan2(): wrong type of argument! (2)", s);
+      return 0;
+    }
+
+    result->value = (varType)(atan2f(args[1].val_f, args[2].val_f));
     result->type = SVS_TYPE_FLT;
     return 1;
   }

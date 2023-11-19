@@ -53,7 +53,8 @@ typedef enum {
 	LOWER = 24,
 	UPPER = 25,
 	RLEN = 26,
-	CALL = 27
+	CALL = 27,
+	ATAN2 = 28, 
 } builtinCallEnum;
 
 typedef struct {
