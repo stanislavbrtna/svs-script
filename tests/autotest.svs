@@ -213,6 +213,9 @@ function main {
   		and instr("abcdefghchijklmnopq", "chui") == 0
   		and lower("aBcDeFgH") == "abcdefgh"
   		and upper("aBcDeFgH") == "ABCDEFGH"
+  		and charval("A") == 65
+  		and charval(300) == ""
+  		and charval("x") == 120
   		) {
 
     sys print(cnt + " - Integrated functions:OK");

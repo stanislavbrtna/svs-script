@@ -45,6 +45,7 @@ svsBuiltInCallsTableType svsBuiltInCallsTable[] = {
   {"instr", INSTR},
   {"lower", LOWER},
   {"upper", UPPER},
+  {"charval", CHARVAL},
   // advanced math
   {"sin", SIN},
   {"cos", COS},
@@ -635,6 +636,33 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     result->value = (varType)(strNewStreamEnd(s));
     result->type = SVS_TYPE_STR;
     return 1;
+  }
+
+  // num = charval(str); str = charval(num);
+  if (callId == CHARVAL) {
+    if (count != 1) {
+      simpleError((uint8_t *)"charval(): wrong argument count!", s);
+      return 0;
+    }
+
+    if (argType[1] == SVS_TYPE_STR) {
+      result->value = (varType) ((uint32_t)s->stringField[args[1].val_str]);
+      result->type = SVS_TYPE_NUM;
+      return 1;
+    }
+
+    if (argType[1] == SVS_TYPE_NUM) {      
+      strNewStreamInit(s);
+      if (args[1].val_s < 256 && args[1].val_s > 0) {
+        strNewStreamPush((uint8_t)args[1].val_s, s);
+      }
+      result->value = (varType)(strNewStreamEnd(s));
+      result->type = SVS_TYPE_STR;
+      return 1;
+    }
+
+    simpleError((uint8_t *)"charval(): wrong argument type!", s);
+    return 0;
   }
 
   // str2 = upper(str);
