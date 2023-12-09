@@ -189,6 +189,9 @@ function main {
   		and typeof(3.3) == TYPE_FLOAT
   		and call(&testfunc, 1, 2, 3, 4, 5, 6, 7, 8, 9) == 45
   		and num("69") == 69
+  		and num("0x50") == 80
+  		and num("0xa") == 10
+  		and num("0xFF") == 255
   		and num(55.96) == 55
   		and float("3.3") == 3.3
   		and float("123.456") == 123.456

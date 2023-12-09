@@ -167,6 +167,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   if (callId == NUM) {
     varType prac;
     uint8_t negative = 0;
+    uint8_t hex = 0;
     uint16_t x = 0;
     prac.val_s = 0;
 
@@ -188,10 +189,33 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       }
 
       while((s->stringField[args[1].val_str+x] != 0)&&(s->stringField[args[1].val_str+x] != '.')) {
-        if((s->stringField[args[1].val_str+x] >= '0') && (s->stringField[args[1].val_str+x]<='9')) {
-          prac.val_s *= 10;
-          prac.val_s += s->stringField[args[1].val_str + x] - 48;
+        
+        if (s->stringField[args[1].val_str+x] == 'x') {
+          hex = 1;
         }
+        if (hex == 0) {
+          if((s->stringField[args[1].val_str+x] >= '0') && (s->stringField[args[1].val_str+x]<='9')) {
+            prac.val_s *= 10;
+            prac.val_s += s->stringField[args[1].val_str + x] - 48;
+          }
+        } else {
+          if((s->stringField[args[1].val_str+x] >= '0') && (s->stringField[args[1].val_str+x]<='9')) {
+            prac.val_s *= 16;
+            prac.val_s += s->stringField[args[1].val_str + x] - 48;
+          }
+
+          if((s->stringField[args[1].val_str+x] >= 'a') && (s->stringField[args[1].val_str+x]<='f')) {
+            prac.val_s *= 16;
+            prac.val_s += s->stringField[args[1].val_str + x] - 'a' + 10;
+          }
+
+          if((s->stringField[args[1].val_str+x] >= 'A') && (s->stringField[args[1].val_str+x]<='F')) {
+            prac.val_s *= 16;
+            prac.val_s += s->stringField[args[1].val_str + x] - 'A' + 10;
+          }
+        }
+        
+        
         x++;
       }
 
@@ -216,7 +240,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       return 1;
     }
 
-    simpleError((uint8_t *)"real(): wrong type of argument!", s);
+    simpleError((uint8_t *)"num(): wrong type of argument!", s);
     return 0;
   }
 
