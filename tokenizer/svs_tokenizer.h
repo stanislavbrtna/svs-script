@@ -25,7 +25,7 @@ SOFTWARE.
 
 #include "../svs_basics.h"
 
-uint8_t tokenGetch();
+uint8_t tokenGetch(svsVM *s);
 uint8_t tokenPreprocessor();
 uint8_t tokenInput(uint16_t *index, uint8_t inc);
 uint8_t tokenParse(svsVM *s);
