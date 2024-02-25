@@ -283,7 +283,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
         x++;
       }
 
-      if ((s->stringField[args[1].val_str + x] == '.')){
+      if ((s->stringField[args[1].val_str + x] == '.') || (s->stringField[args[1].val_str + x] == ',')) {
         x++;
         while((s->stringField[args[1].val_str + x] != 0) && isNumber(s->stringField[args[1].val_str + x])) {
             fltPrac += ((float)(s->stringField[args[1].val_str + x] - 48)/(float)((exp_helper(10, float_dp))));

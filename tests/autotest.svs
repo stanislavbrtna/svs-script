@@ -196,6 +196,7 @@ function main {
   		and float("3.3") == 3.3
   		and float("123.456") == 123.456
   		and float("456.789") == 456.789
+  		and float("420,69") == 420.69
   		and float("3.3") == 3.3
   		and float(99) == 99.0
   		and isnum("da5sd") == 0
