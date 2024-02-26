@@ -283,22 +283,50 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
         x++;
       }
 
-      if ((s->stringField[args[1].val_str + x] == '.') || (s->stringField[args[1].val_str + x] == ',')) {
+      // 1.234
+      if ((s->stringField[args[1].val_str + x] == '.')) {
         x++;
         while((s->stringField[args[1].val_str + x] != 0) && isNumber(s->stringField[args[1].val_str + x])) {
             fltPrac += ((float)(s->stringField[args[1].val_str + x] - 48)/(float)((exp_helper(10, float_dp))));
             float_dp++;
             x++;
         }
+
+        if (negative == 1) {
+          fltPrac *= -1;
+        }
+
+        result->value = (varType)(fltPrac);
+        result->type = 3;
+        return 1;
       }
 
-      if (negative == 1) {
-        fltPrac *= -1;
-      }
+      // 1,256.789 or 1,236
+      if ((s->stringField[args[1].val_str + x] == ',')) {
+        x++;
+        while((s->stringField[args[1].val_str + x] != 0)) {
 
-      result->value = (varType)(fltPrac);
-      result->type = 3;
-      return 1;
+          if (isNumber(s->stringField[args[1].val_str + x])) {
+            fltPrac += ((float)(s->stringField[args[1].val_str + x] - 48)/(float)((exp_helper(10, float_dp))));
+            float_dp++;
+            x++;
+          } else if ((s->stringField[args[1].val_str + x] == '.') && float_dp == 4) {
+            fltPrac *= 1000;
+            float_dp = 1;
+            x++;
+          } else {
+            break;
+          }
+        }
+
+        if (negative == 1) {
+          fltPrac *= -1;
+        }
+
+        result->value = (varType)(fltPrac);
+        result->type = 3;
+        return 1;
+      }
     }
 
     if (argType[1] == 3) { // from float

@@ -18,7 +18,9 @@ Function *num()* accepts string or float and tries to convert it to the type *nu
 
 #### Float
     float(expr);
-Function *float()* accepts string or num and tries to convert it to the type *float*.
+Function *float()* accepts string or num and tries to convert it to the type *float*. If the expression result is a string,
+comma (,) or dot (.) is accepted as decimal separator. Numbers formated like 1,234.56 are also accepted.
+Any other character terminates the string to float conversion.
 
 #### Is Num
     isnum(expr);
