@@ -318,15 +318,15 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
             break;
           }
         }
-
-        if (negative == 1) {
-          fltPrac *= -1;
-        }
-
-        result->value = (varType)(fltPrac);
-        result->type = 3;
-        return 1;
       }
+
+      if (negative == 1) {
+        fltPrac *= -1;
+      }
+
+      result->value = (varType)(fltPrac);
+      result->type = 3;
+      return 1;
     }
 
     if (argType[1] == 3) { // from float

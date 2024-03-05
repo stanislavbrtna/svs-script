@@ -193,6 +193,8 @@ function main {
   		and num("0xa") == 10
   		and num("0xFF") == 255
   		and num(55.96) == 55
+  		and float("33") == 33.0
+  		and float("") == 0.0
   		and float("3.3") == 3.3
   		and float("123.456") == 123.456
   		and float("456.789") == 456.789
