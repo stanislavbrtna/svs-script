@@ -7,7 +7,7 @@ CFLAGS = -std=c99
 
 LIBS = -lm
 
-DEFINES = -std=c99 -DPC -DCMDLINE -DTOKEN_CACHE_DISABLED
+DEFINES = -std=c99 -DPC -DCMDLINE # -DTOKEN_CACHE_DISABLED
 
 SRCS = $(shell find "." -name "*.c")
 

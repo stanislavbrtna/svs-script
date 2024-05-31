@@ -1273,8 +1273,15 @@ uint8_t tokenParse(svsVM *s) {
           // add new function
           if (s->funcTableLen < FUNCTION_TABLE_L) {
             s->funcTableLen++;
-            s->funcTable[s->funcTableLen].tokenId = posToken + 1; // point token to first token of the function
-            s->funcTable[s->funcTableLen].name = strNewP(pracName2, s);
+            s->funcTable[s->funcTableLen].tokenId  = posToken + 1; // point token to first token of the function
+            s->funcTable[s->funcTableLen].name     = strNewP(pracName2, s);
+            s->funcTable[s->funcTableLen].inCache  = 0;
+            s->funcTable[s->funcTableLen].hitCount = 0;
+
+            if(s->funcTableLen > 1) {
+              s->funcTable[s->funcTableLen - 1].size = posToken - s->funcTable[s->funcTableLen - 1].tokenId;
+            }
+            
             INCREMENT_STATIC_STRINGS
           } else {
             tokenizerErrorPrint((uint8_t *)"Error: too many functions!");
@@ -1516,6 +1523,7 @@ uint8_t tokenParse(svsVM *s) {
 
     //eof
     if (tokenInput(&posText, 0) == 0) {
+      s->funcTable[s->funcTableLen].size = posToken - s->funcTable[s->funcTableLen].tokenId;
       setTokenType(posToken, SVS_TOKEN_ENDPROG, s);
       tokenDMSG("Token set, type EOF/END", \
                   posToken, \

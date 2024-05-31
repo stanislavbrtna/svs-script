@@ -200,11 +200,11 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s) {
 void fillCache(uint16_t cache_pos, uint16_t load_start, uint16_t load_end, svsVM *s);
 
 // advanced cache reloader
-uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
+uint8_t cacheReload(uint16_t tokenId,  svsVM *s) {
   uint16_t x;
-  uint16_t chacheStartPrac;
+  uint16_t chacheStartOld;
 
-  if (cacheDebug==1){
+  if (cacheDebug == 1) {
     printf("cacheReload dbg: BEGIN: index: %u cache start: %u -> reloading cache\n(chache size: %u )\n", tokenId,s->cacheStart, TOKEN_LENGTH );
   }
   //
@@ -217,66 +217,71 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
     errMsgS((uint8_t *)"cacheReload: Error: File not valid!");
   }
 #endif
-  //TOKEN_CACHE_STEP
 
-  chacheStartPrac = s->cacheStart;
+  chacheStartOld = s->cacheStart;
 
-  if (tokenId < s->cacheStart) {
+  if(tokenId < s->cacheStart) {
+    // token id je před začátkem cache
     s->cacheStart = tokenId;
 
-    // pokudjde něco znovupoužít
-    // bacha, token lenght je sice x, ale indexuje se od 0 do x-1
-    if (chacheStartPrac < (tokenId + TOKEN_LENGTH - 1)) {
-      //printf("  debug: REV from %u to %u\n", TOKEN_LENGTH, TOKEN_LENGTH - 1 - (chacheStartPrac - tokenId));
-      for(x = 0; x < ((tokenId + TOKEN_LENGTH) - chacheStartPrac); x++) {
-        s->tokenCache[TOKEN_LENGTH-1 - x] = s->tokenCache[TOKEN_LENGTH-1 - (chacheStartPrac - tokenId )-x];
-        //printf( "   %u = %u\n", TOKEN_LENGTH-1 - x, TOKEN_LENGTH - (chacheStartPrac - tokenId )-x);
+    if (chacheStartOld < (tokenId + TOKEN_LENGTH - 1)) {
+      for(x = 0; x < ((tokenId + TOKEN_LENGTH) - chacheStartOld); x++) {
+        s->tokenCache[TOKEN_LENGTH-1 - x] = s->tokenCache[TOKEN_LENGTH-1 - (chacheStartOld - tokenId )-x];
       }
-      //printf ("repeats %u\n", x-1);
     } else {
-      //printf("debug: quick REV\n");
-      chacheStartPrac = tokenId + TOKEN_LENGTH;
+      chacheStartOld = tokenId + TOKEN_LENGTH;
     }
-    fillCache(0, tokenId, chacheStartPrac, s);
 
-  } else {
-
-    //pokud se něco z cache dá znovupoužít
-    //printf("  debug: FWD: %u < %u\n",((tokenId + TOKEN_CACHE_STEP) - TOKEN_LENGTH), (chacheStartPrac + TOKEN_LENGTH));
-    if (((tokenId + TOKEN_CACHE_STEP) - TOKEN_LENGTH) < (chacheStartPrac + TOKEN_LENGTH)) {
-      //printf("   debug: FWD from %u to %u\n", TOKEN_LENGTH - ((chacheStartPrac + TOKEN_LENGTH) - (tokenId + TOKEN_CACHE_STEP - TOKEN_LENGTH) ), 0);
+    fillCache(0, tokenId, chacheStartOld, s);
+  } else { // token id je za začátkem cache
+    
+    if (((tokenId + TOKEN_CACHE_STEP) - TOKEN_LENGTH) < (chacheStartOld + TOKEN_LENGTH)) { // token id 
       s->cacheStart = (tokenId + TOKEN_CACHE_STEP) - TOKEN_LENGTH;
-      for(x = 0; x < ( (chacheStartPrac + TOKEN_LENGTH) - (tokenId + TOKEN_CACHE_STEP - TOKEN_LENGTH)) ; x++) {
-        s->tokenCache[x] = s->tokenCache[x + TOKEN_LENGTH - ((chacheStartPrac + TOKEN_LENGTH) - (tokenId + TOKEN_CACHE_STEP - TOKEN_LENGTH))];
-        //printf( "   %u = %u\n", x, x + TOKEN_LENGTH - ((chacheStartPrac + TOKEN_LENGTH) - (tokenId + TOKEN_CACHE_STEP - TOKEN_LENGTH)));
+      for(x = 0; x < ( (chacheStartOld + TOKEN_LENGTH) - (tokenId + TOKEN_CACHE_STEP - TOKEN_LENGTH)) ; x++) {
+        s->tokenCache[x] = s->tokenCache[x + TOKEN_LENGTH - ((chacheStartOld + TOKEN_LENGTH) - (tokenId + TOKEN_CACHE_STEP - TOKEN_LENGTH))];
       }
-      //printf ("   repeatz %u, cache start:%u \n", x-1, s->cacheStart);
-      fillCache(x, chacheStartPrac + TOKEN_LENGTH, tokenId + TOKEN_CACHE_STEP, s);
+      fillCache(x, chacheStartOld + TOKEN_LENGTH, tokenId + TOKEN_CACHE_STEP, s);
     } else {
-      // jump is out of reach for chache, reloading all
-      //printf("   debug: quick FWD\n");
       s->cacheStart = tokenId;
       fillCache(0, tokenId, tokenId + TOKEN_LENGTH, s);
     }
   }
-  //printf("cacheReload dbg: END: index: %u cache start: %u\n", tokenId,s->cacheStart );
 
   return 1;
 }
 
-void fillCache(uint16_t cache_pos, uint16_t load_start, uint16_t load_end, svsVM *s) {
-  uint32_t x, ret;
 
-  //printf("debug: fill params: chache_pos:%u start:%u stop:%u\n", cache_pos, load_start, load_end);
+void fillCache(uint16_t cache_pos, uint16_t load_start, uint16_t load_end, svsVM *s) {
+  uint32_t x;
+
+  #ifdef PC
+  fseek(s->vmCache, sizeof(tokenCacheStruct) * (load_start), SEEK_SET);
+  #else
+  f_lseek(&(s->vmCache),sizeof(tokenCacheStruct) * (load_start));
+  #endif
+
+  printf("debug: fill params: chache_pos:%u start:%u stop:%u\n", cache_pos, load_start, load_end);
   for(x = 0; (load_start + x) < load_end; x++) {
     #ifdef PC
-    fseek(s->vmCache, sizeof(tokenCacheStruct) * (load_start + x), SEEK_SET);
     fread(&(s->tokenCache[cache_pos+x]), sizeof(tokenCacheStruct), 1, s->vmCache);
     #else
-    f_lseek(&(s->vmCache),sizeof(tokenCacheStruct) * (load_start + x));
     f_read(&(s->vmCache), &(s->tokenCache[cache_pos+x]), sizeof(tokenCacheStruct), (UINT*)&ret );
     #endif
   }
+}
+
+
+void svsCacheRemoveChunk(uint16_t base, uint16_t size, svsVM *s) {
+
+  if(base + size > TOKEN_LENGTH) {
+    errMsgS("svsCacheRemoveChunk: Error: Size is larger than TOKEN_LENGTH!");
+    return;
+  }
+
+  for(uint16_t x = 0; x < s->tokenMax - base - size; x++) {
+    s->tokenCache[base + x] = s->tokenCache[base + size + x];
+  }
+
 }
 #endif
 

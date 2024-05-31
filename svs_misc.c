@@ -38,9 +38,10 @@ void svsReset(svsVM *s) {
 #ifdef PC
   s->vmCache = 0;
 #endif
-  s->tokenMax = 1;
-  s->vmCacheUsed = 0;
-  s->cacheStart = 0;
+  s->tokenMax      = 1;
+  s->vmCacheUsed   = 0;
+  s->cacheStart    = 0;
+  s->tokenCacheMax = 1;
 
   s->handbrake = 0;
   s->syscallTableLen = 0;

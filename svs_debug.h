@@ -28,5 +28,6 @@ void tokenPrint(svsVM *s);
 void varTablePrint(svsVM *s);
 void strTablePrint(svsVM *s);
 void svsPrintUsedUp(svsVM *s);
+void svsFunctionTablePrint(svsVM *s);
 
 #endif

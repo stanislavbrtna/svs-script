@@ -45,7 +45,39 @@ uint16_t commExecById(uint16_t id, svsVM *s) {
   s->commRetVal.val_u = 0;
   s->commRetType = 0;
   s->commRetFlag = 0;
+
+  #if TOKEN_CACHE_DISABLED==1
+
   commExecLoop(s->funcTable[id].tokenId, s);
+
+  #else
+
+  if(s->funcTable[id].hitCount < 30000) {
+    s->funcTable[id].hitCount++;
+  }
+
+  // function in cache?
+    // yes: run it!
+    //  no: load it
+      // will it fit?
+        // yes: load it, run it
+        //  no: clean up less used for it to fit, load it
+
+
+  if(s->funcTable[id].inCache == 1) {
+    commExecLoop(s->funcTable[id].cacheTokenId, s);
+  } else {
+    if(TOKEN_LENGTH - s->tokenCacheMax > s->funcTable[id].size) {
+      fillCache(s->tokenCacheMax, s->funcTable[id].tokenId, s->funcTable[id].tokenId + s->funcTable[id].size, s);
+      s->funcTable[id].cacheTokenId = s->tokenCacheMax;
+      s->tokenCacheMax += s->funcTable[id].size;
+      s->funcTable[id].inCache = 1;
+      printf("loading: %s, cpos: %u, size: %u, loc: %u\n", s->funcTable[id].name, s->funcTable[id].cacheTokenId, s->funcTable[id].size, s->funcTable[id].tokenId);
+      commExecLoop(s->funcTable[id].cacheTokenId, s);
+    }
+  }
+  
+  #endif
   return 0;
 }
 

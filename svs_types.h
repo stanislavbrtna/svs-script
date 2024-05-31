@@ -82,8 +82,12 @@ SOFTWARE.
 
 
 typedef struct {
-  uint8_t *name;
+  uint8_t  *name;
   uint16_t tokenId;
+  uint16_t size;
+  uint16_t cacheTokenId;
+  uint8_t  inCache;
+  uint16_t hitCount;
 } fTableType;
 
 typedef union {
@@ -139,19 +143,20 @@ typedef struct {
   FRESULT cacheFr;
 #endif
   // token cache
-  uint8_t vmCacheUsed;
+  uint8_t  vmCacheUsed;
   uint16_t cacheStart;
   uint16_t tokenMax;
-  tokenCacheStruct tokenCache[TOKEN_LENGTH+1]; 
+  tokenCacheStruct tokenCache[TOKEN_LENGTH+1];
+  uint16_t tokenCacheMax;
 
   fTableType funcTable[FUNCTION_TABLE_L+1]; // indexed from 1
-  uint16_t	funcTableLen; // number of functions in a script
+  uint16_t	 funcTableLen; // number of functions in a script
 
-  sysCall syscallTable[SYSCALL_TABLE_L+1]; // indexed from 1
+  sysCall   syscallTable[SYSCALL_TABLE_L+1]; // indexed from 1
   uint16_t  syscallTableLen; // number of sys.* calls
 
   varTableType varTable[VAR_TABLE_L+1]; // indexed from 1
-  uint16_t varTableLen; // number of variables
+  uint16_t     varTableLen; // number of variables
 
 
 #ifdef SVS_USE_SEPARATE_STRING_FIELD

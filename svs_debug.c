@@ -86,3 +86,40 @@ void svsPrintUsedUp(svsVM *s) {
   printf("    cacheStart:      %u\n", s->cacheStart);
   printf("    tokenMax:        %u\n", s->tokenMax);
 }
+
+void svsFunctionTablePrint(svsVM *s) {
+  puts("FunctionTable:");
+
+  for(uint16_t i = 1; i<= s->funcTableLen; i++) {
+    uint16_t size = 0;
+    printf("%s - tokenId: %u, hitCount: %u (size: %u)\n", s->funcTable[i].name, s->funcTable[i].tokenId, s->funcTable[i].hitCount, s->funcTable[i].size);
+  }
+
+  puts("------------------------");
+
+  uint16_t totalHitSize = 0;
+  for(uint16_t i = 1; i <= s->funcTableLen; i++) {
+    if(s->funcTable[i].hitCount) {
+      if(i < s->funcTableLen) {
+        totalHitSize += s->funcTable[i + 1].tokenId - s->funcTable[i].tokenId;
+      } else {
+        totalHitSize += s->tokenMax - s->funcTable[i].tokenId;
+      }
+      
+    }
+  }
+  printf("Total hitsize: %u\n", totalHitSize);
+
+  totalHitSize = 0;
+  for(uint16_t i = 1; i <= s->funcTableLen; i++) {
+    if(s->funcTable[i].hitCount == 500) {
+      if(i < s->funcTableLen) {
+        totalHitSize += s->funcTable[i + 1].tokenId - s->funcTable[i].tokenId;
+      } else {
+        totalHitSize += s->tokenMax - s->funcTable[i].tokenId;
+      }
+      
+    }
+  }
+  printf("Essential functions: %u\n", totalHitSize);
+}
