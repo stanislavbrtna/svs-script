@@ -58,7 +58,7 @@ This file contains the main defines and limits of SVS.
 #endif
 
 #ifndef FUNCTION_TABLE_L
-  #define FUNCTION_TABLE_L 50 // počet funkcí v jednom souboru / max functions in one file
+  #define FUNCTION_TABLE_L 100 // počet funkcí v jednom souboru / max functions in one file
 #endif
 
 #ifndef VAR_TABLE_L
