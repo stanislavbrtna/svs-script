@@ -33,6 +33,7 @@ All keywords, variables and functions are case sensitive. Here is a table of all
 | arg0, arg1 ... arg9 | Function arguments. |
 | array | Initializes array. |
 | break | Breaks the for or while loop. |
+| continue | Continues the loop from its start. |
 | end | Specifies the end of file. Not mandatory if EOF is present. |
 | for | For loop. |
 | function | Defines new function. |
@@ -226,7 +227,7 @@ Example:
 Note: Try to always use curly brackets.
 
 #### While
-While loop is done by *while* keyword, followed by expression inside brackets. Following command will be executed while the expression is not equal zero. You can stop the loop by using *break* statement anywhere inside the loop.
+While loop is done by *while* keyword, followed by expression inside brackets. Following command will be executed while the expression is not equal zero. You can stop the loop by using *break* statement anywhere inside the loop. The *continue* statement can be used to continue the loop execution from its start.
 
 Example:
 
@@ -244,10 +245,21 @@ Example:
       print("loop 2");
     }
 
+    a = 0;
+    b = 0;
+
+    while(a < 6) {
+      a++;
+      if(a % 2) {
+        continue;
+      }
+      b++;
+    }
+
 #### For
 For loop is done by *for* keyword, followed by brackets containing statement as following:
 for (< initialisation statement >; < expression >; < usually increment >;)
-For will execute first statement once, evaluate expression and at the end of loop the increment/decrement statement is executed. For loop can be exited with *break* keyword.
+For will execute first statement once, evaluate expression and at the end of loop the increment/decrement statement is executed. For loop can be exited with *break* keyword. The *continue* works same as in *while* loop.
 
 Example:
 

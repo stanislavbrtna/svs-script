@@ -111,19 +111,19 @@ The *break* statement can be used both in for and in while loop.
 #### While
     function main {
 
-	  while(1) {
-		if (a == 5) {
-		  break;
-		}
-		a = a + 1;
-		print("loop");
-	  }
+      while(1) {
+        if (a == 5) {
+          break;
+        }
+        a = a + 1;
+        print("loop");
+      }
 
-	  b = 5;
-	  while(b) {
-		b = b - 1;
-		print("loop 2");
-	  }
+	    b = 5;
+      while(b) {
+        b = b - 1;
+        print("loop 2");
+      }
     }
 
 ### Functions

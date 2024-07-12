@@ -461,7 +461,8 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
       a ten se breakne.
       */
 
-      if (getTokenType(currToken, s) != SVS_TOKEN_BREAK) { //break? ne
+      if (getTokenType(currToken, s) != SVS_TOKEN_BREAK
+          && getTokenType(currToken, s) != SVS_TOKEN_CONTINUE) { //break? ne
         //vykonáváme příkaz dokud nenarazíme na break a nebo end of block
         currToken = commExecLoop(currToken, s);
 
@@ -477,9 +478,10 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
           return 0;
         }
 
-        if (getTokenType(currToken, s) == SVS_TOKEN_BREAK) { //break
-          s->varTableLen = varTableSP; //při opuštění bloku vrátíme stack
-          commExDMSG("commExecLoop: block: break occured inside block!", currToken, s);
+        if (getTokenType(currToken, s) == SVS_TOKEN_BREAK
+        || getTokenType(currToken, s) == SVS_TOKEN_CONTINUE) { //break
+          s->varTableLen = varTableSP; // při opuštění bloku vrátíme stack
+          commExDMSG("commExecLoop: block: break/continue occured inside block!", currToken, s);
           return currToken;
         }
 
@@ -493,7 +495,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
 
       } else { // break
         s->varTableLen = varTableSP;
-        commExDMSG("commExecLoop: start of block: break occured!", currToken, s);
+        commExDMSG("commExecLoop: start of block: break/continue occured!", currToken, s);
         return currToken;
       }
     }
@@ -588,6 +590,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
     uint16_t endPrac = 0;
     uint16_t loopPrac = 0;
     uint32_t x = 0;
+    uint8_t  continueFlag = 0;
 
     commExDMSG("commExecLoop: for statement", currToken, s);
     currToken++;
@@ -665,7 +668,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         }
 
         //Detekce breaku
-        if (getTokenType(currToken, s) == 15) {
+        if (getTokenType(currToken, s) == SVS_TOKEN_BREAK) {
           //v případě breaku nahrajeme do current tokenu start smyčky a pak jí přeskočíme comm skipem
           currToken = loopPrac;
           currToken = commSkip(currToken, s);
@@ -676,8 +679,12 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
           break;
         }
 
-        if (getTokenType(currToken, s) == 16) {
-          commExDMSG("commExecLoop: while: return occured, returning", currToken, s);
+        if (getTokenType(currToken, s) == SVS_TOKEN_CONTINUE) {
+          continueFlag = 1;
+        }
+
+        if (getTokenType(currToken, s) == SVS_TOKEN_RETURN) {
+          commExDMSG("commExecLoop: for: return occured, returning", currToken, s);
           return currToken;
         }
 
@@ -685,6 +692,11 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         commExecLoop(endPrac, s);
         if (errCheck(s)) {
           return 0;
+        }
+
+        if (continueFlag) {
+          commExDMSG("commExecLoop: for: continue occured", currToken, s);
+          continue;
         }
       }
     }
@@ -727,9 +739,10 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
           if (errCheck(s)) {
             return 0;
           }
-          //Detekce breaku
-          if (getTokenType(currToken, s) == 15) {
-            //v případě breaku nahrajeme do current tokenu start smyčky a pak jí přeskočíme comm skipem
+          
+          //Break
+          if (getTokenType(currToken, s) == SVS_TOKEN_BREAK) {
+            // v případě breaku nahrajeme do current tokenu start smyčky a pak jí přeskočíme comm skipem
             currToken = backBr + 1;
             currToken = commSkip(currToken, s);
             if (errCheck(s)) {
@@ -739,7 +752,13 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
             break;
           }
 
-          if (getTokenType(currToken, s) == 16) {
+          //Break
+          if (getTokenType(currToken, s) == SVS_TOKEN_CONTINUE) {
+            commExDMSG("commExecLoop: while: continue occured, starting over", currToken, s);
+            continue;
+          }
+
+          if (getTokenType(currToken, s) == SVS_TOKEN_RETURN) {
             commExDMSG("commExecLoop: while: return occured, returning", currToken, s);
             return currToken;
           }

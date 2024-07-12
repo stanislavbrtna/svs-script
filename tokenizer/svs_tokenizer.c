@@ -1041,6 +1041,15 @@ uint8_t tokenParse(svsVM *s) {
         setTokenType(posToken, SVS_TOKEN_BREAK, s);
         Lock = 0;
       }
+      if (strCmp(pracName, (uint8_t *)"continue")) {
+        tokenDMSG("Token set, type CONTINUE",
+                  posToken,
+                  getTokenData(posToken, s),
+                  getTokenType(posToken, s),
+                  posText);
+        setTokenType(posToken, SVS_TOKEN_CONTINUE, s);
+        Lock = 0;
+      }
       if (strCmp(pracName, (uint8_t *)"return")) {
         tokenDMSG("Token set, type RETURN",
                   posToken,

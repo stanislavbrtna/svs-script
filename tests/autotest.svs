@@ -113,6 +113,25 @@ function main {
     sys print(cnt + " - while-break:OK");
   }
   cnt = cnt + 1;
+  
+  a = 0;
+  b = 0;
+  
+  while (a < 6) {
+    a++;
+    if (a%2) {
+      continue;
+    }
+    b++;
+  }
+  
+  if (a != 6 or b != 3) {
+    sys print(cnt + " - while-continue:FAIL");
+    FAIL = 1;
+  } else {
+    sys print(cnt + " - while-continue:OK");
+  }
+  cnt = cnt + 1;
 
   b = 0;
   for(a = 0; a < 5; a = a + 1;) {
@@ -124,6 +143,22 @@ function main {
     FAIL = 1;
   } else {
     sys print(cnt + " - for:OK");
+  }
+  cnt = cnt + 1;
+  
+  b = 0;
+  for(a = 0; a < 6; a = a + 1;) {
+    if(a%2) {
+      continue;
+    }
+    b++;
+  }
+  
+  if ((a != 6) + (b != 3)) {
+    sys print(cnt + " - for-continue:FAIL " + b);
+    FAIL = 1;
+  } else {
+    sys print(cnt + " - for-continue:OK");
   }
   cnt = cnt + 1;
 
