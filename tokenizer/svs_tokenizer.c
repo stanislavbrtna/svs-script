@@ -1366,7 +1366,7 @@ uint8_t tokenParse(svsVM *s) {
         #else
         if(!tokenGetchOpen(filename, s)) {
         #endif
-          tokenizerErrorPrint((uint8_t *)"tokenParse: Error occured while openning imported file!");
+          tokenizerErrorPrintNL((uint8_t *)"tokenParse: Error occured while openning imported file!");
           return 1;
         }
 
@@ -1380,7 +1380,7 @@ uint8_t tokenParse(svsVM *s) {
 
         // tokenize new file
         if (tokenParse(s) != 0) {
-          tokenizerErrorPrint((uint8_t *)"tokenParse: Error importing file!");
+          tokenizerErrorPrintNL((uint8_t *)"tokenParse: Error importing file!");
           return 1;
         }
 
