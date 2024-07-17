@@ -263,7 +263,6 @@
             place.
           -->
           <!--keyword>sys</keyword-->
-          <keyword>do</keyword>
           <keyword>else(if)?</keyword>
           <keyword>end</keyword>
           <keyword>function</keyword>
@@ -272,6 +271,7 @@
           <keyword>while</keyword>
           <keyword>for</keyword>
           <keyword>break</keyword>
+          <keyword>continue</keyword>
         </context>
       </include>
     </context>
