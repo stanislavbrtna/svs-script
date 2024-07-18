@@ -77,8 +77,7 @@ Function *print* prints its parameter on standard output. Since SVS version 1.1 
     ver();
 Return: [num] version
 
-Since SVS 0.8.8 you can use *[num]ver()* to get current version of SVS. Version is returned as number, for example version 1.0.0 will return 1000, version 1.5.3 will be 1530.
-
+You can use *[num]ver()* to get current version of SVS. Version is returned as number, for example version 1.8.2 will return 10820.
 
 ### Built-in math functions
 Since version 0.8.6 SVS contains optional built-in math functions. These functions are enabled by default with SVS_USE_ADV_MATH define.
