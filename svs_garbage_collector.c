@@ -127,20 +127,16 @@ uint8_t gcRemoveStrIdLen(uint16_t strId, uint16_t str_len, svsVM *s) {
 
 
 uint8_t gcRemoveString(uint16_t strId, svsVM *s) {
-  uint16_t x = 0;
-  uint16_t str_len = 0;
-
-  str_len = gcGetLen(strId, s);
-
+  uint16_t str_len = gcGetLen(strId, s);
   gcRemoveStrIdLen(strId, str_len, s);
 }
 
 void garbageCollect(int32_t count, svsVM *s) {
-  uint16_t x = 0;
-  uint8_t valid = 0;
-  uint8_t all_valid = 1;
   uint16_t gc_start;
-  uint8_t full = 0;
+  uint16_t x         = 0;
+  uint8_t  valid     = 0;
+  uint8_t  all_valid = 1;
+  uint8_t  full      = 0;
 
   if (count == 0) {
     if (s->stringFieldLen + 1 < GC_THRESHOLD) {
@@ -177,7 +173,7 @@ void garbageCollect(int32_t count, svsVM *s) {
   }
 
   uint16_t remove_start = 0;
-  uint8_t chain_remove = 0;
+  uint8_t  chain_remove = 0;
   uint16_t chained = 0;
 
   for(; x < s->stringFieldLen - 1; x++) {
@@ -228,12 +224,10 @@ void garbageCollect(int32_t count, svsVM *s) {
 
 void gcCheckField(svsVM *s) {
   uint16_t x = 0;
-  uint8_t valid = 0;
-  uint8_t all_valid = 1;
-  uint16_t gc_start;
-  uint8_t safepoint_shown = 0;
+  uint8_t  valid = 0;
+  uint8_t  all_valid = 1;
+  uint8_t  safepoint_shown = 0;
 
-  gc_start = s->stringFieldLen;
   printf("%s: starting\n", __FUNCTION__);
   if (0 == s->stringFieldLen) {
     printf("%s:Nothing in string field.\n", __FUNCTION__);
