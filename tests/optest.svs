@@ -28,7 +28,20 @@ function main {
     print("AND FAIL 1");
   }
 
-  if ((1 and 0) == 1){
+  nex_ex = 0;
+  ex_ex = 0;
+
+  if ((0 and nex()) == 1 + ex()) {
+    FAIL = 1;
+    print("AND FAIL 2");
+  }
+
+  if (nex_ex == 1 or ex_ex == 0) {
+    FAIL = 1;
+    print("AND Lazy FAIL");
+  }
+
+  if ((0 and 5) == 1){
     FAIL = 1;
     print("AND FAIL 2");
   }
@@ -41,6 +54,19 @@ function main {
   if ((0 or 0) == 1){
     FAIL = 1;
     print("OR FAIL 2");
+  }
+
+  nex_ex = 0;
+  ex_ex = 0;
+
+  if ((1 or nex()) == 0 + ex()){
+    FAIL = 1;
+    print("OR FAIL 3");
+  }
+
+  if (nex_ex == 1 or ex_ex == 0) {
+    FAIL = 1;
+    print("OR Lazy FAIL nex:" + nex_ex + " ex:" + ex_ex);
   }
 
   if ((not 1) == 1){
@@ -291,4 +317,13 @@ function main {
     print("FAIL");
   }
   return FAIL;
+}
+
+
+function nex {
+  nex_ex = 1;
+}
+
+function ex {
+  ex_ex = 1;
 }
