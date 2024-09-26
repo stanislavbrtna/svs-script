@@ -41,7 +41,7 @@ uint16_t exprExecValueSkip(uint16_t index, svsVM *s) {
         errSoft((uint8_t *)"exprExecSkip ARRAY: Missing \"]\")!", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
         errSoftSetToken(index, s);
-        return;
+        return index;
       }
       return index + 1;
     }
