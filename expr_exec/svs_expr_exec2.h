@@ -23,7 +23,7 @@ SOFTWARE.
 #ifndef SVS_EXPR_EXEC2_H
 #define SVS_EXPR_EXEC2_H
 
-#include "svs_basics.h"
+#include "../svs_basics.h"
 
 void varRetValZero(varRetVal *x);
 

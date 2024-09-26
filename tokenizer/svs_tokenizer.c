@@ -936,7 +936,7 @@ uint8_t tokenParse(svsVM *s) {
     if (tokenInput(&posText, 0) == '&') {
       tokenInput(&posText, 1);
 
-      setTokenType(posToken, SVS_TOKEN_AMP, s);
+      setTokenType(posToken, SVS_TOKEN_CONST_STR, s);
       setTokenData(posToken, (varType)s->stringFieldLen, s);
       INCREMENT_STATIC_STRINGS
 

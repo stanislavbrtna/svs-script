@@ -41,4 +41,6 @@ void commArgNull(comExArgs *target);
 void commArgCopy(comExArgs* source, comExArgs* target);
 uint16_t commParseCall(uint16_t index, svsVM *s);
 
+uint16_t exprSkip(uint16_t index, svsVM *s);
+
 #endif
