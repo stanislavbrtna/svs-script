@@ -519,6 +519,14 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
       }
       x = varPrac.value.val_s; //výsledek ifu
       currToken = varPrac.tokenId;
+
+      if(varPrac.type == SVS_TYPE_STR) {
+        errSoft((uint8_t *)"commEx: if statement: result of the expression was a string!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+        errSoftSetToken(currToken, s);
+        return 0;
+      }
+
       if (getTokenType(currToken, s) != 6) {
         errSoft((uint8_t *)"commEx: Syntax error in if statement, missing \")\"", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
@@ -625,6 +633,13 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
           return 0;
         }
         x = varPrac.value.val_s; //výsledek podmínky
+        
+        if(varPrac.type == SVS_TYPE_STR) {
+          errSoft((uint8_t *)"commEx: for statement: result of the expression was a string!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+          errSoftSetToken(currToken, s);
+          return 0;
+        }
         currToken = varPrac.tokenId;
         endPrac = currToken + 1;
 
@@ -724,6 +739,12 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
           return 0;
         }
         x = varPrac.value.val_s; //výsledek podmínky
+        if(varPrac.type == SVS_TYPE_STR) {
+          errSoft((uint8_t *)"commEx: while statement: result of the expression was a string!", s);
+          errSoftSetParam((uint8_t *)"TokenId", (varType)currToken, s);
+          errSoftSetToken(currToken, s);
+          return 0;
+        }
         currToken = varPrac.tokenId;
         backBr = currToken;
         if (getTokenType(currToken, s) != 6) {
