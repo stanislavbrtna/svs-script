@@ -28,6 +28,7 @@ uint16_t exprExecValueSkip(uint16_t index, svsVM *s) {
   if(getTokenType(index, s) == SVS_TOKEN_CONST_NUM
     || getTokenType(index, s) == SVS_TOKEN_CONST_FLOAT
     || getTokenType(index, s) == SVS_TOKEN_CONST_STR
+    || getTokenType(index, s) == SVS_TOKEN_ARG
   ) {
     return index + 1;
   }
@@ -75,7 +76,7 @@ uint16_t exprExecSkip(uint16_t index, svsVM *s) {
   // skip value
   index = exprExecValueSkip(index, s);
 
-  while ((getTokenType(index, s) != SVS_TOKEN_RBR)) {
+  while ((getTokenType(index, s) != SVS_TOKEN_RBR) && (getTokenType(index, s) != SVS_TOKEN_SCOL)) {
     index = exprExecValueSkip(index + 1, s);
   }
   return index;
