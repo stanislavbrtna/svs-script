@@ -28,13 +28,14 @@ uint16_t exprExecValueSkip(uint16_t index, svsVM *s) {
   if(getTokenType(index, s) == SVS_TOKEN_CONST_NUM
     || getTokenType(index, s) == SVS_TOKEN_CONST_FLOAT
     || getTokenType(index, s) == SVS_TOKEN_CONST_STR
-    || getTokenType(index, s) == SVS_TOKEN_ARG
-  ) {
+  ){
     return index + 1;
   }
 
   // var or array
-  if(getTokenType(index, s) == SVS_TOKEN_VAR) {
+  if(getTokenType(index, s) == SVS_TOKEN_VAR
+     || getTokenType(index, s) == SVS_TOKEN_ARG
+  ){
     index++;
     if(getTokenType(index, s) == SVS_TOKEN_LSQB) {
       index = exprExecValueSkip(index + 1, s);
@@ -76,7 +77,10 @@ uint16_t exprExecSkip(uint16_t index, svsVM *s) {
   // skip value
   index = exprExecValueSkip(index, s);
 
-  while ((getTokenType(index, s) != SVS_TOKEN_RBR) && (getTokenType(index, s) != SVS_TOKEN_SCOL)) {
+  while (getTokenType(index, s) != SVS_TOKEN_RBR
+    && getTokenType(index, s) != SVS_TOKEN_SCOL
+    && getTokenType(index, s) != SVS_TOKEN_COL
+  ){
     index = exprExecValueSkip(index + 1, s);
   }
   return index;

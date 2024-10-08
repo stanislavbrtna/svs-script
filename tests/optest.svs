@@ -68,18 +68,43 @@ function main {
     FAIL = 1;
     print("OR Lazy FAIL nex:" + nex_ex + " ex:" + ex_ex);
   }
+  
+  nex_ex = 0;
+  ex_ex = 0;
+  
+  # expression skip code tests
+  a = 1 or nex();
+  
+  if (nex_ex != 0) {
+    FAIL = 1;
+    print("Evaluation command Lazy FAIL");
+  }
+  
+  for(i = 0; i < 10 or ex_p(); i++;) {}
+  
+  if (ex_ex != 1) {
+    FAIL = 1;
+    print("For loop Lazy FAIL");
+  }
+  
+  skip_test(0 and 44, 8, 11);
+  
+  if (skip_test != 19) {
+    FAIL = 1;
+    print("Function call lazy FAIL");
+  }
 
-  if ((not 1) == 1){
+  if ((not 1) == 1) {
     FAIL = 1;
     print("NOT FAIL 1");
   }
 
-  if ((not 0) == 0){
+  if ((not 0) == 0) {
     FAIL = 1;
     print("NOT FAIL 2");
   }
 
-  if ((2 < 1) or (1 > 2) or (2 <= 1) or (1 >= 2)){
+  if ((2 < 1) or (1 > 2) or (2 <= 1) or (1 >= 2)) {
     FAIL = 1;
     print("< > <= >= FAIL 1");
   }
@@ -326,4 +351,12 @@ function nex {
 
 function ex {
   ex_ex = 1;
+}
+
+function ex_p {
+  ex_ex++;
+}
+
+function skip_test {
+  skip_test = arg1 + arg2;
 }

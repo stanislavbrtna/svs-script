@@ -189,7 +189,7 @@ This will produce errors in future releases.\n",
     if (errCheck(s)) {
       return;
     }
-    if (result->type != 0) {
+    if (result->type != SVS_TYPE_NUM) {
       errSoft((uint8_t *)"ExprExecLvl5 NOT: You can only apply NOT on num type!", s);
       errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
       errSoftSetToken(index, s);
