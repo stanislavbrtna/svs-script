@@ -240,6 +240,8 @@ function main {
   		and isnum("da5sd") == 0
   		and isnum("1") == 1
   		and isnum("1.1") == 2
+  		and isnum("1,1") == 2
+  		and isnum("2,695.1") == 2
   		and isnum(1) == 1
   		and isnum(1.1) == 2
   		and len("abcd") == 4

@@ -381,15 +381,26 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     if ((argType[1] == 1)) {
       int32_t isNum = 1;
       int32_t isFlt = 0;
-      uint8_t str;
+      uint8_t c;
       uint16_t x = 0;
 
       while (s->stringField[args[1].val_str + x] != 0) {
-        str = s->stringField[args[1].val_str + x];
-        if ((!isNumber(str))&&(str != ' ')&&(str != '.')&&(str != '-')) {
+        c = s->stringField[args[1].val_str + x];
+        // when char is not one that occurs in numbers/floats
+        if (
+            (!isNumber(c))
+            && (c != ' ')
+            && (c != '.')
+            && (c != '-')
+            && (c != ',')
+        ){
+          // then break
           isNum = 0;
+          break;
         }
-        if (str == '.'){
+
+        // float detect
+        if (c == '.' || c == ',') {
           isFlt = 1;
         }
 
@@ -1046,8 +1057,6 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     if (args[1].val_s == -4) {
       gcCheckField(s);
     }
-    
-    
 
     result->value = (varType)((uint32_t)0);
     result->type = SVS_TYPE_NUM;
