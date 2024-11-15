@@ -139,7 +139,7 @@ uint8_t cacheReload(uint16_t tokenId, svsVM *s){
     // DBG
     if (cacheDebug == 1) {
       for(uint8_t i = 0; i < TOKEN_SEGMENTS; i++) {
-        printf("CACHE: %u, hit: %u\n", i, s->tokenSegmentHits[i]);  
+        printf("CACHE: %u, start: %u, hits: %u\n", i, s->tokenSegmentStart[i], s->tokenSegmentHits[i]);  
       }
     }
 
@@ -154,7 +154,8 @@ uint8_t cacheReload(uint16_t tokenId, svsVM *s){
     }
 
     for(uint8_t i = 0; i < TOKEN_SEGMENTS; i++) {
-      s->tokenSegmentHits[i] -= s->tokenSegmentHits[leastUsed];
+      //s->tokenSegmentHits[i] -= s->tokenSegmentHits[leastUsed];
+      s->tokenSegmentHits[i] = 0;
     }
 
     // get the least used segment
@@ -166,8 +167,7 @@ uint8_t cacheReload(uint16_t tokenId, svsVM *s){
     errMsgS("Cache alg failed!");
   }
 
-  // nahrát segment
-  // TODO: research: modifikovat tokenID tak, aby se segmenty nepřekrývaly?
+  tokenId = (tokenId/TOKEN_SEGMENT_SIZE) * TOKEN_SEGMENT_SIZE;
   if (cacheDebug == 1) {
     printf("Reloading! segment:%u tokId: %u\n", segment, tokenId);
   }
