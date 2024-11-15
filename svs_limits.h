@@ -37,8 +37,20 @@ This file contains the main defines and limits of SVS.
 #endif
 
 #if TOKEN_CACHE_DISABLED == 0
-	#define TOKEN_LENGTH 2048 // size of token cache
-	#define TOKEN_CACHE_STEP 128 // size of step for chaching the swap file
+  
+  #ifndef SVS_TOKEN_CACHE_SEGMENTED
+    #define SVS_TOKEN_CACHE_SEGMENTED
+	  #define TOKEN_SEGMENT_SIZE 256
+	  #define TOKEN_SEGMENTS 8
+    #define TOKEN_LENGTH (TOKEN_SEGMENT_SIZE*TOKEN_SEGMENTS)
+  #endif
+
+  // old caching scheme
+  #ifdef SVS_TOKEN_CACHE_STEPPING
+    #define TOKEN_LENGTH 2048 // size of token cache
+	  #define TOKEN_CACHE_STEP 128 // size of step for chaching the swap file
+  #endif
+
 #else
   #ifndef TOKEN_LENGTH
 	  #define TOKEN_LENGTH 35000 // token chache size for disabled swap file

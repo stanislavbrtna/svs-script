@@ -22,76 +22,8 @@ SOFTWARE.
 
 #include "svs_token_cache.h"
 
-uint8_t cacheDebug = 0;
 
-
-//cgDMSG("text");
-void cacheDMSG(char *text){
-  if (cacheDebug==1){
-    printf("cacheDMSG: %s \n", text);
-  }
-}
-
-void setCacheDebug(uint8_t level){
-  cacheDebug = level;
-}
-
-
-#if TOKEN_CACHE_DISABLED == 1
-uint8_t getTokenType(uint16_t tokenId, svsVM *s) {
-  if(tokenId < TOKEN_LENGTH) {
-    return s->tokenCache[tokenId].Type;
-  }else{
-    errMsgS("getTokenType: Token field index invalid!");
-  }
-  return 0;
-}
-
-uint8_t setTokenType(uint16_t tokenId, uint8_t val, svsVM *s) {
-  if(tokenId<TOKEN_LENGTH) {
-    s->tokenCache[tokenId].Type = val;
-  } else {
-    errMsgS("setTokenType: Token field index invalid!");
-  }
-  return 0;
-}
-
-VARTYPE getTokenData(uint16_t tokenId, svsVM *s) {
-  if(tokenId<TOKEN_LENGTH) {
-    return s->tokenCache[tokenId].Data;
-  } else {
-    errMsgS("getTokenData: Token field index invalid!");
-  }
-  return (varType) 0;
-}
-
-uint8_t setTokenData(uint16_t tokenId, VARTYPE val, svsVM *s){
-  if(tokenId<TOKEN_LENGTH){
-    s->tokenCache[tokenId].Data=val;
-  }else{
-    errMsgS("setTokenData: Token field index invalid!");
-  }
-  return 0;
-}
-
-uint16_t getTokenMax(svsVM *s){
-  return TOKEN_LENGTH;
-}
-
-uint8_t closeTokenCache(svsVM *s){
-  return 0;
-}
-
-void SVScloseCache(svsVM *s) {
-  return;
-}
-
-void SVSopenCache(svsVM *s) {
-  return;
-}
-
-#else
-
+#ifdef SVS_TOKEN_CACHE_STEPPING
 
 uint8_t tokenInCache(uint16_t tokenId, svsVM *s){
   if((tokenId < (TOKEN_LENGTH + s->cacheStart)) && (tokenId >= (s->cacheStart))) {
@@ -120,82 +52,6 @@ varType getTokenData(uint16_t tokenId, svsVM *s){
   }
 }
 
-
-
-#ifdef PC
-
-void SVScloseCache(svsVM *s) {
-  if (s->vmCache) {
-    fclose(s->vmCache);
-  } else {
-    errMsgS("SVScloseCache: Double close occured!");
-  }
-}
-
-void SVSopenCache(svsVM *s) {
-  s->vmCache = fopen(s->vmName, "r+");
-  if (!(s->vmCache)) {
-    errMsgS("SVSopenCache: Error while opening cache file!");
-  }
-}
-
-#else
-
-void SVScloseCache(svsVM *s) {
-  f_close(&(s->vmCache));
-}
-
-void SVSopenCache(svsVM *s) {
-  s->cacheFr = f_open(&(s->vmCache), (char *)s->vmName, FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
-  if (s->cacheFr != FR_OK) {
-    errMsgS((uint8_t *)"SVScloseCache: Error while opening cache file!");
-  }
-}
-
-#endif
-
-#ifdef CACHE_SIMPLE
-//simple cache reloader
-uint8_t cacheReload(uint16_t tokenId,  svsVM *s) {
-  uint32_t x, ret;
-  tokenCacheStruct prac;
-  prac.Data.val_s=666;
-  prac.Type=6;
-  if (cacheDebug==1){
-    printf("cacheReload dbg: BEGIN: index: %u cache start: %u -> reloading cache\n", tokenId, s->cacheStart);
-  }
-  //
-#ifdef PC
-  if ((s->vmCache)==0){
-    errMsgS("cacheReload: Error: File not valid!");
-  }
-#else
-  if ((s->cacheFr)!=FR_OK){
-    errMsgS("cacheReload: Error: File not valid!");
-  }
-#endif
-
-  //fseek(s->vmCache,sizeof(tokenCacheStruct)*TOKEN_LENGTH*(tokenId%TOKEN_LENGTH),SEEK_SET);
-
-  s->cacheStart=TOKEN_LENGTH*(tokenId/TOKEN_LENGTH);
-
-  for(x=0;x<TOKEN_LENGTH;x++){
-    #ifdef PC
-    fseek(s->vmCache,sizeof(tokenCacheStruct)*(TOKEN_LENGTH*(tokenId/TOKEN_LENGTH)+x),SEEK_SET);
-    ret= fread(&(s->tokenCache[x]), sizeof(tokenCacheStruct), 1, s->vmCache);
-    #else
-    f_lseek(&(s->vmCache),sizeof(tokenCacheStruct)*(TOKEN_LENGTH*(tokenId/TOKEN_LENGTH)+x));
-    f_read(&(s->vmCache),&(s->tokenCache[x]),sizeof(tokenCacheStruct), (UINT*) &ret );
-    #endif
-  }
-
-  //printf("cacheReload dbg: END: index: %u cache start: %u\n", tokenId,s->cacheStart );
-
-  return 1;
-
-}
-
-#else
 
 void fillCache(uint16_t cache_pos, uint16_t load_start, uint16_t load_end, svsVM *s);
 
@@ -278,7 +134,6 @@ void fillCache(uint16_t cache_pos, uint16_t load_start, uint16_t load_end, svsVM
     #endif
   }
 }
-#endif
 
 
 uint8_t openTokenCache(svsVM *s) {

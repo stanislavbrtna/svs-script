@@ -89,27 +89,27 @@ typedef struct {
 } fTableType;
 
 typedef union {
-   int32_t  val_s;   // signed type, used for SVS_TYPE_NUM
-   uint16_t val_str; // position in string field, used for SVS_TYPE_STR
-   uint32_t val_u;   // Used for system call ids
-   float val_f;      // float value for SVS_TYPE_FLT
+  int32_t  val_s;   // signed type, used for SVS_TYPE_NUM
+  uint16_t val_str; // position in string field, used for SVS_TYPE_STR
+  uint32_t val_u;   // Used for system call ids
+  float    val_f;      // float value for SVS_TYPE_FLT
 } varType;
 
 typedef struct {
   uint8_t *name;
   uint32_t maskId; // maskovací id lokální proměnné/mask-id used for loacal variables
-  varType value;   // num - hodnota, str-nultý charakter v tabulce, string je ukončen \0 / value of the variable
-  uint8_t type;    // variable type defined in SVS_TYPE_*
+  varType  value;   // num - hodnota, str-nultý charakter v tabulce, string je ukončen \0 / value of the variable
+  uint8_t  type;    // variable type defined in SVS_TYPE_*
 } varTableType;
 
 typedef struct {    // return structure for a function call
-  varType value;   
-  uint8_t type;     // var type
+  varType  value;   
+  uint8_t  type;     // var type
   uint16_t tokenId; // token to return to
 } varRetVal;
 
 typedef struct {
-  char *errString;
+  char     *errString;
   uint16_t tokenId;
 } errStruct;
 
@@ -141,27 +141,33 @@ typedef struct {
   FRESULT cacheFr;
 #endif
   // token cache
-  uint8_t vmCacheUsed;
-  uint16_t cacheStart;
-  uint16_t tokenMax;
-  tokenCacheStruct tokenCache[TOKEN_LENGTH+1]; 
+  uint8_t          vmCacheUsed;
+  uint16_t         cacheStart;
+  uint16_t         tokenMax;
+  tokenCacheStruct tokenCache[TOKEN_LENGTH+1];
 
-  fTableType funcTable[FUNCTION_TABLE_L+1]; // indexed from 1
-  uint16_t	funcTableLen; // number of functions in a script
+#ifdef SVS_TOKEN_CACHE_SEGMENTED
+  uint16_t tokenSegmentStart[TOKEN_SEGMENTS];
+  uint16_t tokenSegmentValid[TOKEN_SEGMENTS];
+  uint16_t tokenSegmentHits[TOKEN_SEGMENTS];
+  uint8_t  tokenLastSegment;
+#endif
 
-  sysCall syscallTable[SYSCALL_TABLE_L+1]; // indexed from 1
-  uint16_t  syscallTableLen; // number of sys.* calls
+  fTableType   funcTable[FUNCTION_TABLE_L+1];   // indexed from 1
+  uint16_t	   funcTableLen;                    // number of functions in a script
 
-  varTableType varTable[VAR_TABLE_L+1]; // indexed from 1
-  uint16_t varTableLen; // number of variables
+  sysCall      syscallTable[SYSCALL_TABLE_L+1]; // indexed from 1
+  uint16_t     syscallTableLen;                 // number of sys.* calls
 
+  varTableType varTable[VAR_TABLE_L+1];         // indexed from 1
+  uint16_t     varTableLen;                     // number of variables
 
 #ifdef SVS_USE_SEPARATE_STRING_FIELD
-  uint8_t *stringField; // indexed from 0
-  uint32_t stringFieldMax;
+  uint8_t  *stringField;                        // indexed from 0
+  uint32_t  stringFieldMax;
 #else
-  uint8_t stringField[STRING_FIELD_L + 1]; // indexed from 0
-  uint32_t stringFieldMax;
+  uint8_t   stringField[STRING_FIELD_L + 1];    // indexed from 0
+  uint32_t  stringFieldMax;
 #endif
   
   // number of used chars, always points to the next free char
@@ -172,31 +178,30 @@ typedef struct {
   // string garbage collection safe point 
   uint16_t gcSafePoint;
   // string garbage collection profiler status
-  uint8_t profilerEnabled;
+  uint8_t  profilerEnabled;
 
   comExArgs commArgs;
-
-  uint8_t commFlag;
-  varType commRetVal;
-  uint8_t commRetType;
-  uint8_t commRetFlag;
-  uint16_t progLine;
-  uint8_t globalDebug; // debug mode
-  // pokud 1, zastavuje virtuální stroj/if 1, vm tries to halt the execution
-  uint8_t handbrake;
+  uint8_t   commFlag;
+  varType   commRetVal;
+  uint8_t   commRetType;
+  uint8_t   commRetFlag;
+  uint16_t  progLine;
+  
+  uint8_t   globalDebug; // debug mode
+  uint8_t   handbrake; // if 1, vm tries to halt the execution
 
   // array field
-  varType varArray[SVS_ARRAY_LEN+1];
-  uint8_t varArrayType[SVS_ARRAY_LEN+1];
+  varType  varArray[SVS_ARRAY_LEN+1];
+  uint8_t  varArrayType[SVS_ARRAY_LEN+1];
   uint16_t varArrayLen;
 
   //soft errors
-  uint8_t err;
-  char *errString;
+  uint8_t  err;
+  char     *errString;
   volatile uint16_t errToken;
-  uint16_t errDbgVar[5];
-  uint8_t *errDbgStr[5];
-  uint8_t errDbgUsed;
+  uint16_t  errDbgVar[5];
+  uint8_t  *errDbgStr[5];
+  uint8_t   errDbgUsed;
 
 } svsVM;
 

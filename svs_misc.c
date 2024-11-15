@@ -75,6 +75,16 @@ void svsReset(svsVM *s) {
     s->varArrayType[x] = SVS_TYPE_UNDEF;
   }
 
+#ifdef SVS_TOKEN_CACHE_SEGMENTED
+  for(uint8_t i = 0; i < TOKEN_SEGMENTS; i++) {
+    s->tokenSegmentStart[i] = 0;
+    s->tokenSegmentValid[i] = 0;
+    s->tokenSegmentHits[i]  = 0;
+  }
+ 
+  s->tokenLastSegment = 0;
+#endif
+
   svsSetName((uint8_t *)"def.b", s);
   svsSetFileName((uint8_t *)"def.svs", s);
   // TODO: remove this in v.1.4
