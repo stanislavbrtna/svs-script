@@ -83,7 +83,7 @@ varType getTokenData(uint16_t tokenId, svsVM *s){
 
 
 void fillCacheSegment(uint8_t segment, uint16_t load_start, svsVM *s) {
-  uint32_t x;
+  uint32_t x, ret;
 
   //printf("debug: fill params: chache_pos:%u start:%u stop:%u\n", cache_pos, load_start, load_end);
   for(x = 0; x < TOKEN_SEGMENT_SIZE; x++) {
@@ -137,8 +137,10 @@ uint8_t cacheReload(uint16_t tokenId, svsVM *s){
     uint8_t  leastUsed = 0;
     
     // DBG
-    for(uint8_t i = 0; i < TOKEN_SEGMENTS; i++) {
-      printf("CACHE: %u, hit: %u\n", i, s->tokenSegmentHits[i]);  
+    if (cacheDebug == 1) {
+      for(uint8_t i = 0; i < TOKEN_SEGMENTS; i++) {
+        printf("CACHE: %u, hit: %u\n", i, s->tokenSegmentHits[i]);  
+      }
     }
 
     for(uint8_t i = 0; i < TOKEN_SEGMENTS; i++) {
@@ -146,7 +148,10 @@ uint8_t cacheReload(uint16_t tokenId, svsVM *s){
         leastUsed = i;
       }  
     }
-    printf("DBG: least: %u\n", leastUsed);
+
+    if (cacheDebug == 1) {
+      printf("DBG: least: %u\n", leastUsed);
+    }
 
     for(uint8_t i = 0; i < TOKEN_SEGMENTS; i++) {
       s->tokenSegmentHits[i] -= s->tokenSegmentHits[leastUsed];
@@ -163,10 +168,11 @@ uint8_t cacheReload(uint16_t tokenId, svsVM *s){
 
   // nahrát segment
   // TODO: research: modifikovat tokenID tak, aby se segmenty nepřekrývaly?
-  printf("Reloading! segment:%u tokId: %u\n", segment, tokenId);
+  if (cacheDebug == 1) {
+    printf("Reloading! segment:%u tokId: %u\n", segment, tokenId);
+  }
   fillCacheSegment(segment, tokenId, s);
 
-  
   // update metadata
   s->tokenSegmentStart[segment] = tokenId;
   s->tokenSegmentValid[segment] = 1;
