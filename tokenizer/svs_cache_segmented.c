@@ -28,20 +28,12 @@ extern uint8_t cacheDebug;
 
 uint32_t cacheReloads;
 
-uint16_t segmentOffsetTable[TOKEN_SEGMENTS];
-
 uint32_t svsGetCacheReloads(uint8_t reset) {
   uint32_t res = cacheReloads;
   if (reset) {
     cacheReloads = 0;
   }
   return res;
-}
-
-void svsLoadCacheSegmentOffsets() {
-  for(uint8_t i = 0; i < TOKEN_SEGMENTS; i++) {
-    segmentOffsetTable[i] = i * TOKEN_SEGMENT_SIZE;
-  }
 }
 
 void adjustHitRate(uint8_t hit, svsVM *s);
@@ -60,7 +52,11 @@ static inline uint8_t tokenInCache(uint16_t tokenId, svsVM *s) {
 }
 
 
-uint8_t getTokenType(uint16_t tokenId, svsVM *s){
+inline uint8_t getTokenType(uint16_t tokenId, svsVM *s){
+  if(s->tokenMax < TOKEN_LENGTH) {
+    return s->tokenCache[tokenId].Type;
+  }
+  
   uint8_t segment = tokenInCache(tokenId, s);
   if (!segment) {
     segment = cacheReload(tokenId, s);
@@ -68,13 +64,17 @@ uint8_t getTokenType(uint16_t tokenId, svsVM *s){
 
   segment--;
   return s->tokenCache[
-    segmentOffsetTable[segment]          // segment position
+    TOKEN_SEGMENT_SIZE*segment          // segment position
     + (tokenId - s->tokenSegmentStart[segment]) // position in segment
   ].Type;
 }
 
 
-varType getTokenData(uint16_t tokenId, svsVM *s){
+inline varType getTokenData(uint16_t tokenId, svsVM *s){
+  if(s->tokenMax < TOKEN_LENGTH) {
+    return s->tokenCache[tokenId].Data;
+  }
+
   uint8_t segment = tokenInCache(tokenId, s);
   if (!segment) {
     segment = cacheReload(tokenId, s);
@@ -82,7 +82,7 @@ varType getTokenData(uint16_t tokenId, svsVM *s){
 
   segment--;
   return s->tokenCache[
-    segmentOffsetTable[segment]          // segment position
+    TOKEN_SEGMENT_SIZE*segment          // segment position
     + (tokenId - s->tokenSegmentStart[segment]) // position in segment
   ].Data;
 }
