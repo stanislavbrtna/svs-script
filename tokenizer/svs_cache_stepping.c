@@ -27,6 +27,16 @@ SOFTWARE.
 
 extern uint8_t cacheDebug;
 
+uint32_t cacheReloads;
+
+uint32_t svsGetCacheReloads(uint8_t reset) {
+  uint32_t res = cacheReloads;
+  if (reset) {
+    cacheReloads = 0;
+  }
+  return res;
+}
+
 uint8_t tokenInCache(uint16_t tokenId, svsVM *s){
   if((tokenId < (TOKEN_LENGTH + s->cacheStart)) && (tokenId >= (s->cacheStart))) {
     return 1;
@@ -118,7 +128,7 @@ uint8_t cacheReload(uint16_t tokenId,  svsVM *s){
     }
   }
   //printf("cacheReload dbg: END: index: %u cache start: %u\n", tokenId,s->cacheStart );
-
+  cacheReloads++;
   return 1;
 }
 

@@ -38,35 +38,32 @@ void setCacheDebug(uint8_t level){
 }
 
 // cache open/close
-
-#ifdef PC
-
-void SVScloseCache(svsVM *s) {
-  if (s->vmCache) {
-    fclose(s->vmCache);
-  } else {
-    errMsgS("SVScloseCache: Double close occured!");
+#if TOKEN_CACHE_DISABLED == 0
+  #ifdef PC
+  void SVScloseCache(svsVM *s) {
+    if (s->vmCache) {
+      fclose(s->vmCache);
+    } else {
+      errMsgS("SVScloseCache: Double close occured!");
+    }
   }
-}
 
-void SVSopenCache(svsVM *s) {
-  s->vmCache = fopen(s->vmName, "r+");
-  if (!(s->vmCache)) {
-    errMsgS("SVSopenCache: Error while opening cache file!");
+  void SVSopenCache(svsVM *s) {
+    s->vmCache = fopen(s->vmName, "r+");
+    if (!(s->vmCache)) {
+      errMsgS("SVSopenCache: Error while opening cache file!");
+    }
   }
-}
-
-#else
-
-void SVScloseCache(svsVM *s) {
-  f_close(&(s->vmCache));
-}
-
-void SVSopenCache(svsVM *s) {
-  s->cacheFr = f_open(&(s->vmCache), (char *)s->vmName, FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
-  if (s->cacheFr != FR_OK) {
-    errMsgS((uint8_t *)"SVScloseCache: Error while opening cache file!");
+  #else
+  void SVScloseCache(svsVM *s) {
+    f_close(&(s->vmCache));
   }
-}
 
+  void SVSopenCache(svsVM *s) {
+    s->cacheFr = f_open(&(s->vmCache), (char *)s->vmName, FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
+    if (s->cacheFr != FR_OK) {
+      errMsgS((uint8_t *)"SVScloseCache: Error while opening cache file!");
+    }
+  }
+  #endif
 #endif

@@ -77,4 +77,8 @@ void SVSopenCache(svsVM *s) {
   return;
 }
 
+uint32_t svsGetCacheReloads(uint8_t reset) {
+  return 0;
+}
+
 #endif
