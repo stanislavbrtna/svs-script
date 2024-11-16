@@ -50,10 +50,8 @@ uint8_t getTokenType(uint16_t tokenId, svsVM *s){
 
   if(s->tokenLastSegment != segment - 1) {
     s->tokenLastSegment = segment - 1;
-    adjustHitRate(segment - 1, s);
+    //adjustHitRate(segment - 1, s);
   }
-
-  //printf("GetType: seg: %u, seg_pos:%u, index: %u\n", segment-1, tokenId - s->tokenSegmentStart[segment - 1], tokenId);
 
   return s->tokenCache[
     TOKEN_SEGMENT_SIZE * (segment - 1)          // segment position
@@ -70,10 +68,8 @@ varType getTokenData(uint16_t tokenId, svsVM *s){
 
   if(s->tokenLastSegment != segment - 1) {
     s->tokenLastSegment = segment - 1;
-    adjustHitRate(segment - 1, s);
+    //adjustHitRate(segment - 1, s);
   }
-
-  //printf("GetData: seg: %u, seg_pos:%u\n", segment-1, tokenId - s->tokenSegmentStart[segment - 1]);
 
   return s->tokenCache[
     TOKEN_SEGMENT_SIZE * (segment - 1)          // segment position
@@ -85,17 +81,13 @@ varType getTokenData(uint16_t tokenId, svsVM *s){
 void fillCacheSegment(uint8_t segment, uint16_t load_start, svsVM *s) {
   uint32_t x, ret;
 
-  //printf("debug: fill params: chache_pos:%u start:%u stop:%u\n", cache_pos, load_start, load_end);
-  for(x = 0; x < TOKEN_SEGMENT_SIZE; x++) {
-    #ifdef PC
-    // TODO: seek netřeba? načíst jedním callem?
-    fseek(s->vmCache, sizeof(tokenCacheStruct) * (load_start + x), SEEK_SET);
-    fread(&(s->tokenCache[TOKEN_SEGMENT_SIZE*segment + x]), sizeof(tokenCacheStruct), 1, s->vmCache);
-    #else
-    f_lseek(&(s->vmCache), sizeof(tokenCacheStruct) * (load_start + x));
-    f_read(&(s->vmCache), &(s->tokenCache[TOKEN_SEGMENT_SIZE*segment + x]), sizeof(tokenCacheStruct), (UINT*)&ret );
-    #endif
-  }
+#ifdef PC
+  fseek(s->vmCache, sizeof(tokenCacheStruct) * (load_start), SEEK_SET);
+  fread(&(s->tokenCache[TOKEN_SEGMENT_SIZE*segment]), sizeof(tokenCacheStruct), TOKEN_SEGMENT_SIZE, s->vmCache);
+#else
+  f_lseek(&(s->vmCache), sizeof(tokenCacheStruct) * load_start);
+  f_read(&(s->vmCache), &(s->tokenCache[TOKEN_SEGMENT_SIZE*segment]), sizeof(tokenCacheStruct)*TOKEN_SEGMENT_SIZE, (UINT*)&ret );
+#endif
 }
 
 
@@ -134,7 +126,6 @@ uint8_t cacheReload(uint16_t tokenId, svsVM *s){
 
   // something more funky
   if (!found) {
-    uint8_t  leastUsed = 0;
     
     // DBG
     if (cacheDebug == 1) {
@@ -142,25 +133,12 @@ uint8_t cacheReload(uint16_t tokenId, svsVM *s){
         printf("CACHE: %u, start: %u, hits: %u\n", i, s->tokenSegmentStart[i], s->tokenSegmentHits[i]);  
       }
     }
-
-    for(uint8_t i = 0; i < TOKEN_SEGMENTS; i++) {
-      if(s->tokenSegmentHits[i] < s->tokenSegmentHits[leastUsed]) {
-        leastUsed = i;
-      }  
-    }
-
-    if (cacheDebug == 1) {
-      printf("DBG: least: %u\n", leastUsed);
-    }
-
-    for(uint8_t i = 0; i < TOKEN_SEGMENTS; i++) {
-      //s->tokenSegmentHits[i] -= s->tokenSegmentHits[leastUsed];
-      s->tokenSegmentHits[i] = 0;
-    }
+    // TODO: implement more robust cache replacement alg...
 
     // get the least used segment
     found = 1;
-    segment = leastUsed;
+    // random is the way
+    segment = SVS_RND_FUNCTION % TOKEN_SEGMENTS;
   }
 
   if (!found) {
