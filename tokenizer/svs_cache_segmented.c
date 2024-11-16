@@ -26,6 +26,16 @@ extern uint8_t cacheDebug;
 
 #ifdef SVS_TOKEN_CACHE_SEGMENTED
 
+uint32_t cacheReloads;
+
+uint32_t svsGetCacheReloads(uint8_t reset) {
+  uint32_t res = cacheReloads;
+  if (reset) {
+    cacheReloads = 0;
+  }
+  return res;
+}
+
 void adjustHitRate(uint8_t hit, svsVM *s);
 
 // returns segment + 1
@@ -48,11 +58,6 @@ uint8_t getTokenType(uint16_t tokenId, svsVM *s){
     segment = cacheReload(tokenId, s);
   }
 
-  if(s->tokenLastSegment != segment - 1) {
-    s->tokenLastSegment = segment - 1;
-    //adjustHitRate(segment - 1, s);
-  }
-
   return s->tokenCache[
     TOKEN_SEGMENT_SIZE * (segment - 1)          // segment position
     + (tokenId - s->tokenSegmentStart[segment - 1]) // position in segment
@@ -64,11 +69,6 @@ varType getTokenData(uint16_t tokenId, svsVM *s){
   uint8_t segment = tokenInCache(tokenId, s);
   if (!segment) {
     segment = cacheReload(tokenId, s);
-  }
-
-  if(s->tokenLastSegment != segment - 1) {
-    s->tokenLastSegment = segment - 1;
-    //adjustHitRate(segment - 1, s);
   }
 
   return s->tokenCache[
@@ -155,6 +155,8 @@ uint8_t cacheReload(uint16_t tokenId, svsVM *s){
   s->tokenSegmentStart[segment] = tokenId;
   s->tokenSegmentValid[segment] = 1;
   s->tokenSegmentHits[segment]  = 1;
+
+  cacheReloads++;
 
   return segment + 1;
 }
