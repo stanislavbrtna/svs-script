@@ -83,6 +83,8 @@ void svsReset(svsVM *s) {
   }
  
   s->tokenLastSegment = 0;
+
+  svsLoadCacheSegmentOffsets();
 #endif
 
   svsSetName((uint8_t *)"def.b", s);

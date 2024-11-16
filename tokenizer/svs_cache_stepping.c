@@ -25,6 +25,8 @@ SOFTWARE.
 
 #ifdef SVS_TOKEN_CACHE_STEPPING
 
+extern uint8_t cacheDebug;
+
 uint8_t tokenInCache(uint16_t tokenId, svsVM *s){
   if((tokenId < (TOKEN_LENGTH + s->cacheStart)) && (tokenId >= (s->cacheStart))) {
     return 1;

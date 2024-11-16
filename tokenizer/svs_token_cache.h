@@ -32,10 +32,13 @@ uint16_t getTokenMax(svsVM *s);
 uint8_t closeTokenCache(svsVM *s);
 uint8_t cacheReload(uint16_t tokenId,  svsVM *s);
 uint8_t cacheRead(svsVM *s);
-uint8_t tokenInCache(uint16_t tokenId, svsVM *s);
 void setCacheDebug(uint8_t level);
 
 void SVScloseCache(svsVM *s);
 void SVSopenCache(svsVM *s);
+
+uint32_t svsGetCacheReloads(uint8_t reset);
+
+void svsLoadCacheSegmentOffsets();
 
 #endif

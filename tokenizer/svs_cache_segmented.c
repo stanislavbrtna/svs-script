@@ -28,6 +28,8 @@ extern uint8_t cacheDebug;
 
 uint32_t cacheReloads;
 
+uint16_t segmentOffsetTable[TOKEN_SEGMENTS];
+
 uint32_t svsGetCacheReloads(uint8_t reset) {
   uint32_t res = cacheReloads;
   if (reset) {
@@ -36,10 +38,16 @@ uint32_t svsGetCacheReloads(uint8_t reset) {
   return res;
 }
 
+void svsLoadCacheSegmentOffsets() {
+  for(uint8_t i = 0; i < TOKEN_SEGMENTS; i++) {
+    segmentOffsetTable[i] = i * TOKEN_SEGMENT_SIZE;
+  }
+}
+
 void adjustHitRate(uint8_t hit, svsVM *s);
 
 // returns segment + 1
-uint8_t tokenInCache(uint16_t tokenId, svsVM *s) {
+static inline uint8_t tokenInCache(uint16_t tokenId, svsVM *s) {
   for(uint8_t i = 0; i < TOKEN_SEGMENTS; i++) {
     if(tokenId >= s->tokenSegmentStart[i]
       && tokenId < s->tokenSegmentStart[i] + TOKEN_SEGMENT_SIZE
@@ -58,9 +66,10 @@ uint8_t getTokenType(uint16_t tokenId, svsVM *s){
     segment = cacheReload(tokenId, s);
   }
 
+  segment--;
   return s->tokenCache[
-    TOKEN_SEGMENT_SIZE * (segment - 1)          // segment position
-    + (tokenId - s->tokenSegmentStart[segment - 1]) // position in segment
+    segmentOffsetTable[segment]          // segment position
+    + (tokenId - s->tokenSegmentStart[segment]) // position in segment
   ].Type;
 }
 
@@ -71,9 +80,10 @@ varType getTokenData(uint16_t tokenId, svsVM *s){
     segment = cacheReload(tokenId, s);
   }
 
+  segment--;
   return s->tokenCache[
-    TOKEN_SEGMENT_SIZE * (segment - 1)          // segment position
-    + (tokenId - s->tokenSegmentStart[segment - 1]) // position in segment
+    segmentOffsetTable[segment]          // segment position
+    + (tokenId - s->tokenSegmentStart[segment]) // position in segment
   ].Data;
 }
 
