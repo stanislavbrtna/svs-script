@@ -40,8 +40,8 @@ This file contains the main defines and limits of SVS.
   
   #ifndef SVS_TOKEN_CACHE_SEGMENTED
     #define SVS_TOKEN_CACHE_SEGMENTED
-	  #define TOKEN_SEGMENT_SIZE 64
-	  #define TOKEN_SEGMENTS 32
+	  #define TOKEN_SEGMENT_SIZE 128
+	  #define TOKEN_SEGMENTS 16
     #define TOKEN_LENGTH (TOKEN_SEGMENT_SIZE*TOKEN_SEGMENTS)
   #endif
 
