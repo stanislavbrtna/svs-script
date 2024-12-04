@@ -126,11 +126,6 @@ uint8_t gcRemoveStrIdLen(uint16_t strId, uint16_t str_len, svsVM *s) {
 }
 
 
-uint8_t gcRemoveString(uint16_t strId, svsVM *s) {
-  uint16_t str_len = gcGetLen(strId, s);
-  gcRemoveStrIdLen(strId, str_len, s);
-}
-
 void garbageCollect(int32_t count, svsVM *s) {
   uint16_t gc_start;
   uint16_t x         = 0;
