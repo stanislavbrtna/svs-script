@@ -152,6 +152,11 @@ void garbageCollect(int32_t count, svsVM *s) {
 
   if (s->profilerEnabled) {
     printf("Profiler: collecting garbage! ");
+    if(full) {
+      printf("(full) ");
+    } else {
+      printf("(partial) ");
+    }
   }
   gc_start = s->stringFieldLen;
 
@@ -166,7 +171,7 @@ void garbageCollect(int32_t count, svsVM *s) {
 
   if (s->stringConstMax > s->gcSafePoint) {
     x = s->stringConstMax;
-    cgDMSG("string max used");
+    cgDMSG("string const max used");
   } else {
     x = s->gcSafePoint;
     cgDMSG("safepoint used");
@@ -181,13 +186,13 @@ void garbageCollect(int32_t count, svsVM *s) {
       valid = gcGetValidString(x + 1, s); // check validity of the next one    
       if (0 == valid && chain_remove == 0) {
         all_valid = 0;
-        cgDMSG("Non-valid string removed.");
+        cgDMSG("Non-valid string found, starting chain removal.");
         remove_start = x + 1;
         chain_remove = 1;
         chained = 0;
       }
 
-      if (0 == valid && chain_remove == 1) {
+      if (valid == 0 && chain_remove == 1) {
         chained ++;
       }
 
@@ -195,7 +200,7 @@ void garbageCollect(int32_t count, svsVM *s) {
 
         //printf("Removing strings: %u, len: %u in chain: %u\n", remove_start, x - remove_start + 1, chained);
         uint16_t len = x - remove_start + 1;
-
+        cgDMSG("Removing string.");
         gcRemoveStrIdLen(remove_start, len, s);
         chain_remove = 0;
         x = remove_start; 
@@ -209,6 +214,11 @@ void garbageCollect(int32_t count, svsVM *s) {
         }
       }
     }
+  }
+
+  if(chain_remove == 1) {
+    cgDMSG("Removing chain to field len");
+    s->stringFieldLen = remove_start;
   }
 
   if (s->profilerEnabled) {
