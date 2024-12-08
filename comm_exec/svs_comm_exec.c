@@ -206,6 +206,9 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         currToken = varPrac.tokenId;
         varSetVal(id, varPrac.value, s);
         varSetType(id, varPrac.type, s);
+      } else {
+        varSetVal(id, (varType) 0, s);
+        varSetType(id, SVS_TYPE_UNDEF, s);
       }
 
       if (getTokenType(currToken, s) != SVS_TOKEN_SCOL) { //zkontrolujeme středník / semicolon check
