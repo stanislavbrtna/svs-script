@@ -49,7 +49,7 @@ uint8_t gcGetValidString(uint16_t strId, svsVM *s) {
   }
 
   #ifndef CMDLINE
-  if (gr2_garbage_workaround2( (uint8_t*) ((uint32_t)strId + (uint32_t)(s->stringField)))) {
+  if (gr2_garbage_workaround2( (uint8_t*) ((size_t)strId + (size_t)(s->stringField)))) {
     return 1;
   }
   #endif
@@ -116,9 +116,9 @@ uint8_t gcRemoveStrIdLen(uint16_t strId, uint16_t str_len, svsVM *s) {
 
   #ifndef CMDLINE
     gr2_garbage_workaround(
-                       (void *)((uint32_t)strId + (uint32_t)(s->stringField)),
-                       str_len,
-                       (void *)((uint32_t)s->stringField + (uint32_t)s->stringFieldMax)
+      (uint8_t *)((size_t)strId + (size_t)(s->stringField)),
+      str_len,
+      (uint8_t *)((size_t)s->stringField + (size_t)s->stringFieldMax)
     );
   #endif
 
