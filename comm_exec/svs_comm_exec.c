@@ -207,7 +207,7 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
         varSetVal(id, varPrac.value, s);
         varSetType(id, varPrac.type, s);
       } else {
-        varSetVal(id, (varType) 0, s);
+        varSetVal(id, (varType) (uint32_t)0, s);
         varSetType(id, SVS_TYPE_UNDEF, s);
       }
 
