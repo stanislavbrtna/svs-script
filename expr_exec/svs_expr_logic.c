@@ -23,6 +23,8 @@ SOFTWARE.
 
 #include "svs_expr_exec2.h"
 
+uint16_t exprExecSkip(uint16_t index, svsVM *s);
+
 uint16_t exprExecValueSkip(uint16_t index, svsVM *s) {
   // one token
   if(getTokenType(index, s) == SVS_TOKEN_CONST_NUM
@@ -35,10 +37,10 @@ uint16_t exprExecValueSkip(uint16_t index, svsVM *s) {
   // var or array
   if(getTokenType(index, s) == SVS_TOKEN_VAR
      || getTokenType(index, s) == SVS_TOKEN_ARG
-  ){
+  ) {
     index++;
     if(getTokenType(index, s) == SVS_TOKEN_LSQB) {
-      index = exprExecValueSkip(index + 1, s);
+      index = exprExecSkip(index + 1, s);
       if (getTokenType(index, s) != SVS_TOKEN_RSQB) {
         errSoft((uint8_t *)"exprExecSkip ARRAY: Missing \"]\")!", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
@@ -80,6 +82,7 @@ uint16_t exprExecSkip(uint16_t index, svsVM *s) {
   while (getTokenType(index, s) != SVS_TOKEN_RBR
     && getTokenType(index, s) != SVS_TOKEN_SCOL
     && getTokenType(index, s) != SVS_TOKEN_COL
+    && getTokenType(index, s) != SVS_TOKEN_RSQB
   ){
     index = exprExecValueSkip(index + 1, s);
   }
