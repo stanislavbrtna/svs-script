@@ -38,8 +38,11 @@ uint32_t svsGetCacheReloads(uint8_t reset) {
 
 void adjustHitRate(uint8_t hit, svsVM *s);
 
+#define seg(i) do{if(tokenId >= s->tokenSegmentStart[i] && tokenId < s->tokenSegmentStart[i] + TOKEN_SEGMENT_SIZE  && s->tokenSegmentValid[0]) {return i+1;}} while(0)
+
 // returns segment + 1
 static inline uint8_t tokenInCache(uint16_t tokenId, svsVM *s) {
+#if TOKEN_SEGMENTS != 16
   for(uint8_t i = 0; i < TOKEN_SEGMENTS; i++) {
     if(tokenId >= s->tokenSegmentStart[i]
       && tokenId < s->tokenSegmentStart[i] + TOKEN_SEGMENT_SIZE
@@ -48,6 +51,27 @@ static inline uint8_t tokenInCache(uint16_t tokenId, svsVM *s) {
       return i + 1;
     }
   }
+#else
+  // this is a bit faster on the device,
+  // previous code is too long for loop unrolling perhaps?
+  seg(0);
+  seg(1);
+  seg(2);
+  seg(3);
+  seg(4);
+  seg(5);
+  seg(6);
+  seg(7);
+  seg(8);
+  seg(9);
+  seg(10);
+  seg(11);
+  seg(12);
+  seg(13);
+  seg(14);
+  seg(15);
+#endif
+
   return 0;
 }
 
