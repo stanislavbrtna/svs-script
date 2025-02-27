@@ -231,6 +231,8 @@ function main {
   		and float("33") == 33.0
   		and float("") == 0.0
   		and float("3.3") == 3.3
+  		and float("3.99999999") == 4.0
+      and float("3.99999") == 3.99999
   		and float("123.456") == 123.456
   		and float("456.789") == 456.789
   		and float("420,69") == 420.69

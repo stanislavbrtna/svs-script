@@ -272,18 +272,18 @@ VARTYPE i16toString(VARTYPE num, svsVM *s) {
   return retval;
 }
 
-varType floatToString(varType num, svsVM *s) {
 #ifdef USE_FLOAT
+varType floatToString(varType num, svsVM *s) {
   VARTYPE retval;
   uint8_t neg = 0;
   uint8_t a,b;
 
-  uint64_t prac1 = 0;
-  uint64_t prac2 = 0;
-  uint16_t decnum = 0;
+  uint64_t base     = 0;
+  uint64_t fraction = 0;
+  uint16_t decnum   = 0;
 
-  uint8_t i[20] = "0000000000000.00000";
-  //               -999999999999.99999
+  uint8_t outBuff[20] = "0000000000000.00000";
+  //                     -999999999999.99999
 
   if (errCheck(s)) {
     return (varType) (int32_t)0;
@@ -318,66 +318,73 @@ varType floatToString(varType num, svsVM *s) {
     num.val_f *= -1;
   }
 
-  prac1 = (uint64_t)num.val_f;
-  num.val_f -= (float)prac1;
+  base = (uint64_t)num.val_f;
+  num.val_f -= (float)base;
 
+  // move fraction above zero
   while (num.val_f != (float)((uint64_t)num.val_f)) {
     num.val_f *= 10;
     decnum++;
   }
 
-  prac2 = (uint64_t)num.val_f;
-
-  a = 0;
-
-  while (0 != prac1) {
-    i[12 - a] = (prac1 % 10 + 48);
-    prac1 = prac1 / 10;
-    a++;
-  }
+  fraction = (uint64_t)num.val_f;
 
   while (decnum > 5) {
-    if ((prac2 % 10) >= 5) {
-      prac2 /= 10;
-      prac2 += 1;
+    if ((fraction % 10) >= 5) {
+      fraction /= 10;
+      fraction += 1;
     } else {
-      prac2 /= 10;
+      fraction /= 10;
     }
     decnum--;
   }
 
   a = 0;
 
-  while (0 != prac2) {
-    i[18 - a - 5 + decnum] = (prac2 % 10 + 48);
-    prac2 = prac2 / 10;
+  while (0 != fraction) {
+    outBuff[18 - a - 5 + decnum] = (fraction % 10 + 48);
+    fraction = fraction / 10;
+    a++;
+
+    if (18 - a - 5 + decnum == 13 && fraction != 0) {
+      outBuff[13] = '.';
+      base++;
+      break;
+    }
+  }
+
+  a = 0;
+
+  while (0 != base) {
+    outBuff[12 - a] = (base % 10 + 48);
+    base = base / 10;
     a++;
   }
 
   a = 18;
-  while(i[a] == '0') {
-    i[a] = 0;
+  while(outBuff[a] == '0') {
+    outBuff[a] = 0;
     a--;
   }
 
-  if (i[a] == '.') {
-    i[a] = 0;
+  if (outBuff[a] == '.') {
+    outBuff[a] = 0;
   }
 
   a = 0;
 
   if (neg == 0) {
-    while ((i[0] == '0') && (i[1] != '.')) {
+    while ((outBuff[0] == '0') && (outBuff[1] != '.')) {
       for (b = 0; b < 19; b++) {
-        i[b] = i[b + 1];
+        outBuff[b] = outBuff[b + 1];
       }
       a++;
     }
   } else {
-    i[0] = '-';
-    while((i[1] == '0') && (i[2] != '.')) {
+    outBuff[0] = '-';
+    while((outBuff[1] == '0') && (outBuff[2] != '.')) {
       for (b = 1; b < 19; b++) {
-        i[b] = i[b + 1];
+        outBuff[b] = outBuff[b + 1];
       }
       a++;
     }
@@ -387,12 +394,15 @@ varType floatToString(varType num, svsVM *s) {
     return retval;
   }
 
-  retval.val_str = strNew(i,s);
+  retval.val_str = strNew(outBuff,s);
   return retval;
+}
 
-  #else
+#else
+
+varType floatToString(varType num, svsVM *s) {
   VARTYPE retval;
   retval.val_str = 0;
   return retval;
-  #endif
 }
+#endif

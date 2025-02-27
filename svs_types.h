@@ -23,7 +23,6 @@ SOFTWARE.
 #ifndef SVS_TYPES_H
 #define SVS_TYPES_H
 
-//#define VARTYPE int16_t
 #define VARTYPE varType
 
 #define SVS_TYPE_NUM 0
@@ -92,7 +91,7 @@ typedef union {
   int32_t  val_s;   // signed type, used for SVS_TYPE_NUM
   uint16_t val_str; // position in string field, used for SVS_TYPE_STR
   uint32_t val_u;   // Used for system call ids
-  float    val_f;      // float value for SVS_TYPE_FLT
+  float    val_f;   // float value for SVS_TYPE_FLT
 } varType;
 
 typedef struct {
