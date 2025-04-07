@@ -70,7 +70,6 @@ uint8_t *strNewP(uint8_t *index, svsVM *s) {
 // sets the str_id pointer to the svs string index of the new string
 // Given pointer will not be valid after garbage collection
 uint8_t *strNewPLen(uint32_t len, uint16_t * str_id, svsVM *s) {
-  uint16_t x = 0;
   uint8_t *retval;
   retval = &(s->stringField[s->stringFieldLen]);
 

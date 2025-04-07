@@ -222,7 +222,7 @@ void gcCollectArrays(svsVM *s) {
 void printArrays(svsVM *s) {
   puts("Arrays:");
   for(uint32_t x = 1; x <= s->varArrayLen; x++) {
-    printf("%u : %ld \n", (unsigned int)x, s->varArray[x].val_s);
+    printf("%u : %d \n", (unsigned int)x, s->varArray[x].val_s);
   }
   puts("End");
 }

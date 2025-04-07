@@ -113,12 +113,11 @@ inline varType getTokenData(uint16_t tokenId, svsVM *s){
 
 
 void fillCacheSegment(uint8_t segment, uint16_t load_start, svsVM *s) {
-  uint32_t x, ret;
-
 #ifdef PC
   fseek(s->vmCache, sizeof(tokenCacheStruct) * (load_start), SEEK_SET);
   fread(&(s->tokenCache[TOKEN_SEGMENT_SIZE*segment]), sizeof(tokenCacheStruct), TOKEN_SEGMENT_SIZE, s->vmCache);
 #else
+  uint32_t ret;
   f_lseek(&(s->vmCache), sizeof(tokenCacheStruct) * load_start);
   f_read(&(s->vmCache), &(s->tokenCache[TOKEN_SEGMENT_SIZE*segment]), sizeof(tokenCacheStruct)*TOKEN_SEGMENT_SIZE, (UINT*)&ret );
 #endif
@@ -127,8 +126,6 @@ void fillCacheSegment(uint8_t segment, uint16_t load_start, svsVM *s) {
 
 // advanced cache reloader
 uint8_t cacheReload(uint16_t tokenId, svsVM *s){
-  uint16_t x;
-  uint16_t chacheStartPrac;
 
   if (cacheDebug == 1) {
     printf("cacheReload dbg: BEGIN: index: %u cache start: %u -> reloading cache\n(chache size: %u )\n", tokenId, s->cacheStart, TOKEN_LENGTH );
@@ -136,11 +133,11 @@ uint8_t cacheReload(uint16_t tokenId, svsVM *s){
 
   // Error handling
 #ifdef PC
-  if ((s->vmCache)==0){
+  if ((s->vmCache) == 0) {
     errMsgS("cacheReload: Error: File not valid!");
   }
 #else
-  if ((s->cacheFr)!=FR_OK){
+  if ((s->cacheFr) != FR_OK) {
     errMsgS((uint8_t *)"cacheReload: Error: File not valid!");
   }
 #endif

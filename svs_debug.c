@@ -69,7 +69,7 @@ void strTablePrint(svsVM *s) {
 }
 
 void svsPrintUsedUp(svsVM *s) {
-  printf("SVS vm %s, (%lu): \n", s->vmName, (uint32_t) s);
+  printf("SVS vm %s, (%u b): \n", s->vmName, (uint32_t) sizeof(s));
   printf("    fname:           %s\n", s->fName);
   printf("Functions:\n");
   printf("    funcTableLen:    %u of %u\n", s->funcTableLen, FUNCTION_TABLE_L);
