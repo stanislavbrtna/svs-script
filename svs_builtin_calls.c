@@ -593,12 +593,16 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     while (s->stringField[args[1].val_str + x] != 0) {
 
       if (len >= ((int32_t)args[2].val_u) && (len <= args[3].val_s)) {
-        strNewStreamPush(s->stringField[args[1].val_str + x], s);
+        if(strNewStreamPush(s->stringField[args[1].val_str + x], s)) {
+          simpleError((uint8_t *)"substr(): out of string memory!", s);
+        }
 
         if ((s->stringField[args[1].val_str + x] >= 0xC3) \
             && (s->stringField[args[1].val_str + x] <= 0xC5)) {
           x++;
-          strNewStreamPush(s->stringField[args[1].val_str + x], s);
+          if(strNewStreamPush(s->stringField[args[1].val_str + x], s)) {
+            simpleError((uint8_t *)"substr(): out of string memory!", s);
+          }
         }
       } else {
         if ((s->stringField[args[1].val_str + x] >= 0xC3) \
