@@ -131,7 +131,7 @@ typedef struct {
 
 typedef struct {
   uint8_t vmName[SVS_FILE_NAME_L+1];  // vm name
-  uint8_t fName[SVS_FILE_NAME_L]; // .svs file name
+  uint8_t fName[SVS_FILE_NAME_L+1];   // .svs file name
 
 #ifdef PC //chache file, different for pc and umc
   FILE *vmCache;

@@ -1090,7 +1090,7 @@ uint8_t tokenParse(svsVM *s) {
           && pracName[3] <= '9'
       ) {
         setTokenType(posToken, SVS_TOKEN_ARG, s);
-        setTokenData(posToken, (varType)((uint16_t)(pracName[3] - '0')), s);
+        setTokenData(posToken, (varType)((uint32_t)(pracName[3] - '0')), s);
         tokenDMSG("Token set, type ARG",
           posToken,
           getTokenData(posToken, s),
@@ -1153,7 +1153,7 @@ uint8_t tokenParse(svsVM *s) {
                       getTokenType(posToken, s),
                       posText);
             setTokenType(posToken, 0, s);
-            setTokenData(posToken, (varType)((sysConsts[x])[y].value), s);
+            setTokenData(posToken, (varType)((uint32_t)((sysConsts[x])[y].value)), s);
             Lock = 0;
           }
           y++;
@@ -1192,7 +1192,7 @@ uint8_t tokenParse(svsVM *s) {
           uint16_t wrapperId;
           wrapperId = getSysWrapperId(pracName2);
           if (wrapperId) {
-            setTokenData(posToken, (varType)((uint32_t)wrapperId - 1), s);
+            setTokenData(posToken, (varType)((uint32_t)(wrapperId - 1)), s);
             posToken++;
             setTokenType(posToken, SVS_TOKEN_SYS, s);
             setTokenData(posToken, (varType)((uint16_t)0), s);
@@ -1214,7 +1214,7 @@ uint8_t tokenParse(svsVM *s) {
 
         if (syscallExists(pracName2, s)) { // check if syscall exists
           // then set token as that syscall
-          setTokenData(posToken, (varType)((uint16_t)syscallGetId(pracName2, s)), s);
+          setTokenData(posToken, (varType) ((uint32_t)syscallGetId(pracName2, s)), s);
           tokenDMSG("Token set, type existing SYSCALL",
                     posToken,
                     getTokenData(posToken, s),
@@ -1227,17 +1227,13 @@ uint8_t tokenParse(svsVM *s) {
 
             s->syscallTable[s->syscallTableLen].sysCallName = strNewP(pracName2, s);
             INCREMENT_STATIC_STRINGS
-            setTokenData(posToken, (varType) s->syscallTableLen, s);
-            #ifdef WEBTARGET
-            //doNotRemoveThese(s->syscallTableLen, s->syscallTable[s->syscallTableLen].sysCallName);
-            //printf("Hotfix: There must be a better way to tell the llvm to not throw away theese variables than with printf... %u - %s \nyeah, I tried volatilize the s**t out, didn't help.\n",s->syscallTableLen,s->syscallTable[s->syscallTableLen].sysCallName );
-            #endif
-            //printf("syscall id: %u, name: %s \n",s->syscallTableLen,s->syscallTable[s->syscallTableLen].sysCallName );
+            setTokenData(posToken, (varType) ((uint32_t)s->syscallTableLen), s);
             tokenDMSG("Token set, type new SYSCALL",
                       posToken,
                       getTokenData(posToken, s),
                       getTokenType(posToken, s),
                       posText);
+            //printf("addin syscall: %s\n", s->syscallTable[s->syscallTableLen].sysCallName);
           } else {
             tokenizerErrorPrint((uint8_t *)"tokenParse: Too many SYS calls in one file!");
             return 1;
@@ -1458,7 +1454,7 @@ uint8_t tokenParse(svsVM *s) {
           } else {
             s->varTableLen++;
             setTokenType(posToken, SVS_TOKEN_VAR, s); //nastavíme typ
-            setTokenData(posToken, (varType) s->varTableLen, s);
+            setTokenData(posToken, (varType) ((uint32_t)s->varTableLen), s);
             s->varTable[s->varTableLen].type = SVS_TYPE_UNDEF;
             s->varTable[s->varTableLen].name = strNewP(pracName, s);
             INCREMENT_STATIC_STRINGS
@@ -1484,7 +1480,7 @@ uint8_t tokenParse(svsVM *s) {
             // we register it as a built-in call, otherwise it will be a normal call
             if (getBuiltInCallId(pracName) && !(functionExists(pracName, s))) {
               setTokenType(posToken, SVS_TOKEN_FUNCTION_BUILTIN, s);
-              setTokenData(posToken, (varType)getBuiltInCallId(pracName), s);
+              setTokenData(posToken, (varType)((uint32_t)getBuiltInCallId(pracName)), s);
               tokenDMSG("Token set, type BUILT-IN CALL, function name:",
                           posToken, getTokenData(posToken, s),
                           getTokenType(posToken, s),
@@ -1500,7 +1496,7 @@ uint8_t tokenParse(svsVM *s) {
               setTokenType(posToken, SVS_TOKEN_CALL, s);
               INCREMENT_STATIC_STRINGS
               // TODO: deduplicate call names somehow
-              setTokenData(posToken, (varType)strNew(pracName, s), s);
+              setTokenData(posToken, (varType)((uint32_t)strNew(pracName, s)), s);
               if (errCheck(s)) {
                 return 1;
               }

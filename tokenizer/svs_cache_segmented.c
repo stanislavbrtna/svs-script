@@ -26,6 +26,7 @@ extern uint8_t cacheDebug;
 
 #ifdef SVS_TOKEN_CACHE_SEGMENTED
 
+int SVS_RND_FUNCTION;
 uint32_t cacheReloads;
 
 uint32_t svsGetCacheReloads(uint8_t reset) {

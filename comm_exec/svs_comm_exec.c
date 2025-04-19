@@ -110,8 +110,11 @@ uint16_t commExec(uint8_t * name, svsVM *s) {
 
     return res;
   } else {
-    errSoft((uint8_t *)"commExecById: Function does not exist.", s);
-    printf("Missing function:%s\nFunction table len: %u\n", name, s->funcTableLen);
+    errSoft((uint8_t *)"commExec: Function does not exist.", s);
+    printf("Missing function:%s\n Function table len: %u, contents:\n", name, s->funcTableLen);
+    for (uint16_t x = 1; x <= s->funcTableLen; x++) {
+      printf("%u - %s\n", x, s->funcTable[x].name);
+    }
     return 0;
   }
 }

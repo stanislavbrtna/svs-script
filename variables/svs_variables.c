@@ -66,7 +66,7 @@ varType varGetIdFromMask(varType Id, svsVM *s) {
       //printf("comparing %u and %u\n",s->varTable[x].maskId, Id.val_u);
       if (s->varTable[x].maskId == Id.val_u) {
         //printf("Local variable found: id=%u\n",x);
-        return (varType)x;
+        return (varType)((uint32_t)x); // the (uint32_t) retype is needed for llvm... it borks othervise
       }
     }
     //printf("Local variable NOT found: id=%u\n",Id.val_u);
@@ -124,8 +124,8 @@ varType newArray(varType id, uint16_t len, svsVM *s) {
     return (varType)((uint16_t)0);
   }
   // first element of array is its lenght
-  s->varArray[s->varArrayLen] = (varType)len;
-  retval = (varType)s->varArrayLen;
+  s->varArray[s->varArrayLen] = (varType)((uint32_t)len);
+  retval = (varType)((uint32_t)s->varArrayLen);
   s->varArrayLen++;
   s->varArrayLen += len;
 
@@ -227,12 +227,12 @@ void printArrays(svsVM *s) {
   puts("End");
 }
 
-VARTYPE varGetId(uint8_t *name, svsVM *s) {
+varType varGetId(uint8_t *name, svsVM *s) {
   uint16_t x = 0;
   if (s->varTableLen != 0) {
     for(x = 1; x <= s->varTableLen; x++) {
       if (strCmp(name, s->varTable[x].name)) {
-        return (varType)x;
+        return (varType)((uint32_t)x);
       }
     }
   }
@@ -252,7 +252,7 @@ uint8_t varGetType(VARTYPE id, svsVM *s) {
   return 0;
 }
 
-uint8_t varSetType(VARTYPE id, uint8_t type, svsVM *s) {
+uint8_t varSetType(varType id, uint8_t type, svsVM *s) {
   #ifdef LOCAL_VARIABLES_ENABLED
   id = varGetIdFromMask(id, s);
   #endif
@@ -265,25 +265,26 @@ uint8_t varSetType(VARTYPE id, uint8_t type, svsVM *s) {
   return 1;
 }
 
-VARTYPE varGetVal(VARTYPE id, svsVM *s) {
+varType varGetVal(varType id, svsVM *s) {
   #ifdef LOCAL_VARIABLES_ENABLED
   id = varGetIdFromMask(id, s);
   #endif
   if (id.val_u <= s->varTableLen) {
-    //printf("varGetVal id:%u value:%u \n",id,varTable[id].value);
-    return (varType)s->varTable[id.val_u].value;
+    //printf("varGetVal id:%u value:%u \n", id.val_u, s->varTable[id.val_u].value.val_u);
+    return s->varTable[id.val_u].value;
   }
   errMsgS((uint8_t *)"varGetVal: variable not found!");
   errHalt();
   return (varType)((uint16_t) 0);
 }
 
-uint8_t varSetVal(VARTYPE id, VARTYPE val, svsVM *s) {
+uint8_t varSetVal(varType id, varType val, svsVM *s) {
   #ifdef LOCAL_VARIABLES_ENABLED
   id = varGetIdFromMask(id, s);
   #endif
   if (id.val_u <= s->varTableLen) {
-    s->varTable[id.val_u].value.val_s = val.val_s;
+    //printf("varSetVal id:%u value:%u (%s)\n", id.val_u, val.val_u, s->varTable[id.val_u].name);
+    s->varTable[id.val_u].value = val;
     return 1;
   }
   errMsgS((uint8_t *)"varSetVal: variable not found!");

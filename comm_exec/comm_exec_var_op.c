@@ -465,9 +465,9 @@ uint8_t comm_exec_var_op(uint16_t *token, svsVM * s) {
       }
 
       currToken++;
-
-      uint8_t currentArrayType = s->varArrayType[1 + varGetVal(getTokenData(x, s), s).val_s +  index.val_s];
-      varType currentArrayValue = s->varArray[1 + varGetVal(getTokenData(x, s), s).val_s +  index.val_s];
+      //printf("token data: %u, val_id: %u , index val: %u\n", getTokenData(x, s).val_u, varGetVal(getTokenData(x, s), s).val_u,  index.val_s);
+      uint8_t currentArrayType = s->varArrayType[1 + varGetVal(getTokenData(x, s), s).val_s + index.val_s];
+      varType currentArrayValue = s->varArray[1 + varGetVal(getTokenData(x, s), s).val_s + index.val_s];
 
 
       // ++ --

@@ -27,10 +27,10 @@ Misc. functions used in SVS.
 
 #include "svs_basics.h"
 uint8_t syscallExists(uint8_t *name, svsVM *s);
-uint8_t syscallGetId(uint8_t *name, svsVM *s);
+uint16_t syscallGetId(uint8_t *name, svsVM *s);
 
 uint8_t functionExists(uint8_t *name, svsVM *s);
-uint8_t functionGetId(uint8_t *name, svsVM *s);
+uint16_t functionGetId(uint8_t *name, svsVM *s);
 
 uint8_t isNumber(uint8_t x);
 uint8_t isRegChar(uint8_t x);

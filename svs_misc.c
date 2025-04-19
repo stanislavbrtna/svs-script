@@ -112,14 +112,14 @@ void svsInfo(svsVM *s) {
 
 void svsSetName(uint8_t * name, svsVM *s) {
   uint16_t x;
-  for(x = 0; x < SVS_FILE_NAME_L; x++) {
+  for(x = 0; x < SVS_FILE_NAME_L - 1; x++) {
     s->vmName[x] = name[x];
   }
 }
 
 void svsSetFileName(uint8_t * name, svsVM *s) {
   uint16_t x;
-  for(x = 0; x < SVS_FILE_NAME_L; x++) {
+  for(x = 0; x < SVS_FILE_NAME_L - 1; x++) {
     s->fName[x] = name[x];
   }
 }
@@ -145,7 +145,7 @@ uint8_t syscallExists(uint8_t *name, svsVM *s) {
   return 0;
 }
 
-uint8_t syscallGetId(uint8_t *name, svsVM *s) {
+uint16_t syscallGetId(uint8_t *name, svsVM *s) {
   uint16_t x = 0;
   if (s->syscallTableLen != 0) {
     for (x = 1; x <= s->syscallTableLen; x++) {
@@ -169,7 +169,7 @@ uint8_t functionExists(uint8_t *name, svsVM *s) {
   return 0;
 }
 
-uint8_t functionGetId(uint8_t *name, svsVM *s) {
+uint16_t functionGetId(uint8_t *name, svsVM *s) {
   uint16_t x = 0;
   if (s->funcTableLen != 0) {
     for (x = 1; x <= s->funcTableLen; x++) {

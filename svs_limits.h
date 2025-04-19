@@ -27,8 +27,8 @@ This file contains the main defines and limits of SVS.
 
 /*============================= Versions =====================================*/
 
-#define SVS_VERSION    "1.9.0"
-#define SVS_VERSION_NUM 10900
+#define SVS_VERSION    "1.9.1"
+#define SVS_VERSION_NUM 10910
 
 /*============================= Local Config =================================*/
 
