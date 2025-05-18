@@ -284,7 +284,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       }
 
       // 1.234
-      if ((s->stringField[args[1].val_str + x] == '.')) {
+      if (s->stringField[args[1].val_str + x] == '.') {
         x++;
         while((s->stringField[args[1].val_str + x] != 0) && isNumber(s->stringField[args[1].val_str + x])) {
             fltPrac += ((float)(s->stringField[args[1].val_str + x] - 48)/(float)((exp_helper(10, float_dp))));
@@ -302,7 +302,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       }
 
       // 1,256.789 or 1,236
-      if ((s->stringField[args[1].val_str + x] == ',')) {
+      if (s->stringField[args[1].val_str + x] == ',') {
         x++;
         while((s->stringField[args[1].val_str + x] != 0)) {
 
@@ -378,7 +378,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       return 0;
     }
 
-    if ((argType[1] == 1)) {
+    if (argType[1] == 1) {
       int32_t isNum = 1;
       int32_t isFlt = 0;
       uint8_t c;
