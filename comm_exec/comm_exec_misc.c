@@ -37,13 +37,13 @@ uint16_t exprSkip(uint16_t index, svsVM *s) {
       if (count > 0) {
       count -= 1;
       } else {
-        errSoft((uint8_t *)"commSkip: Bracket sanity error.", s);
+        errSoft((uint8_t *)"exprSkip: Bracket sanity error.", s);
         errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
         errSoftSetToken(index, s);
         return 0;
       }
       if (count == 0) {
-        commExDMSG("commSkip expression skip end, (skipped)", index, s);
+        commExDMSG("exprSkip: expression skip end, (skipped)", index, s);
         break;
       }
     }
@@ -64,13 +64,15 @@ uint16_t commSkip(uint16_t index, svsVM *s) {
 
   // skip if/else
   if (getTokenType(x, s) == SVS_TOKEN_IF) {
+    commExDMSG("commSkip IF", index, s);
     x = exprSkip(x, s);
     x++;
     x = commSkip(x, s);
     if (getTokenType(x + 1, s) != SVS_TOKEN_ELSE) {
       return x;
     } else {
-      x++;
+      commExDMSG("commSkip found else branch", index, s);
+      x += 2;
       x = commSkip(x, s);
       return x;
     }
