@@ -16,7 +16,48 @@ function main {
   cnt = cnt + 1;
 
   FAIL = 0;
+  
+  # not very deep else-if construct test
+  eifFAIL = 0; 
+  
+  if(1) {
+    eifFAIL += 0; # right branch
+  } else if (0) {
+    eifFAIL += 1;
+  } else if (0) {
+    eifFAIL += 1;
+  } else {
+    eifFAIL += 1;
+  }
+  
+  if(0) {
+    eifFAIL += 1; 
+  } else if (0) {
+    eifFAIL += 1;
+  } else if (0) {
+    eifFAIL += 1;
+  } else {
+    eifFAIL += 0; # right branch
+  }
+  
+  if(0) {
+    eifFAIL += 1; 
+  } else if (1) {
+    eifFAIL += 0; # right branch
+  } else if (1) {
+    eifFAIL += 1;
+  } else {
+    eifFAIL += 1; 
+  }
+  
+  if(eifFAIL) {
+    FAIL = 1;
+    sys print(cnt + " - else-if: FAIL");
+  } else {
+    sys print(cnt + " - else-if: OK");
+  }
 
+  cnt++;
 
   if((0xff == 255) * (0xa == 10) * (0x11 == 17)) {
     sys print(cnt + " - hexparse:OK");
@@ -251,6 +292,7 @@ function main {
   		and getcp("abcd", 2) == "b"
   		and getcp("žžgře", 4) == "ř"
   		and substr("ABCDEF", 2, 5) == "BCDE"
+  		and substr("A😃BCDEF", 2, 3) == "😃B"
       and substr("abcšdefčghř123", 8, 12) == "čghř1"
   		and instr("abcdefghchijklmnopq", "chi") == 9
   		and instr("abcdefghchijklmnopq", "abc") == 1
@@ -260,12 +302,16 @@ function main {
   		and lower("aBcDeFgH") == "abcdefgh"
   		and upper("aBcDeFgH") == "ABCDEFGH"
   		and charval("A") == 65
+  		and charval("😃", 0) == 0xF0
+  		and charval("😃", 1) == 0x9F
+  		and charval("😃", 2) == 0x98
+  		and charval("😃", 3) == 0x83
+  		and charval("😃", 5) == -1
   		and charval(300) == ""
   		and charval("x") == 120
   		) {
-
     sys print(cnt + " - Integrated functions:OK");
-  }else{
+  } else {
     sys print(cnt + " - Integrated functions:FAIL");
     FAIL = 1;
   }

@@ -446,7 +446,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   if (callId == GETCP) {
     int32_t len = 1; // we start indexing strings from 1
     int32_t x = 0;
-    uint8_t tmpChar[4];
+    uint8_t tmpChar[5];
 
     tmpChar[0] = 0;
 
@@ -466,27 +466,54 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
     }
 
     while (s->stringField[args[1].val_str + x] != 0) {
+      // success
       if (len == args[2].val_s) {
+
         if ((s->stringField[args[1].val_str + x] >= 0xC3) \
               && (s->stringField[args[1].val_str + x] <= 0xC5)) {
           tmpChar[0] = s->stringField[args[1].val_str + x];
           tmpChar[1] = s->stringField[args[1].val_str + x + 1];
           tmpChar[2] = 0;
-        } else if ((x > 1) && (s->stringField[args[1].val_str + x - 1] >= 0xC3) \
+          break;
+        }
+        
+        if ((x > 1) && (s->stringField[args[1].val_str + x - 1] >= 0xC3) \
               && (s->stringField[args[1].val_str + x - 1] <= 0xC5)) {
           tmpChar[0] = s->stringField[args[1].val_str + x - 1];
           tmpChar[1] = s->stringField[args[1].val_str + x];
           tmpChar[2] = 0;
-        } else {
-          tmpChar[0] = s->stringField[args[1].val_str + x];
-          tmpChar[1] = 0;
+          break;
         }
+
+        if (
+          s->stringField[args[1].val_str + x] == 0xF0 &&
+          s->stringField[args[1].val_str + x + 1] == 0x9F
+        ){
+          tmpChar[0] = s->stringField[args[1].val_str + x];
+          tmpChar[1] = s->stringField[args[1].val_str + x + 1];
+          tmpChar[2] = s->stringField[args[1].val_str + x + 2];
+          tmpChar[3] = s->stringField[args[1].val_str + x + 3];
+          tmpChar[4] = 0;
+          break;
+        }
+
+        tmpChar[0] = s->stringField[args[1].val_str + x];
+        tmpChar[1] = 0;
         break;
       }
-      if ((s->stringField[args[1].val_str + x] >= 0xC3) \
-            && (s->stringField[args[1].val_str + x] <= 0xC5)) {
+
+      if (
+        s->stringField[args[1].val_str + x] >= 0xC3 &&
+        s->stringField[args[1].val_str + x] <= 0xC5
+      ){
         x++;
+      } else if (
+        s->stringField[args[1].val_str + x] >= 0xF0 &&
+        s->stringField[args[1].val_str + x + 1] == 0x9F
+      ){
+        x += 3;
       }
+
       len++;
       x++;
     }
@@ -519,10 +546,18 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
 
     if (argType[1] == SVS_TYPE_STR) {
       while (s->stringField[args[1].val_str + x] != 0) {
+        // cz chars
         if ((s->stringField[args[1].val_str + x] >= 0xC3) \
             && (s->stringField[args[1].val_str + x] <= 0xC5)) {
           x++;
         }
+
+        // emoji
+        if ((s->stringField[args[1].val_str + x] == 0xF0) \
+            && (s->stringField[args[1].val_str + x + 1] == 0x9F)) {
+          x += 3;
+        }
+
         len++;
         x++;
       }
@@ -595,6 +630,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
       if (len >= ((int32_t)args[2].val_u) && (len <= args[3].val_s)) {
         if(strNewStreamPush(s->stringField[args[1].val_str + x], s)) {
           simpleError((uint8_t *)"substr(): out of string memory!", s);
+          return 0;
         }
 
         if ((s->stringField[args[1].val_str + x] >= 0xC3) \
@@ -602,8 +638,29 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
           x++;
           if(strNewStreamPush(s->stringField[args[1].val_str + x], s)) {
             simpleError((uint8_t *)"substr(): out of string memory!", s);
+            return 0;
           }
         }
+        
+        if ((s->stringField[args[1].val_str + x] == 0xF0) \
+            && (s->stringField[args[1].val_str + x + 1] == 0x9F)) {
+          x++;
+          if(strNewStreamPush(s->stringField[args[1].val_str + x], s)) {
+            simpleError((uint8_t *)"substr(): out of string memory!", s);
+            return 0;
+          }
+          x++;
+          if(strNewStreamPush(s->stringField[args[1].val_str + x], s)) {
+            simpleError((uint8_t *)"substr(): out of string memory!", s);
+            return 0;
+          }
+          x++;
+          if(strNewStreamPush(s->stringField[args[1].val_str + x], s)) {
+            simpleError((uint8_t *)"substr(): out of string memory!", s);
+            return 0;
+          }
+        }
+
       } else {
         if ((s->stringField[args[1].val_str + x] >= 0xC3) \
             && (s->stringField[args[1].val_str + x] <= 0xC5)) {
@@ -706,19 +763,57 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
   }
 
   // num = charval(str); str = charval(num);
+  // num = charval(str, byte);
   if (callId == CHARVAL) {
-    if (count != 1) {
-      simpleError((uint8_t *)"charval(): wrong argument count!", s);
-      return 0;
-    }
-
     if (argType[1] == SVS_TYPE_STR) {
+      if (count != 1 && count != 2) {
+        simpleError((uint8_t *)"charval(): wrong argument count!", s);
+        return 0;
+      }
+
+      if(count == 2) {
+        if(argType[2] != SVS_TYPE_NUM) {
+          simpleError((uint8_t *)"charval(): wrong type of argument!", s);
+          return 0;
+        }
+
+        uint8_t charLen = 0;
+
+        if(
+          s->stringField[args[1].val_str] >= 0xC3 &&
+          s->stringField[args[1].val_str + 1] <= 0xC5
+        ){
+          charLen = 2;
+        }
+
+        if(
+          s->stringField[args[1].val_str] == 0xF0 &&
+          s->stringField[args[1].val_str + 1] == 0x9F
+        ){
+          charLen = 4;
+        }
+
+        if(args[2].val_s < charLen && args[2].val_s >= 0) {
+          result->value = (varType) ((uint32_t)s->stringField[args[1].val_str + args[2].val_s]);
+          result->type = SVS_TYPE_NUM;
+          return 1;
+        } else {
+          result->value = (varType) -1;
+          result->type = SVS_TYPE_NUM;
+          return 1;
+        }
+      }
+      
       result->value = (varType) ((uint32_t)s->stringField[args[1].val_str]);
       result->type = SVS_TYPE_NUM;
       return 1;
     }
 
-    if (argType[1] == SVS_TYPE_NUM) {      
+    if (argType[1] == SVS_TYPE_NUM) {
+      if (count != 1) {
+        simpleError((uint8_t *)"charval(): wrong argument count!", s);
+        return 0;
+      }  
       strNewStreamInit(s);
       if (args[1].val_s < 256 && args[1].val_s > 0) {
         strNewStreamPush((uint8_t)args[1].val_s, s);

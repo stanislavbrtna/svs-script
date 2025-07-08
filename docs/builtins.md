@@ -43,6 +43,16 @@ Return: [str] char at given position
 
 Function *getcp(string, position)* returns new string containing only one char that is at given position in a given string. If the position is invalid, then it returns empty string.
 
+#### Get char value
+This function can be used in multiple ways, depending on the number and type of the parameters.
+    charval([str]string);
+Return: [num] value of the first byte
+    charval([str]string, [num]byte_no);
+Return: [num] value of the *byte_no* byte, indexed from zero
+Usage is as follows: Get character with *substr* or *getcp*, then determine the byte lenght of the result with *rlen*. Resulting one-character multiple bytes long string can then be adressed with *charval*. 
+    charval([num]val);
+Retrurn: [str] 1 byte long string with its first byte of *val* value.
+
 #### Get substring (substr)
     substr([str]string, [num]begin, [num]end);
 Return: [str] substring
