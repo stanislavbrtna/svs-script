@@ -798,7 +798,7 @@ uint16_t execBuiltInCall(builtinCallEnum callId, varType *args,  uint8_t * argTy
           result->type = SVS_TYPE_NUM;
           return 1;
         } else {
-          result->value = (varType) -1;
+          result->value = (varType) (int32_t)-1;
           result->type = SVS_TYPE_NUM;
           return 1;
         }
