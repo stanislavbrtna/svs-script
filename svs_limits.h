@@ -88,7 +88,7 @@ This file contains the main defines and limits of SVS.
 #endif
 
 #ifndef SYSCALL_TABLE_L
-  #define SYSCALL_TABLE_L 100  // kolik různých sys volání může obsahovat jeden vm / max number of different syscalls in one file
+  #define SYSCALL_TABLE_L 128  // kolik různých sys volání může obsahovat jeden vm / max number of different syscalls in one file
 #endif
 
 #ifndef SYSCALL_WRAPPERS
