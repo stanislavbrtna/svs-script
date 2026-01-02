@@ -20,7 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#ifdef CMDLINE
 #define MAIN_SVS
+
 #include "svs.h"
 #include <dirent.h>
 #include <stdio.h>
@@ -30,7 +32,7 @@ char *progname;
 
 void pcBasicWrapInit();
 
-#ifdef CMDLINE
+
 int main(int argc, char *argv[]) {
   svsVM s;
   varRetVal result;
