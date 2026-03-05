@@ -31,7 +31,7 @@ void errSoft(uint8_t *str, svsVM *s) {
   if (errCheck(s)) {
     errSoftPrint(s);
     printf("Another error: %s\n", str);
-    errMsgS((uint8_t *)"errSoft:Double soft error occured!");
+    errMsgS((uint8_t *)"errSoft: Double soft error occured!");
   } else {
     s->err = 1;
     s->errString = (char *) str;

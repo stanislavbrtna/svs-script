@@ -1243,6 +1243,13 @@ uint8_t tokenParse(svsVM *s) {
 
       //definice funkce: kontrola funkční lookup table -> přidání názvu a tokenu do funkční lookup table
       if (strCmp(pracName, (uint8_t *)"function")) {
+
+        if (tokenEofCheck(brCount1, brCount2)) {
+          tokenizerErrorPrintNL((uint8_t *)"tokenParse: Bracket error in the function:");
+          tokenizerErrorPrintNL(s->funcTable[s->funcTableLen].name);
+          return 1;
+        }
+
         setTokenType(posToken, SVS_TOKEN_FUNCTION, s);
         tokenDMSG("Token set, type FUNCTION, name:",
                   posToken,
