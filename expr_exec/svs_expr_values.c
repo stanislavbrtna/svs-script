@@ -135,7 +135,7 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
           return;
         }
 
-        if (arrayIndex.val_s > s->varArray[arrayBase.val_s].val_s) {
+        if (arrayIndex.val_s >= s->varArray[arrayBase.val_s].val_s) {
           errSoft((uint8_t *)"ExprExecLvl5 ARRAY: Array out of bounds!", s);
           errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
           errSoftSetToken(index, s);
