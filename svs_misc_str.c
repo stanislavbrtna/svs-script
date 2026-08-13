@@ -209,6 +209,23 @@ uint8_t strCmp(uint8_t *a, uint8_t *b) {
   return 0;
 }
 
+uint32_t strCp(uint8_t *in, uint8_t *out, uint32_t maxLen) {
+  uint32_t i = 0;
+  while (in[i] != 0) {
+    out[i] = in[i];
+    i++;
+
+    if (i == maxLen) {
+      if(i) out[i - 1] = 0;
+      return i;
+    }
+  }
+
+  out[i] = 0;
+  
+  return i;
+}
+
 
 uint16_t strLenId(uint16_t id, svsVM *s) {
   uint16_t i = 0;

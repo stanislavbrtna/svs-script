@@ -30,7 +30,7 @@ All keywords, variables and functions are case sensitive. Here is a table of all
 | Keyword | Meaning |
 | --- | --- |
 | and | Logical and. |
-| arg0, arg1 ... arg9 | Function arguments. |
+| arg0, arg1 ... arg9 | Legacy function arguments. |
 | array | Initializes array. |
 | break | Breaks the for or while loop. |
 | continue | Continues the loop from its start. |
@@ -44,7 +44,7 @@ All keywords, variables and functions are case sensitive. Here is a table of all
 | or | Logical or. |
 | return | Return from function. |
 | sys | System function call |
-| while | while loop. |
+| while | While loop. |
 
 ### Symbols
 | Symbol | Meaning |
@@ -281,6 +281,11 @@ SVS functions can be called from another SVS function or from the script interpr
       return;
     }
 
+    function add (a, b) {
+      return a + b;
+    }
+
+    # Legacy
     function add {
       return arg0 + arg1;
     }
@@ -292,9 +297,12 @@ Function must contain at least one command or empty command block to be valid.
 Examples of minimal valid functions:
 
     function f1 {}
-    function f2 return arg0 + 2;
+    function f2 (a) return a + 2;
     function f3 b = 2;
 
+Maximum number of function arguments is 10. Function argument identificators can't be used as names for local variables inside the function body.
+
+*Technical note:* Function arguments live on the stack, so can be used for deep recursive operations, that would otherwise deplete the variables memory.
 
 Maximum of functions in one file is limited by FUNCTION_TABLE_L define. Return command and return value are both optional.
 

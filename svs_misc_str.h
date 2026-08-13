@@ -36,6 +36,7 @@ uint8_t strNewStreamPush(uint8_t c,svsVM *s);
 uint16_t strNewStreamEnd(svsVM *s);
 
 uint8_t strCmp(uint8_t *a, uint8_t *b);
+uint32_t strCp(uint8_t *in, uint8_t *out, uint32_t maxLen);
 
 uint16_t strLenId(uint16_t id, svsVM *s);
 

@@ -430,6 +430,31 @@ uint8_t getKeyword(uint8_t *buffer, uint16_t *posText) {
       return 1;
     }
   }
+  buffer[pracStrInd] = 0;
+  return 0;
+}
+
+
+uint8_t whitespaceFilter(uint16_t *posText) {
+  while(1) {
+    if (isRegChar(tokenInput(posText, 0))) {
+      break;
+    } else {
+      if (tokenInput(posText, 0) != ' ' && tokenInput(posText, 0) != '\n') {
+        return 1;
+      }
+    }
+    tokenInput(posText, 1);
+  }
+  return 0;
+}
+
+uint8_t argInTable(uint8_t *pracName, uint8_t argAlias[][15], uint16_t argCount) {
+  for(uint32_t i = 0; i < argCount; i++) {
+    if(strCmp(pracName, argAlias[i])) {
+      return i + 1;
+    }
+  }
   return 0;
 }
 
@@ -449,6 +474,9 @@ uint8_t tokenParse(svsVM *s) {
   uint16_t float_dp = 0;
   uint8_t esc_c_prac = 0;
   uint16_t tokenizer_prev_text;
+
+  uint8_t argAlias[10][NAME_LENGTH] = {0};
+  uint16_t argAliasCount = 0;
 
   tokenizer_prev_text = 1;
 
@@ -1083,14 +1111,21 @@ uint8_t tokenParse(svsVM *s) {
         Lock = 0;
       }
 
-      if (pracName[0] == 'a'
+      uint8_t inArgTable = argInTable(pracName, argAlias, argAliasCount);
+
+      if ((pracName[0] == 'a'
           && pracName[1] == 'r'
           && pracName[2] == 'g'
           && pracName[3] >= '0'
-          && pracName[3] <= '9'
+          && pracName[3] <= '9') || inArgTable
       ) {
         setTokenType(posToken, SVS_TOKEN_ARG, s);
-        setTokenData(posToken, (varType)((uint32_t)(pracName[3] - '0')), s);
+        if (inArgTable) {
+          setTokenData(posToken, (varType)((uint32_t)(inArgTable - 1)), s);
+        } else {
+          setTokenData(posToken, (varType)((uint32_t)(pracName[3] - '0')), s);
+        }
+
         tokenDMSG("Token set, type ARG",
           posToken,
           getTokenData(posToken, s),
@@ -1259,18 +1294,12 @@ uint8_t tokenParse(svsVM *s) {
         Lock = 0;
         //získání názvu funkce:
         //filtrace bordelu
-        while(1) {
-          if (isRegChar(tokenInput(&posText, 0))) {
-            break;
-          } else {
-            if (tokenInput(&posText, 0) != ' ') {
-              tokenizerErrorPrint((uint8_t *)"tokenParse: Undefined symbol after function statement!");
-              //printf("symbol: %c %u\n", tokenInput(&posText, 0), tokenInput(&posText, 0));
-              return 1;
-            }
-          }
-          tokenInput(&posText, 1);
+
+        if (whitespaceFilter(&posText)) {
+          tokenizerErrorPrint((uint8_t *)"tokenParse: Undefined symbol after function statement!");
+          return 1;
         }
+
         //získání názvu funkce
         if (getKeyword(pracName2, &posText)) {
           tokenizerErrorPrint((uint8_t *)"tokenParse: function name too long!");
@@ -1293,6 +1322,54 @@ uint8_t tokenParse(svsVM *s) {
             return 1;
           }
         }
+
+        // get function arguments
+        whitespaceFilter(&posText);
+
+        if (tokenInput(&posText, 0) == '(') {
+          uint32_t i = 0;
+          
+          argAliasCount = 0;
+          for(uint32_t i = 0; i < 10; i++) {
+            argAlias[i][0] = 0;
+          }
+
+          tokenInput(&posText, 1); 
+          do {
+            whitespaceFilter(&posText);
+
+            if (tokenInput(&posText, 0) == ')') {
+              break;
+            }
+            
+            if (getKeyword(pracName2, &posText)) {
+              tokenizerErrorPrint((uint8_t *)"tokenParse: function name too long!");
+              return 1;
+            }
+
+            uint8_t *s = argAlias[i];
+            
+            if(!isRegChar(pracName2[0])) {
+              tokenizerErrorPrint((uint8_t *)"tokenParse: Unsupported character in argument name.");
+              return 1;
+            }
+
+            strCp(pracName2, s, NAME_LENGTH);
+            whitespaceFilter(&posText);
+            
+            if(tokenInput(&posText, 0) == ',') {
+              tokenInput(&posText, 1);
+            }
+            i++;
+            argAliasCount = i;
+            if (i > 9) {
+              tokenizerErrorPrint((uint8_t *)"tokenParse: Too many arguments for a function!");
+              return 1;
+            }
+          } while (tokenInput(&posText, 0) != ')');
+          tokenInput(&posText, 1); 
+        }
+
         tokenDMSG((char *)s->funcTable[s->funcTableLen].name,
                   posToken,
                   getTokenData(posToken, s),
