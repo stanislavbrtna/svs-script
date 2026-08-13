@@ -25,6 +25,7 @@ SOFTWARE.
 
 #include "svs.h"
 #include <dirent.h>
+#include <time.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
