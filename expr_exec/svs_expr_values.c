@@ -110,10 +110,28 @@ void exprExecLvl5(uint16_t index, varRetVal *result, svsVM *s) {
 
     if (result->type == 0) {
       exprExecDMSG("ExprExecLvl5 VAR type NUM", result->value.val_s, result->tokenId, s);
+      if (getTokenType(index + 1, s) == SVS_TOKEN_LSQB) {
+        errSoft((uint8_t *)"ExprExecLvl5 NUM: Not indexable type!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
+        errSoftSetToken(index, s);
+        return;
+      }
     } else if (result->type == 1) {
       exprExecDMSG("ExprExecLvl5 VAR type STR", result->value.val_s, result->tokenId, s);
+      if (getTokenType(index + 1, s) == SVS_TOKEN_LSQB) {
+        errSoft((uint8_t *)"ExprExecLvl5 STR: Not indexable type!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
+        errSoftSetToken(index, s);
+        return;
+      }
     } else if (result->type == 3) {
       exprExecDMSG("ExprExecLvl5 VAR type FLT", result->value.val_s, result->tokenId, s);
+      if (getTokenType(index + 1, s) == SVS_TOKEN_LSQB) {
+        errSoft((uint8_t *)"ExprExecLvl5 FLT: Not indexable type!", s);
+        errSoftSetParam((uint8_t *)"TokenId", (varType)index, s);
+        errSoftSetToken(index, s);
+        return;
+      }
     } else if (result->type == SVS_TYPE_ARR) {
       exprExecDMSG("ExprExecLvl5 VAR type ARRAY", result->value.val_s, result->tokenId, s);
       varType arrayIndex;
