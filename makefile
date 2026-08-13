@@ -33,6 +33,7 @@ test: svs
 	./bin/svs tests/gctest.svs
 	./bin/svs tests/optest.svs
 	./bin/svs tests/optest_arg.svs
+	./bin/svs tests/fn-args.svs
 	./bin/svs tests/array-gc-test.svs
 	./bin/svs tests/import.svs
 	./bin/svs tests/snipplets.svs
