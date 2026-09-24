@@ -1310,18 +1310,25 @@ uint8_t tokenParse(svsVM *s) {
         if (functionExists(pracName2, s)) {
           tokenizerErrorPrint((uint8_t *)"Error: multiple definitions of function!");
           return 1;
-        } else {
-          // add new function
-          if (s->funcTableLen < FUNCTION_TABLE_L) {
-            s->funcTableLen++;
-            s->funcTable[s->funcTableLen].tokenId = posToken + 1; // point token to first token of the function
-            s->funcTable[s->funcTableLen].name = strNewP(pracName2, s);
-            INCREMENT_STATIC_STRINGS
-          } else {
-            tokenizerErrorPrint((uint8_t *)"Error: too many functions!");
-            return 1;
-          }
         }
+
+        // check table len
+        if (s->funcTableLen >= FUNCTION_TABLE_L - 1) {
+          tokenizerErrorPrint((uint8_t *)"Error: too many functions!");
+          return 1;
+        }
+
+        // add new function
+        s->funcTableLen++;
+        s->funcTable[s->funcTableLen].tokenId = posToken + 1; // point token to first token of the function
+        s->funcTable[s->funcTableLen].name = strNewP(pracName2, s);
+        INCREMENT_STATIC_STRINGS
+
+        argAliasCount = 0;
+        for(uint32_t i = 0; i < 10; i++) {
+          argAlias[i][0] = 0;
+        }
+        
 
         // get function arguments
         whitespaceFilter(&posText);
