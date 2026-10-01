@@ -27,8 +27,8 @@ This file contains the main defines and limits of SVS.
 
 /*============================= Versions =====================================*/
 
-#define SVS_VERSION    "1.10.1"
-#define SVS_VERSION_NUM 11010
+#define SVS_VERSION    "1.10.2"
+#define SVS_VERSION_NUM 11020
 
 /*============================= Local Config =================================*/
 
@@ -70,11 +70,11 @@ This file contains the main defines and limits of SVS.
 #endif
 
 #ifndef FUNCTION_TABLE_L
-  #define FUNCTION_TABLE_L 100 // počet funkcí v jednom souboru / max functions in one file
+  #define FUNCTION_TABLE_L 128 // počet funkcí v jednom souboru / max functions in one file
 #endif
 
 #ifndef VAR_TABLE_L
-  #define VAR_TABLE_L 200 // počet promněnných / max number of variables
+  #define VAR_TABLE_L 300 // počet promněnných / max number of variables
 #endif
 
 #define SVS_USE_SEPARATE_STRING_FIELD // when defined, string field must be stored outside of the svm struct
