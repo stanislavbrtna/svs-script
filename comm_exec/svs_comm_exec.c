@@ -27,6 +27,8 @@ This is the main command execution logic.
 
 uint8_t commExDebug;
 
+// Callback from the blocking svs loop to update other things
+void svsCoopCallback();
 
 void setCommExDebug (uint8_t level) {
   commExDebug = level;
@@ -131,6 +133,10 @@ uint16_t commExecLoop(uint16_t index, svsVM *s) {
   uint16_t varTableSP = 0;
   uint8_t newToken;
   varRetVal varPrac;
+
+#ifdef SVS_COOP_CALLBACK
+  svsCoopCallback();
+#endif
 
   varRetValZero(&varPrac);
 

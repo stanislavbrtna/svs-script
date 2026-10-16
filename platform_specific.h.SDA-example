@@ -25,8 +25,8 @@ This file is example of platform specific include file for the SDA_OS
 #ifndef SVS_PLATFORM_H
 #define SVS_PLATFORM_H
 
-#if defined(STM32F405xx)
-#include "../SDA_OS.h"
+#if defined(STM32F407xx) || defined(STM32F7xx) || defined(STM32H743xx)
+#include "../../sda_platform.h"
 #endif
 
 #endif
